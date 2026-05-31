@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prevano — Découvre ce qui t'attend à la retraite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --r:#E24B4A;--rd:#A32D2D;--rl:rgba(226,75,74,0.12);--rim:rgba(226,75,74,0.25);
+  --bg:#0C0C0B;--bg2:#141413;--bg3:#1C1C1A;--bg4:#242422;
+  --t:#F5F4F0;--tm:#A8A79F;--th:#5F5E5A;
+  --border:rgba(255,255,255,0.07);--borderl:rgba(255,255,255,0.12)
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);font-size:15px;line-height:1.6;min-height:100vh}
+
+/* ── Scroll fade-in ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.6s ease,transform 0.6s ease;will-change:opacity,transform}
+.reveal.visible{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .hero-dot,.plan-loading i{animation:none}
+  .bar-fill,.score-ring-fill,.sim-progress-fill,.ripple{transition:none;animation:none}
+}
+
+nav{border-bottom:1px solid var(--border);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1100px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(226,75,74,0.45),0 2px 8px rgba(0,0,0,0.3);flex-shrink:0}
+.logo-icon svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;line-height:1;background:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 10px rgba(226,75,74,0.3))}
+.logo em{font-style:normal;font-weight:900}
+.nav-pill{background:var(--rl);border:1px solid var(--rim);color:var(--r);font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;letter-spacing:0.06em}
+
+.hero{padding:80px 48px 72px;max-width:1100px;margin:0 auto;text-align:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--rl);border:1px solid var(--rim);color:var(--r);font-size:12px;font-weight:700;padding:7px 18px;border-radius:100px;margin-bottom:32px;letter-spacing:0.08em;box-shadow:0 0 24px rgba(226,75,74,0.15)}
+.hero-dot{width:6px;height:6px;background:var(--r);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+.hero h1{font-size:62px;font-weight:900;line-height:1.03;letter-spacing:-0.045em;margin-bottom:20px;color:var(--t)}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,#E24B4A 0%,#FF8C72 55%,#FFB347 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 28px rgba(226,75,74,0.35))}
+.hero-sub{font-size:18px;color:var(--tm);font-weight:300;max-width:500px;margin:0 auto 16px;line-height:1.7}
+.hero-note{font-size:13px;color:var(--th);margin-bottom:56px}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:var(--r);color:#fff;border:none;padding:14px 28px;border-radius:10px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:background-color 0.2s,transform 0.2s;letter-spacing:0.01em;position:relative;overflow:hidden}
+.hero-cta:hover{background:var(--rd);transform:translateY(-2px)}
+.hero-cta i{font-size:18px;transition:transform 0.2s}
+.hero-cta:hover i{transform:translateX(4px)}
+
+.stats-row{display:flex;justify-content:center;gap:48px;margin-top:56px;padding-top:40px;border-top:1px solid var(--border)}
+.stat-item{text-align:center}
+.stat-item .num{font-size:30px;font-weight:900;letter-spacing:-0.04em;color:var(--t)}
+.stat-item .num em{font-style:normal;background:linear-gradient(135deg,#E24B4A 0%,#FF8C72 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-item .lbl{font-size:12px;color:var(--th);margin-top:2px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em}
+
+/* ── Simulator progress bar ── */
+.sim-progress-wrap{margin-bottom:28px}
+.sim-progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sim-progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--th)}
+.sim-progress-count{font-size:12px;font-weight:700;color:var(--r)}
+.sim-progress-track{height:6px;background:var(--bg4);border-radius:100px;overflow:hidden}
+.sim-progress-fill{height:100%;background:linear-gradient(90deg,var(--r),#FF7B6B);border-radius:100px;transform:scaleX(0);transform-origin:left;transition:transform 0.4s cubic-bezier(.25,.8,.25,1);will-change:transform}
+
+.sim-section{padding:0 48px 64px;max-width:1100px;margin:0 auto}
+.sim-wrap{background:var(--bg2);border:1px solid var(--borderl);border-radius:20px;padding:40px;max-width:680px;margin:0 auto}
+.sim-header{text-align:center;margin-bottom:32px}
+.sim-header h2{font-size:25px;font-weight:900;letter-spacing:-0.04em;margin-bottom:6px;color:var(--t)}
+.sim-header p{font-size:14px;color:var(--tm)}
+.sim-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.field label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--th);margin-bottom:8px;display:block}
+.field input,.field select{width:100%;padding:13px 16px;border-radius:10px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:15px;color:var(--t);background:var(--bg3);outline:none;transition:border-color 0.2s,background-color 0.2s}
+.field input:focus,.field select:focus{border-color:var(--r);background:var(--bg4)}
+.field input.filled,.field select.filled{border-color:rgba(226,75,74,0.4)}
+.field input::placeholder{color:var(--th)}
+.field select option{background:var(--bg3);color:var(--t)}
+
+/* ── Ripple button ── */
+.btn-primary{width:100%;padding:15px;background:var(--r);color:#fff;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:background-color 0.2s,transform 0.2s,opacity 0.2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:0.01em;position:relative;overflow:hidden}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none!important}
+.btn-primary:hover{background:var(--rd);transform:translateY(-1px)}
+.btn-primary:active{transform:scale(0.98)}
+.btn-primary i{font-size:18px;transition:transform 0.2s}
+.btn-primary:hover i{transform:translateX(4px)}
+
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.35);transform:scale(0);animation:ripple-anim 0.55s linear;pointer-events:none}
+@keyframes ripple-anim{to{transform:scale(4);opacity:0}}
+
+.shock{display:none;padding:0 48px 64px;max-width:1100px;margin:0 auto}
+.shock-banner{background:var(--rl);border:1px solid var(--rim);border-radius:16px;padding:28px 32px;text-align:center;margin-bottom:32px}
+.shock-banner h2{font-size:38px;font-weight:900;letter-spacing:-0.045em;color:var(--t);margin-bottom:6px}
+.shock-banner h2 em{font-style:normal;background:linear-gradient(135deg,#E24B4A 0%,#FF8C72 55%,#FFB347 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(226,75,74,0.4))}
+.shock-banner p{font-size:15px;color:var(--tm)}
+.shock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.shock-stat{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px;text-align:center}
+.shock-stat.accent{background:var(--rl);border-color:var(--rim)}
+.shock-stat .val{font-size:26px;font-weight:900;letter-spacing:-0.03em;color:var(--t);margin-bottom:4px}
+.shock-stat.accent .val{color:var(--r)}
+.shock-stat .lbl{font-size:11px;color:var(--th);font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
+
+/* ── Score de préparation ── */
+.score-card{background:var(--bg2);border:1px solid var(--borderl);border-radius:14px;padding:28px;margin-bottom:28px;text-align:center}
+.score-label{font-size:11px;font-weight:700;color:var(--th);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px}
+.score-ring-wrap{display:inline-flex;flex-direction:column;align-items:center;gap:12px}
+.score-ring{position:relative;width:120px;height:120px}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring-bg{fill:none;stroke:var(--bg4);stroke-width:10}
+.score-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.25,.8,.25,1),stroke 0.4s}
+.score-value{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.score-num{font-size:30px;font-weight:900;letter-spacing:-0.04em}
+.score-max{font-size:12px;color:var(--th);font-weight:500;margin-top:2px}
+.score-badge{font-size:13px;font-weight:700;padding:5px 14px;border-radius:100px;letter-spacing:0.04em}
+.score-badge.bad{background:rgba(226,75,74,0.15);color:var(--r)}
+.score-badge.mid{background:rgba(255,180,0,0.15);color:#FFB400}
+.score-badge.good{background:rgba(34,197,94,0.15);color:#22C55E}
+.score-tip{font-size:13px;color:var(--tm);margin-top:10px;max-width:340px;line-height:1.55}
+
+.bar-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:28px}
+.bar-card h3{font-size:11px;font-weight:700;color:var(--th);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px}
+.bar-track{background:var(--bg4);border-radius:8px;height:44px;overflow:hidden;display:flex}
+.bar-fill{background:var(--r);height:100%;transition:width 0.9s cubic-bezier(.25,.8,.25,1);display:flex;align-items:center;justify-content:flex-end;padding-right:12px;min-width:60px}
+.bar-fill span{font-size:13px;font-weight:700;color:#fff;white-space:nowrap}
+.bar-rest{flex:1;display:flex;align-items:center;padding-left:12px}
+.bar-rest span{font-size:12px;color:var(--th);white-space:nowrap}
+.bar-legend{display:flex;gap:20px;margin-top:12px}
+.leg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tm)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+
+.plan-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:28px}
+.plan-card h3{font-size:11px;font-weight:700;color:var(--th);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:20px}
+.plan-loading{display:flex;align-items:center;gap:10px;color:var(--tm);font-size:14px;padding:12px 0}
+.plan-loading i{color:var(--r);font-size:18px;animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.plan-steps{display:flex;flex-direction:column;gap:12px}
+.plan-step{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start;transition:border-color 0.2s;opacity:0;transform:translateY(10px);animation:stepIn 0.4s ease forwards}
+@keyframes stepIn{to{opacity:1;transform:none}}
+.plan-step:hover{border-color:var(--rim)}
+.step-num{width:28px;height:28px;background:var(--r);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.step-content h4{font-size:14px;font-weight:600;margin-bottom:3px;color:var(--t)}
+.step-content p{font-size:13px;color:var(--tm);line-height:1.55}
+
+.email-cta{background:var(--bg2);border:1px solid var(--borderl);border-radius:16px;padding:40px;text-align:center}
+.email-cta h3{font-size:26px;font-weight:900;letter-spacing:-0.04em;color:var(--t);margin-bottom:8px}
+.email-cta p{font-size:14px;color:var(--tm);margin-bottom:28px;line-height:1.65}
+.email-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.email-input{padding:13px 18px;border-radius:10px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:14px;width:270px;outline:none;color:var(--t);background:var(--bg3);transition:border-color 0.2s}
+.email-input:focus{border-color:var(--r)}
+.email-input::placeholder{color:var(--th)}
+.btn-email{background:var(--r);color:#fff;border:none;padding:13px 24px;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background-color 0.2s,transform 0.2s;display:flex;align-items:center;gap:6px;position:relative;overflow:hidden}
+.btn-email:hover{background:var(--rd);transform:translateY(-1px)}
+.btn-email:active{transform:scale(0.98)}
+.email-note{font-size:11px;color:var(--th);margin-top:14px}
+
+/* ── Confetti canvas ── */
+#confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+
+@media(max-width:640px){
+  nav{padding:0 20px}
+  .hero{padding:56px 20px 48px}
+  .hero h1{font-size:38px;letter-spacing:-0.04em}
+  .hero-sub{font-size:16px}
+  .stats-row{gap:24px}
+  .stat-item .num{font-size:22px}
+  .sim-section,.shock{padding-left:20px;padding-right:20px}
+  .sim-wrap{padding:24px}
+  .sim-row{grid-template-columns:1fr}
+  .shock-grid{grid-template-columns:1fr}
+  .shock-banner h2{font-size:26px}
+  .email-cta{padding:28px 20px}
+  .email-row{flex-direction:column;align-items:stretch}
+  .email-input{width:100%}
+  .btn-email{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+        </svg>
+      </div>
+      <div class="logo" translate="no">Pre<em>vano</em></div>
+    </div>
+    <div class="nav-pill">BETA</div>
+  </div>
+</nav>
+
+<div class="hero reveal">
+  <div class="hero-eyebrow"><span class="hero-dot"></span> Simulateur de retraite</div>
+  <h1>Ce que tu toucheras à la retraite<br><em>va te surprendre.</em></h1>
+  <p class="hero-sub">Calcule en 60 secondes le montant exact de ta pension — et ce que tu dois faire maintenant pour l'améliorer.</p>
+  <p class="hero-note">Gratuit · Aucune inscription requise · Résultat immédiat</p>
+  <button class="hero-cta" onclick="document.getElementById('simulator').scrollIntoView({behavior:'smooth'})">
+    Calculer ma retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
+  </button>
+  <div class="stats-row">
+    <div class="stat-item"><div class="num"><em>-63%</em></div><div class="lbl">Perte de revenu moyenne</div></div>
+    <div class="stat-item"><div class="num">60s</div><div class="lbl">Pour voir ton résultat</div></div>
+    <div class="stat-item"><div class="num"><em>3</em></div><div class="lbl">Actions concrètes générées</div></div>
+  </div>
+</div>
+
+<div class="sim-section reveal" id="simulator">
+  <div class="sim-wrap">
+    <div class="sim-header">
+      <h2>Ton simulateur personnalisé</h2>
+      <p>Remplis les 5 champs ci-dessous pour obtenir ta projection</p>
+    </div>
+    <!-- Progress bar -->
+    <div class="sim-progress-wrap">
+      <div class="sim-progress-header">
+        <span class="sim-progress-label">Progression</span>
+        <span class="sim-progress-count" id="progress-count">0 / 5</span>
+      </div>
+      <div class="sim-progress-track">
+        <div class="sim-progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+    <div class="sim-row">
+      <div class="field">
+        <label>Ton âge actuel</label>
+        <input type="number" id="age" placeholder="25" min="18" max="50">
+      </div>
+      <div class="field">
+        <label>Salaire net mensuel (€)</label>
+        <input type="number" id="salaire" placeholder="2 300" min="1000">
+      </div>
+    </div>
+    <div class="sim-row">
+      <div class="field">
+        <label>Épargne mensuelle (€)</label>
+        <input type="number" id="epargne" placeholder="200" min="0">
+      </div>
+      <div class="field">
+        <label>Âge de départ souhaité</label>
+        <input type="number" id="depart" placeholder="64" min="60" max="70">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:20px">
+      <label>Statut professionnel</label>
+      <select id="statut">
+        <option value="" disabled selected>Choisir...</option>
+        <option value="prive">Salarié secteur privé</option>
+        <option value="fonctionnaire">Fonctionnaire</option>
+        <option value="independant">Indépendant / Freelance</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="simulate()">
+      Voir ma projection retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
+
+<div class="shock" id="shock-section">
+  <div class="shock-banner reveal">
+    <h2 id="shock-headline">Tu toucheras <em id="shock-pension">847€</em>/mois à la retraite.</h2>
+    <p id="shock-sub">Soit 63% de moins que ton salaire actuel.</p>
+  </div>
+  <div class="shock-grid reveal">
+    <div class="shock-stat">
+      <div class="val" id="stat-salaire">—</div>
+      <div class="lbl">Salaire actuel / mois</div>
+    </div>
+    <div class="shock-stat accent">
+      <div class="val" id="stat-pension">—</div>
+      <div class="lbl">Pension estimée / mois</div>
+    </div>
+    <div class="shock-stat accent">
+      <div class="val" id="stat-gap">—</div>
+      <div class="lbl">Manque à gagner / mois</div>
+    </div>
+  </div>
+
+  <!-- Score de préparation -->
+  <div class="score-card reveal" id="score-card">
+    <div class="score-label">Score de préparation retraite</div>
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle class="score-ring-bg" cx="60" cy="60" r="50"/>
+          <circle class="score-ring-fill" id="score-ring-fill" cx="60" cy="60" r="50"
+            stroke-dasharray="314" stroke-dashoffset="314"/>
+        </svg>
+        <div class="score-value">
+          <span class="score-num" id="score-num">0</span>
+          <span class="score-max">/100</span>
+        </div>
+      </div>
+      <span class="score-badge" id="score-badge"></span>
+    </div>
+    <p class="score-tip" id="score-tip"></p>
+  </div>
+
+  <div class="bar-card reveal">
+    <h3>Répartition de tes revenus à la retraite</h3>
+    <div class="bar-track">
+      <div class="bar-fill" id="bar-fill" style="width:37%"><span id="bar-pension-label">847€</span></div>
+      <div class="bar-rest"><span id="bar-gap-label">Il manque 1 453€</span></div>
+    </div>
+    <div class="bar-legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--r)"></div>Pension retraite</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--bg4)"></div>Manque à gagner</div>
+    </div>
+  </div>
+  <div class="plan-card reveal">
+    <h3>Ton plan d'action personnalisé</h3>
+    <div class="plan-loading" id="plan-loading">
+      <i class="ti ti-loader-2" aria-hidden="true"></i> Génération de ton plan en cours...
+    </div>
+    <div class="plan-steps" id="plan-steps" style="display:none"></div>
+  </div>
+  <div class="email-cta reveal">
+    <h3>Reçois ton plan complet.</h3>
+    <p>Projections détaillées, stratégies d'épargne et alertes personnalisées —<br>dès le lancement de Prevano.</p>
+    <div class="email-row">
+      <input class="email-input" type="email" placeholder="ton@email.com" id="user-email">
+      <button class="btn-email" onclick="submitEmail()">
+        M'envoyer le plan <i class="ti ti-send" aria-hidden="true"></i>
+      </button>
+    </div>
+    <p class="email-note">Aucun spam. Uniquement ton plan Prevano.</p>
+  </div>
+</div>
+
+<script>
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); revealObserver.unobserve(e.target); }});
+}, {threshold: 0.12});
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ── Ripple — event delegation so it works on all buttons incl. dynamically shown ones ── */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-primary:not(:disabled),.btn-email,.hero-cta');
+  if (!btn) return;
+  const r = btn.getBoundingClientRect();
+  const size = Math.max(r.width, r.height);
+  const rip = document.createElement('span');
+  rip.className = 'ripple';
+  rip.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-r.left-size/2}px;top:${e.clientY-r.top-size/2}px`;
+  btn.appendChild(rip);
+  rip.addEventListener('animationend', () => rip.remove(), {once:true});
+});
+
+/* ── Progress bar (scaleX = GPU layer, no layout reflow) ── */
+const simFields = ['age','salaire','epargne','depart','statut'];
+const progressFill = document.getElementById('progress-fill');
+const progressCount = document.getElementById('progress-count');
+function updateProgress() {
+  const filled = simFields.reduce((n,id) => n + (document.getElementById(id)?.value ? 1 : 0), 0);
+  progressFill.style.transform = `scaleX(${filled / simFields.length})`;
+  progressCount.textContent = filled + ' / ' + simFields.length;
+}
+simFields.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const update = () => { el.classList.toggle('filled', !!el.value); updateProgress(); };
+  el.addEventListener('input', update);
+  el.addEventListener('change', update);
+});
+
+/* ── Confetti (cancelable, pauses when tab hidden) ── */
+let confettiRaf = null;
+function launchConfetti() {
+  if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  if (confettiRaf) { cancelAnimationFrame(confettiRaf); confettiRaf = null; }
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ['#E24B4A','#FF7B6B','#FFB400','#22C55E','#60A5FA','#F5F4F0'];
+  const particles = Array.from({length:120}, () => ({
+    x: Math.random() * canvas.width,
+    y: -10 - Math.random() * 40,
+    r: 4 + Math.random() * 5,
+    d: 1.5 + Math.random() * 2.5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    tilt: Math.random() * 10 - 5,
+    tiltSpeed: 0.1 + Math.random() * 0.15,
+    angle: 0,
+    shape: Math.random() > 0.5 ? 'rect' : 'circle'
+  }));
+  let frame = 0;
+  const maxFrames = 180;
+  const alpha0 = 1;
+  function draw() {
+    if (document.hidden) { confettiRaf = requestAnimationFrame(draw); return; }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const alpha = Math.max(0, alpha0 - frame / maxFrames);
+    ctx.globalAlpha = alpha;
+    particles.forEach(p => {
+      p.y += p.d; p.x += Math.sin(p.angle) * 1.2; p.angle += 0.04; p.tilt += p.tiltSpeed;
+      ctx.fillStyle = p.color;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.tilt * Math.PI / 180);
+      if (p.shape === 'rect') ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r * 0.6);
+      else { ctx.beginPath(); ctx.arc(0, 0, p.r/2, 0, Math.PI*2); ctx.fill(); }
+      ctx.restore();
+    });
+    frame++;
+    if (frame < maxFrames) confettiRaf = requestAnimationFrame(draw);
+    else { ctx.clearRect(0, 0, canvas.width, canvas.height); confettiRaf = null; }
+  }
+  draw();
+}
+
+/* ── Score ── */
+function computeScore(age, sal, pension, ep, annees, statut) {
+  let s = Math.round((pension/sal)*40);
+  s += Math.min(Math.round((ep/sal)*300), 30);
+  s += Math.min(Math.round(annees/43*20), 20);
+  s += statut==='fonctionnaire' ? 10 : statut==='prive' ? 5 : 0;
+  return Math.min(Math.max(s, 5), 100);
+}
+
+function renderScore(score) {
+  const fill = document.getElementById('score-ring-fill');
+  const badge = document.getElementById('score-badge');
+  const num = document.getElementById('score-num');
+  const tip = document.getElementById('score-tip');
+  const [color, cls, label, tipText] = score < 35
+    ? ['#E24B4A','bad','Situation critique','Ton niveau d\'épargne actuel ne compensera pas le manque à la retraite. Il est urgent d\'agir dès maintenant.']
+    : score < 65
+    ? ['#FFB400','mid','À améliorer','Tu as une base correcte, mais quelques ajustements maintenant feront une grande différence dans 20 ans.']
+    : ['#22C55E','good','Bonne trajectoire','Tu es sur la bonne voie. Continue et optimise ton allocation pour sécuriser encore mieux ton avenir.'];
+  fill.style.stroke = color;
+  fill.style.strokeDashoffset = 314 - (score/100)*314;
+  badge.className = 'score-badge ' + cls;
+  badge.textContent = label;
+  tip.textContent = tipText;
+  const start = performance.now();
+  const duration = 900;
+  (function tick(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1-t, 3);
+    num.textContent = Math.round(ease * score);
+    num.style.color = color;
+    if (t < 1) requestAnimationFrame(tick);
+  })(start);
+}
+
+function fmt(n){return Math.round(n).toLocaleString('fr-FR')+'€'}
+
+function simulate(){
+  const age=parseInt(document.getElementById('age').value);
+  const sal=parseInt(document.getElementById('salaire').value);
+  const ep=parseInt(document.getElementById('epargne').value)||0;
+  const dep=parseInt(document.getElementById('depart').value);
+  const statut=document.getElementById('statut').value;
+  if(!age||!sal||!dep||!statut){alert('Merci de remplir tous les champs.');return;}
+  const annees=dep-age;
+  let taux=0;
+  if(statut==='prive') taux=0.35+Math.min(annees/43,1)*0.15;
+  else if(statut==='fonctionnaire') taux=0.55+Math.min(annees/41.5,1)*0.2;
+  else taux=0.25+Math.min(annees/43,1)*0.1;
+  const pension=Math.round(sal*taux);
+  const gap=sal-pension;
+  const pctGap=Math.round((1-pension/sal)*100);
+  const barW=Math.max(Math.round((pension/sal)*100),5);
+
+  const btn = document.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Calcul en cours...';
+
+  document.getElementById('shock-headline').innerHTML='Tu toucheras <em>'+fmt(pension)+'</em>/mois à la retraite.';
+  document.getElementById('shock-sub').textContent='Soit '+pctGap+'% de moins que ton salaire actuel. Voilà ce que ça signifie concrètement.';
+  document.getElementById('stat-salaire').textContent=fmt(sal)+'/mois';
+  document.getElementById('stat-pension').textContent=fmt(pension)+'/mois';
+  document.getElementById('stat-gap').textContent='-'+fmt(gap)+'/mois';
+  document.getElementById('bar-fill').style.width=barW+'%';
+  document.getElementById('bar-pension-label').textContent=fmt(pension);
+  document.getElementById('bar-gap-label').textContent='Il manque '+fmt(gap);
+
+  const shock=document.getElementById('shock-section');
+  shock.style.display='block';
+  shock.querySelectorAll('.reveal').forEach(el => { el.classList.remove('visible'); revealObserver.observe(el); });
+
+  setTimeout(()=>{
+    shock.scrollIntoView({behavior:'smooth',block:'start'});
+    launchConfetti();
+    renderScore(computeScore(age, sal, pension, ep, annees, statut));
+    btn.disabled = false;
+    btn.innerHTML = 'Voir ma projection retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+  }, 150);
+
+  generatePlan(age,sal,pension,gap,ep,annees,statut);
+}
+
+async function generatePlan(age,sal,pension,gap,ep,annees,statut){
+  document.getElementById('plan-loading').style.display='flex';
+  document.getElementById('plan-steps').style.display='none';
+  const label={prive:'salarié du privé',fonctionnaire:'fonctionnaire',independant:'indépendant/freelance'}[statut];
+  const prompt='Tu es expert retraite France. Un(e) '+label+' de '+age+' ans, '+sal+'€ nets/mois, épargne '+ep+'€/mois, touchera ~'+pension+'€/mois à la retraite (manque: '+gap+'€/mois, '+annees+' ans devant lui/elle). Génère EXACTEMENT 3 actions concrètes et chiffrées. JSON uniquement:\n{"steps":[{"title":"Titre court","desc":"1-2 phrases concrètes chiffrées."},{"title":"...","desc":"..."},{"title":"...","desc":"..."}]}';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})});
+    const data=await resp.json();
+    const text=data.content.find(c=>c.type==='text')?.text||'';
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+    const container=document.getElementById('plan-steps');
+    container.innerHTML='';
+    parsed.steps.forEach((s,i) => {
+      const step=document.createElement('div'); step.className='plan-step'; step.style.animationDelay=i*0.12+'s';
+      const numEl=document.createElement('div'); numEl.className='step-num'; numEl.textContent=i+1;
+      const content=document.createElement('div'); content.className='step-content';
+      const h4=document.createElement('h4'); h4.textContent=s.title;
+      const p=document.createElement('p'); p.textContent=s.desc;
+      content.append(h4,p); step.append(numEl,content); container.appendChild(step);
+    });
+    document.getElementById('plan-loading').style.display='none';
+    container.style.display='flex';
+  }catch(e){
+    document.getElementById('plan-loading').innerHTML='<span style="color:var(--tm);font-size:13px">Plan disponible au lancement de Prevano.</span>';
+  }
+}
+
+function submitEmail(){
+  const v=document.getElementById('user-email').value;
+  if(v&&v.includes('@')){
+    window.open('https://e1966e2e.sibforms.com/serve/MUIFAOKeyQAhd7aThpwc95y3ddkMyDgzYfLi_BZwCued7LJpHkCH2Io9vTXExUxgZO0qv8f-g4ho7h9GqgsvY9IQ7X7Fxzt0rUNsvW7hHkVp2e7uOnz1jm92tPscAG1Wirbw_o5NMVxC7OEK4sCSA8E-y2-GisBN3qoiMhPcfmizSh6UHTdIukQ2mue3RuoxBUgbFFUj7Y1nviUWLw==','_blank');
+  } else {alert('Merci d\'entrer un email valide.');}
+}
+</script>
+</body>
+</html>
