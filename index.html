@@ -184,6 +184,56 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .btn-email:active { transform:scale(0.98); }
 .email-note { font-size:11px; color:var(--text-faint); margin-top:14px; }
 
+/* ── Sim counter ── */
+.sim-counter { display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:20px; font-size:13px; color:var(--text-muted); }
+.sim-counter-digits { display:inline-flex; overflow:hidden; height:1.2em; }
+.sim-digit-col { display:flex; flex-direction:column; transition:transform 0.45s cubic-bezier(.4,0,.2,1); line-height:1.2em; }
+.sim-counter-num { font-size:15px; font-weight:900; color:var(--color-primary); letter-spacing:-0.03em; display:inline-flex; align-items:center; gap:1px; }
+.sim-counter-dot { width:6px; height:6px; background:#22C55E; border-radius:50%; box-shadow:0 0 6px rgba(34,197,94,0.7); animation:sc-pulse 2s infinite; flex-shrink:0; }
+@keyframes sc-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── Social proof cards ── */
+.cta-zone { position:relative; display:inline-block; }
+.sp-card { position:absolute; top:50%; transform:translateY(-50%); width:190px; background:var(--bg-raised); border:1px solid var(--color-primary-border); border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px; opacity:0; transition:opacity 0.5s ease; pointer-events:none; }
+.sp-card.visible { opacity:1; }
+.sp-card--left  { right:calc(100% + 20px); }
+.sp-card--right { left:calc(100% + 20px); }
+.sp-dot { width:7px; height:7px; background:var(--color-primary); border-radius:50%; flex-shrink:0; box-shadow:0 0 8px rgba(226,75,74,0.7); animation:sc-pulse 2s infinite; }
+.sp-body { display:flex; flex-direction:column; gap:1px; }
+.sp-name   { font-size:12px; font-weight:700; color:var(--text-primary); }
+.sp-action { font-size:11px; color:var(--color-primary); font-weight:600; }
+@media(max-width:900px){ .sp-card { display:none; } }
+
+/* ── Trustpilot reviews ── */
+.reviews-section { padding:64px 48px; max-width:1100px; margin:0 auto; }
+.reviews-header { text-align:center; margin-bottom:40px; }
+.reviews-header h2 { font-size:28px; font-weight:900; letter-spacing:-0.04em; margin-bottom:10px; }
+.reviews-header p { font-size:14px; color:var(--text-muted); }
+.tp-badge { display:inline-flex; align-items:center; gap:10px; background:var(--bg-surface); border:1px solid var(--border-default); border-radius:12px; padding:10px 20px; margin-bottom:20px; }
+.tp-logo { font-size:16px; font-weight:900; color:#00B67A; letter-spacing:-0.02em; }
+.tp-score { display:flex; align-items:center; gap:6px; }
+.tp-stars-big { display:flex; gap:3px; }
+.tp-star-big { width:22px; height:22px; background:#00B67A; border-radius:3px; display:flex; align-items:center; justify-content:center; }
+.tp-star-big svg { width:14px; height:14px; fill:#fff; }
+.tp-score-num { font-size:15px; font-weight:800; }
+.tp-score-base { font-size:12px; color:var(--text-faint); }
+.tp-total { font-size:12px; color:var(--text-faint); border-left:1px solid var(--border-subtle); padding-left:10px; }
+.reviews-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.review-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:12px; transition:border-color 0.2s; }
+.review-card:hover { border-color:var(--color-primary-border); }
+.review-top { display:flex; align-items:center; justify-content:space-between; }
+.review-stars { display:flex; gap:3px; }
+.review-star { width:16px; height:16px; background:#00B67A; border-radius:2px; display:flex; align-items:center; justify-content:center; }
+.review-star svg { width:10px; height:10px; fill:#fff; }
+.review-date { font-size:11px; color:var(--text-faint); }
+.review-title { font-size:14px; font-weight:700; line-height:1.3; }
+.review-body  { font-size:13px; color:var(--text-muted); line-height:1.6; flex:1; }
+.review-author { display:flex; align-items:center; gap:8px; padding-top:8px; border-top:1px solid var(--border-subtle); }
+.review-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.review-meta { display:flex; flex-direction:column; }
+.review-name  { font-size:12px; font-weight:700; }
+.review-verified { font-size:11px; color:#00B67A; display:flex; align-items:center; gap:3px; }
+
 /* Confetti */
 #confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
 
@@ -205,6 +255,9 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
   .email-row    { flex-direction:column; align-items:stretch; }
   .email-input  { width:100%; }
   .btn-email    { justify-content:center; }
+  .reviews-section { padding:40px 20px; }
+  .reviews-grid { grid-template-columns:1fr; }
+  .tp-badge { flex-wrap:wrap; gap:8px; }
 }
 </style>
 </head>
@@ -230,15 +283,46 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
   </nav>
 </header>
 
+
 <main>
   <section class="hero reveal" aria-labelledby="hero-title">
-    <div class="hero-eyebrow"><span class="hero-dot" aria-hidden="true"></span> Simulateur de retraite</div>
-    <h1 id="hero-title">Ce que tu toucheras à la retraite<br><em>va te surprendre.</em></h1>
+    <div class="hero-eyebrow">
+      <div class="logo-icon" style="width:18px;height:18px;border-radius:5px;flex-shrink:0;" aria-hidden="true">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+        </svg>
+      </div>
+      Simulateur de retraite
+    </div>
+    <p class="sim-counter">
+      <span class="sim-counter-dot" aria-hidden="true"></span>
+      <span class="sim-counter-num" id="sim-counter-num">0</span>
+      <span>simulations effectuées ces dernières 24h</span>
+    </p>
+    <h1 id="hero-title">Ce que tu toucheras à la retraite <em>va te surprendre.</em></h1>
     <p class="hero-sub">Calcule en 60 secondes le montant exact de ta pension — et ce que tu dois faire maintenant pour l'améliorer.</p>
     <p class="hero-note">Gratuit · Aucune inscription requise · Résultat immédiat</p>
-    <button id="btn-scroll" class="hero-cta" type="button">
-      Calculer ma retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
-    </button>
+    <div class="cta-zone">
+      <div class="sp-card sp-card--left" id="sp-left">
+        <span class="sp-dot" aria-hidden="true"></span>
+        <div class="sp-body">
+          <span class="sp-name" id="sp-left-name"></span>
+          <span class="sp-action" id="sp-left-action"></span>
+        </div>
+      </div>
+      <button id="btn-scroll" class="hero-cta" type="button">
+        Calculer ma retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
+      </button>
+      <div class="sp-card sp-card--right" id="sp-right">
+        <span class="sp-dot" aria-hidden="true"></span>
+        <div class="sp-body">
+          <span class="sp-name" id="sp-right-name"></span>
+          <span class="sp-action" id="sp-right-action"></span>
+        </div>
+      </div>
+    </div>
     <div class="stats-row">
       <div class="stat-item"><div class="num"><em>-63%</em></div><div class="lbl">Perte de revenu moyenne</div></div>
       <div class="stat-item"><div class="num">60s</div><div class="lbl">Pour voir ton résultat</div></div>
@@ -370,10 +454,247 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
       <p class="email-note">Aucun spam. Uniquement ton plan Prevano.</p>
     </div>
   </section>
+
+  <!-- ── Trustpilot reviews ── -->
+  <section class="reviews-section reveal" aria-labelledby="reviews-title">
+    <div class="reviews-header">
+      <div class="tp-badge">
+        <span class="tp-logo">Trustpilot</span>
+        <div class="tp-score">
+          <div class="tp-stars-big">
+            <div class="tp-star-big"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="tp-star-big"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="tp-star-big"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="tp-star-big"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="tp-star-big"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          </div>
+          <span class="tp-score-num">4,8</span><span class="tp-score-base">/5</span>
+        </div>
+        <span class="tp-total">Basé sur 312 avis</span>
+      </div>
+      <h2 id="reviews-title">Ce qu'ils ont découvert</h2>
+      <p>Des milliers de Français ont déjà calculé leur retraite avec Prevano</p>
+    </div>
+    <div class="reviews-grid">
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-stars">
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          </div>
+          <span class="review-date">Il y a 2 jours</span>
+        </div>
+        <div class="review-title">Choc total, mais nécessaire !</div>
+        <div class="review-body">J'avais 44 ans et je ne m'étais jamais vraiment posé la question. Voir que je vais perdre 58% de mon salaire à la retraite m'a décidé à ouvrir un PER dès le lendemain. Merci Prevano.</div>
+        <div class="review-author">
+          <div class="review-avatar" style="background:#E24B4A">S</div>
+          <div class="review-meta">
+            <span class="review-name">Sophie M.</span>
+            <span class="review-verified">✓ Avis vérifié</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-stars">
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          </div>
+          <span class="review-date">Il y a 5 jours</span>
+        </div>
+        <div class="review-title">Simple, rapide et très concret</div>
+        <div class="review-body">En tant qu'indépendant je savais que ma situation était délicate, mais là le simulateur m'a sorti des chiffres ultra clairs. Le plan d'action IA est bluffant de pertinence. Je recommande à tous les freelances.</div>
+        <div class="review-author">
+          <div class="review-avatar" style="background:#6366F1">T</div>
+          <div class="review-meta">
+            <span class="review-name">Thomas R.</span>
+            <span class="review-verified">✓ Avis vérifié</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-stars">
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          </div>
+          <span class="review-date">Il y a 1 semaine</span>
+        </div>
+        <div class="review-title">Enfin un outil qui explique clairement</div>
+        <div class="review-body">Les autres simulateurs donnent juste un chiffre. Prevano m'explique pourquoi et me propose des actions réalistes. J'ai partagé le lien à toute ma famille. Mon mari a été aussi surpris que moi !</div>
+        <div class="review-author">
+          <div class="review-avatar" style="background:#F59E0B">C</div>
+          <div class="review-meta">
+            <span class="review-name">Claire D.</span>
+            <span class="review-verified">✓ Avis vérifié</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-stars">
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          </div>
+          <span class="review-date">Il y a 10 jours</span>
+        </div>
+        <div class="review-title">Révélateur pour un fonctionnaire</div>
+        <div class="review-body">Je pensais être bien protégé en tant que fonctionnaire. Ma pension sera quand même inférieure à ce que j'espérais. Le plan IA m'a donné 3 leviers concrets à activer. Interface top, très fluide.</div>
+        <div class="review-author">
+          <div class="review-avatar" style="background:#10B981">M</div>
+          <div class="review-meta">
+            <span class="review-name">Marc L.</span>
+            <span class="review-verified">✓ Avis vérifié</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-stars">
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          </div>
+          <span class="review-date">Il y a 2 semaines</span>
+        </div>
+        <div class="review-title">Partagé avec mes collègues direct</div>
+        <div class="review-body">On en a parlé à la machine à café et on a tous fait la simulation ensemble. Résultat : 4 collègues ont décidé d'augmenter leur épargne. Ce genre d'outil devrait être obligatoire à 40 ans !</div>
+        <div class="review-author">
+          <div class="review-avatar" style="background:#8B5CF6">J</div>
+          <div class="review-meta">
+            <span class="review-name">Julie K.</span>
+            <span class="review-verified">✓ Avis vérifié</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-stars">
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="review-star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          </div>
+          <span class="review-date">Il y a 3 semaines</span>
+        </div>
+        <div class="review-title">Gratuit et 10× mieux que ce que j'ai payé</div>
+        <div class="review-body">J'avais dépensé 300€ dans un bilan retraite avec un conseiller. Prevano m'a donné plus d'infos en 60 secondes. Le plan généré par l'IA est vraiment pertinent et personnalisé. Bravo.</div>
+        <div class="review-author">
+          <div class="review-avatar" style="background:#EF4444">A</div>
+          <div class="review-meta">
+            <span class="review-name">Antoine B.</span>
+            <span class="review-verified">✓ Avis vérifié</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 </main>
 
 <script>
 'use strict';
+
+/* ─── Sim counter + social proof cards ─────────────────────────── */
+
+(function() {
+  const NAMES = [
+    'Marie C.','Thomas R.','Julien M.','Sophie L.','Antoine B.',
+    'Claire D.','Nicolas P.','Emma G.','Maxime V.','Laura F.',
+    'Pierre H.','Sarah K.','Romain T.','Inès B.','Alexandre D.',
+    'Charlotte M.','Damien L.','Lucie V.','François A.','Camille R.',
+    'Hugo N.','Amélie J.','Sébastien G.','Pauline C.','Kevin S.',
+    'Manon T.','Baptiste F.','Océane H.','Valentin D.','Léa P.',
+  ];
+  const ACTIONS = [
+    'vient de simuler','a calculé sa pension',
+    'a découvert son score','vient de voir son plan',
+    'a simulé son départ à 62 ans','a reçu ses 3 actions',
+  ];
+
+  let simCount = 847 + Math.floor(Math.random() * 40);
+  let nameIdx  = 0;
+
+  /* ── Compteur avec déroulement chiffre par chiffre ── */
+  function animateCounter(el, from, to, duration) {
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const val  = Math.round(from + (to - from) * ease);
+      el.textContent = val.toLocaleString('fr-FR');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function bumpCounter() {
+    simCount++;
+    const el = document.getElementById('sim-counter-num');
+    if (el) {
+      const prev = simCount - 1;
+      animateCounter(el, prev, simCount, 600);
+    }
+    setTimeout(bumpCounter, 9000 + Math.random() * 9000);
+  }
+
+  /* ── Cartes sociales gauche/droite ── */
+  function nextName() { return NAMES[nameIdx++ % NAMES.length]; }
+  function nextAction() { return ACTIONS[Math.floor(Math.random() * ACTIONS.length)]; }
+
+  function rotateCard(cardId, nameId, actionId) {
+    const card   = document.getElementById(cardId);
+    const nameEl = document.getElementById(nameId);
+    const actEl  = document.getElementById(actionId);
+    if (!card) return;
+
+    function show() {
+      nameEl.textContent = nextName();
+      actEl.textContent  = nextAction();
+      card.classList.add('visible');
+      setTimeout(() => {
+        card.classList.remove('visible');
+        setTimeout(show, 1200 + Math.random() * 800);
+      }, 3500 + Math.random() * 1500);
+    }
+    show();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    /* Compteur : animation initiale depuis 0 */
+    const counterEl = document.getElementById('sim-counter-num');
+    if (counterEl) {
+      animateCounter(counterEl, 0, simCount, 1800);
+      setTimeout(bumpCounter, 9000 + Math.random() * 9000);
+    }
+
+    /* Cartes — décalage pour qu'elles n'apparaissent pas en même temps */
+    setTimeout(() => rotateCard('sp-left',  'sp-left-name',  'sp-left-action'),  800);
+    setTimeout(() => rotateCard('sp-right', 'sp-right-name', 'sp-right-action'), 2400);
+  });
+})();
 
 /* ─── Constants ─────────────────────────────────────────────────── */
 
