@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prevano — Découvre ce qui t'attend à la retraite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+input, select, button, textarea { font-family: inherit; font-size: inherit; }
+
+/* ── Design tokens ── */
+:root {
+  --color-primary:        #E24B4A;
+  --color-primary-dark:   #A32D2D;
+  --color-primary-subtle: rgba(226,75,74,0.12);
+  --color-primary-border: rgba(226,75,74,0.25);
+  --grad-brand:  linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --grad-text:   linear-gradient(135deg,#E24B4A 0%,#FF8C72 55%,#FFB347 100%);
+  --grad-bar:    linear-gradient(90deg,#E24B4A,#FF7B6B);
+
+  --bg-base:    #0C0C0B;
+  --bg-surface: #141413;
+  --bg-raised:  #1C1C1A;
+  --bg-overlay: #242422;
+
+  --text-primary: #F5F4F0;
+  --text-muted:   #A8A79F;
+  --text-faint:   #5F5E5A;
+
+  --border-subtle:  rgba(255,255,255,0.07);
+  --border-default: rgba(255,255,255,0.12);
+}
+
+/* ── Base ── */
+body { font-family:'Inter',sans-serif; background:var(--bg-base); color:var(--text-primary); font-size:15px; line-height:1.6; min-height:100vh; }
+
+/* ── Scroll reveal ── */
+.reveal { opacity:0; transform:translateY(28px); transition:opacity 0.6s ease,transform 0.6s ease; will-change:opacity,transform; }
+.reveal.visible { opacity:1; transform:none; }
+@media(prefers-reduced-motion:reduce) {
+  .reveal { opacity:1; transform:none; transition:none; }
+  .hero-dot,.plan-loading i { animation:none; }
+  .bar-fill,.score-ring-fill,.sim-progress-fill,.ripple { transition:none; animation:none; }
+}
+
+/* ── Nav ── */
+nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:rgba(12,12,11,0.95); backdrop-filter:blur(12px); position:sticky; top:0; z-index:100; }
+.nav-inner { max-width:1100px; margin:0 auto; height:56px; display:flex; align-items:center; justify-content:space-between; }
+.logo-wrap { display:flex; align-items:center; gap:10px; }
+.logo-icon { width:34px; height:34px; background:var(--grad-brand); border-radius:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px rgba(226,75,74,0.45),0 2px 8px rgba(0,0,0,0.3); flex-shrink:0; }
+.logo { font-size:18px; font-weight:900; letter-spacing:-0.05em; line-height:1; background:var(--grad-brand); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 10px rgba(226,75,74,0.3)); }
+.logo em { font-style:normal; font-weight:900; }
+.nav-pill { background:var(--color-primary-subtle); border:1px solid var(--color-primary-border); color:var(--color-primary); font-size:11px; font-weight:700; padding:4px 12px; border-radius:100px; letter-spacing:0.06em; }
+
+/* ── Hero ── */
+.hero { padding:80px 48px 72px; max-width:1100px; margin:0 auto; text-align:center; }
+.hero-eyebrow { display:inline-flex; align-items:center; gap:8px; background:var(--color-primary-subtle); border:1px solid var(--color-primary-border); color:var(--color-primary); font-size:12px; font-weight:700; padding:7px 18px; border-radius:100px; margin-bottom:32px; letter-spacing:0.08em; box-shadow:0 0 24px rgba(226,75,74,0.15); }
+.hero-dot { width:6px; height:6px; background:var(--color-primary); border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.hero h1 { font-size:62px; font-weight:900; line-height:1.03; letter-spacing:-0.045em; margin-bottom:20px; }
+.hero h1 em { font-style:normal; background:var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 28px rgba(226,75,74,0.35)); }
+.hero-sub { font-size:18px; color:var(--text-muted); font-weight:300; max-width:500px; margin:0 auto 16px; line-height:1.7; }
+.hero-note { font-size:13px; color:var(--text-faint); margin-bottom:56px; }
+.hero-cta { display:inline-flex; align-items:center; gap:8px; background:var(--color-primary); color:#fff; border:none; padding:14px 28px; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s; letter-spacing:0.01em; position:relative; overflow:hidden; }
+.hero-cta:hover { background:var(--color-primary-dark); transform:translateY(-2px); }
+.hero-cta i { font-size:18px; transition:transform 0.2s; }
+.hero-cta:hover i { transform:translateX(4px); }
+
+/* ── Stats ── */
+.stats-row { display:flex; justify-content:center; gap:48px; margin-top:56px; padding-top:40px; border-top:1px solid var(--border-subtle); }
+.stat-item { text-align:center; }
+.stat-item .num { font-size:30px; font-weight:900; letter-spacing:-0.04em; }
+.stat-item .num em { font-style:normal; background:linear-gradient(135deg,#E24B4A 0%,#FF8C72 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.stat-item .lbl { font-size:12px; color:var(--text-faint); margin-top:2px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; }
+
+/* ── Simulator ── */
+.sim-section { padding:0 48px 64px; max-width:1100px; margin:0 auto; }
+.sim-wrap { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:20px; padding:40px; max-width:680px; margin:0 auto; }
+.sim-header { text-align:center; margin-bottom:32px; }
+.sim-header h2 { font-size:25px; font-weight:900; letter-spacing:-0.04em; margin-bottom:6px; }
+.sim-header p { font-size:14px; color:var(--text-muted); }
+
+/* Progress bar */
+.sim-progress-wrap { margin-bottom:28px; }
+.sim-progress-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.sim-progress-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-faint); }
+.sim-progress-count { font-size:12px; font-weight:700; color:var(--color-primary); }
+.sim-progress-track { height:6px; background:var(--bg-overlay); border-radius:100px; overflow:hidden; }
+.sim-progress-fill { height:100%; background:var(--grad-bar); border-radius:100px; transform:scaleX(0); transform-origin:left; transition:transform 0.4s cubic-bezier(.25,.8,.25,1); will-change:transform; }
+
+/* Fields */
+.sim-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.field label { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-faint); margin-bottom:8px; display:block; }
+.field input,.field select { width:100%; padding:13px 16px; border-radius:10px; border:1.5px solid var(--border-subtle); color:var(--text-primary); background:var(--bg-raised); outline:none; transition:border-color 0.2s,background-color 0.2s; }
+.field input:focus,.field select:focus { border-color:var(--color-primary); background:var(--bg-overlay); }
+.field input.filled,.field select.filled { border-color:rgba(226,75,74,0.4); }
+.field input::placeholder { color:var(--text-faint); }
+.field select option { background:var(--bg-raised); color:var(--text-primary); }
+.field--full { margin-bottom:20px; }
+
+/* Buttons */
+.btn-primary { width:100%; padding:15px; background:var(--color-primary); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s,opacity 0.2s; margin-top:8px; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:0.01em; position:relative; overflow:hidden; }
+.btn-primary:hover:not(:disabled) { background:var(--color-primary-dark); transform:translateY(-1px); }
+.btn-primary:active:not(:disabled) { transform:scale(0.98); }
+.btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
+.btn-primary i { font-size:18px; transition:transform 0.2s; }
+.btn-primary:hover:not(:disabled) i { transform:translateX(4px); }
+.sim-error { font-size:13px; color:var(--color-primary); text-align:center; margin-top:10px; min-height:20px; line-height:1.4; }
+
+/* Ripple */
+.ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.35); transform:scale(0); animation:ripple-anim 0.55s linear; pointer-events:none; }
+@keyframes ripple-anim { to { transform:scale(4); opacity:0; } }
+
+/* ── Results ── */
+.shock { display:none; padding:0 48px 64px; max-width:1100px; margin:0 auto; }
+.shock-banner { background:var(--color-primary-subtle); border:1px solid var(--color-primary-border); border-radius:16px; padding:28px 32px; text-align:center; margin-bottom:32px; }
+.shock-banner h2 { font-size:38px; font-weight:900; letter-spacing:-0.045em; margin-bottom:6px; }
+.shock-banner h2 em { font-style:normal; background:var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 20px rgba(226,75,74,0.4)); }
+.shock-banner p { font-size:15px; color:var(--text-muted); }
+.shock-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:28px; }
+.shock-stat { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:14px; padding:22px; text-align:center; }
+.shock-stat.accent { background:var(--color-primary-subtle); border-color:var(--color-primary-border); }
+.shock-stat .val { font-size:26px; font-weight:900; letter-spacing:-0.03em; margin-bottom:4px; }
+.shock-stat.accent .val { color:var(--color-primary); }
+.shock-stat .lbl { font-size:11px; color:var(--text-faint); font-weight:600; text-transform:uppercase; letter-spacing:0.06em; }
+
+/* Score */
+.score-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:14px; padding:28px; margin-bottom:28px; text-align:center; }
+.score-label { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px; }
+.score-ring-wrap { display:inline-flex; flex-direction:column; align-items:center; gap:12px; }
+.score-ring { position:relative; width:120px; height:120px; }
+.score-ring svg { transform:rotate(-90deg); }
+.score-ring-bg { fill:none; stroke:var(--bg-overlay); stroke-width:10; }
+.score-ring-fill { fill:none; stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1.2s cubic-bezier(.25,.8,.25,1),stroke 0.4s; }
+.score-value { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; }
+.score-num { font-size:30px; font-weight:900; letter-spacing:-0.04em; }
+.score-max { font-size:12px; color:var(--text-faint); font-weight:500; margin-top:2px; }
+.score-badge { font-size:13px; font-weight:700; padding:5px 14px; border-radius:100px; letter-spacing:0.04em; }
+.score-badge.bad  { background:rgba(226,75,74,0.15); color:var(--color-primary); }
+.score-badge.mid  { background:rgba(255,180,0,0.15);  color:#FFB400; }
+.score-badge.good { background:rgba(34,197,94,0.15);  color:#22C55E; }
+.score-tip { font-size:13px; color:var(--text-muted); margin-top:10px; max-width:340px; line-height:1.55; }
+
+/* Bar */
+.bar-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:14px; padding:24px; margin-bottom:28px; }
+.bar-card h3 { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px; }
+.bar-track { position:relative; background:var(--bg-overlay); border-radius:8px; height:44px; overflow:hidden; }
+.bar-fill { position:absolute; inset:0; right:auto; width:100%; background:var(--color-primary); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(.25,.8,.25,1); will-change:transform; }
+.bar-labels { position:relative; z-index:1; height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 12px; }
+.bar-lbl-pension { font-size:13px; font-weight:700; color:#fff; white-space:nowrap; }
+.bar-lbl-gap     { font-size:12px; color:var(--text-faint); white-space:nowrap; }
+.bar-legend { display:flex; gap:20px; margin-top:12px; }
+.leg { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); }
+.leg-dot { width:8px; height:8px; border-radius:50%; }
+
+/* Plan */
+.plan-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:14px; padding:28px; margin-bottom:28px; }
+.plan-card h3 { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:20px; }
+.plan-loading { display:flex; align-items:center; gap:10px; color:var(--text-muted); font-size:14px; padding:12px 0; }
+.plan-loading i { color:var(--color-primary); font-size:18px; animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.plan-steps { display:flex; flex-direction:column; gap:12px; }
+.plan-step { background:var(--bg-raised); border:1px solid var(--border-subtle); border-radius:10px; padding:16px 18px; display:flex; gap:14px; align-items:flex-start; transition:border-color 0.2s; opacity:0; transform:translateY(10px); animation:stepIn 0.4s ease forwards; }
+@keyframes stepIn { to { opacity:1; transform:none; } }
+.plan-step:hover { border-color:var(--color-primary-border); }
+.step-num { width:28px; height:28px; background:var(--color-primary); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; flex-shrink:0; }
+.step-content h4 { font-size:14px; font-weight:600; margin-bottom:3px; }
+.step-content p  { font-size:13px; color:var(--text-muted); line-height:1.55; }
+
+/* Email CTA */
+.email-cta { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:16px; padding:40px; text-align:center; }
+.email-cta h3 { font-size:26px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
+.email-cta p  { font-size:14px; color:var(--text-muted); margin-bottom:28px; line-height:1.65; }
+.email-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.email-input { padding:13px 18px; border-radius:10px; border:1.5px solid var(--border-subtle); font-size:14px; width:270px; outline:none; color:var(--text-primary); background:var(--bg-raised); transition:border-color 0.2s; }
+.email-input:focus { border-color:var(--color-primary); }
+.email-input::placeholder { color:var(--text-faint); }
+.btn-email { background:var(--color-primary); color:#fff; border:none; padding:13px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s; display:flex; align-items:center; gap:6px; position:relative; overflow:hidden; }
+.btn-email:hover  { background:var(--color-primary-dark); transform:translateY(-1px); }
+.btn-email:active { transform:scale(0.98); }
+.email-note { font-size:11px; color:var(--text-faint); margin-top:14px; }
+
+/* ── Sim counter ── */
+.sim-counter { display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:20px; font-size:13px; color:var(--text-muted); }
+.sim-counter-digits { display:inline-flex; overflow:hidden; height:1.2em; }
+.sim-digit-col { display:flex; flex-direction:column; transition:transform 0.45s cubic-bezier(.4,0,.2,1); line-height:1.2em; }
+.sim-counter-num { font-size:15px; font-weight:900; color:var(--color-primary); letter-spacing:-0.03em; display:inline-flex; align-items:center; gap:1px; }
+.sim-counter-dot { width:6px; height:6px; background:#22C55E; border-radius:50%; box-shadow:0 0 6px rgba(34,197,94,0.7); animation:sc-pulse 2s infinite; flex-shrink:0; }
+@keyframes sc-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── Social proof cards ── */
+.cta-zone { position:relative; display:inline-block; }
+.sp-card { position:absolute; top:50%; transform:translateY(-50%); width:190px; background:var(--bg-raised); border:1px solid var(--color-primary-border); border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px; opacity:0; transition:opacity 0.5s ease; pointer-events:none; }
+.sp-card.visible { opacity:1; }
+.sp-card--left  { right:calc(100% + 20px); }
+.sp-card--right { left:calc(100% + 20px); }
+.sp-dot { width:7px; height:7px; background:var(--color-primary); border-radius:50%; flex-shrink:0; box-shadow:0 0 8px rgba(226,75,74,0.7); animation:sc-pulse 2s infinite; }
+.sp-body { display:flex; flex-direction:column; gap:1px; }
+.sp-name   { font-size:12px; font-weight:700; color:var(--text-primary); }
+.sp-action { font-size:11px; color:var(--color-primary); font-weight:600; }
+@media(max-width:900px){ .sp-card { display:none; } }
+
+/* ── Témoignages ── */
+.reviews-section { padding:64px 48px; max-width:680px; margin:0 auto; }
+.reviews-placeholder { border:1px dashed var(--border-subtle); border-radius:16px; padding:48px 40px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+.reviews-placeholder p { font-size:15px; color:var(--text-muted); margin:0; text-align:center; }
+.testimonial-form { width:100%; display:flex; flex-direction:column; gap:12px; }
+.testimonial-form input,
+.testimonial-form textarea { width:100%; box-sizing:border-box; background:var(--bg-raised); border:1px solid var(--border-default); border-radius:10px; padding:11px 14px; font-size:14px; color:var(--text-body); outline:none; transition:border-color 0.2s; resize:vertical; }
+.testimonial-form input:focus,
+.testimonial-form textarea:focus { border-color:var(--color-primary); }
+.testimonial-form textarea { min-height:100px; }
+.btn-testimonial { align-self:flex-end; background:var(--color-primary); color:#fff; border:none; padding:11px 22px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s; }
+.btn-testimonial:hover { background:var(--color-primary-dark); transform:translateY(-1px); }
+.testimonial-thanks { font-size:13px; color:var(--color-primary); display:none; text-align:center; }
+
+/* ── Pricing ── */
+.pricing-section { margin-bottom:28px; }
+.pricing-header { text-align:center; margin-bottom:28px; }
+.pricing-eyebrow { font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--color-primary); text-transform:uppercase; margin-bottom:8px; }
+.pricing-header h3 { font-size:24px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
+.pricing-sub { font-size:14px; color:var(--text-muted); }
+.pricing-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.pricing-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:16px; padding:28px 24px; display:flex; flex-direction:column; gap:20px; position:relative; transition:border-color 0.2s,transform 0.2s; }
+.pricing-card:hover { border-color:var(--border-default); transform:translateY(-2px); }
+.pricing-card--pro { border-color:var(--color-primary-border); background:linear-gradient(135deg,rgba(226,75,74,0.07) 0%,rgba(255,123,53,0.04) 100%); }
+.pricing-card--pro:hover { border-color:var(--color-primary); }
+.plan-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--grad-brand); color:#fff; font-size:10px; font-weight:800; padding:4px 14px; border-radius:100px; letter-spacing:0.08em; white-space:nowrap; }
+.plan-name { font-size:13px; font-weight:700; color:var(--text-faint); letter-spacing:0.06em; text-transform:uppercase; }
+.plan-price { display:flex; align-items:baseline; gap:3px; }
+.price-amount { font-size:36px; font-weight:900; letter-spacing:-0.04em; }
+.price-period { font-size:14px; color:var(--text-muted); }
+.plan-features { list-style:none; display:flex; flex-direction:column; gap:9px; flex:1; }
+.plan-features li { font-size:13px; color:var(--text-muted); display:flex; align-items:flex-start; gap:8px; line-height:1.45; }
+.plan-features li::before { content:''; flex-shrink:0; width:16px; height:16px; border-radius:50%; background:var(--color-primary-subtle); border:1px solid var(--color-primary-border); margin-top:1px; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 8.5L6.8 11L12 5' stroke='%23E24B4A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-size:contain; background-repeat:no-repeat; }
+.btn-pricing { width:100%; padding:13px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s,filter 0.2s,opacity 0.2s; letter-spacing:0.01em; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:6px; }
+.btn-pricing:hover:not(:disabled) { transform:translateY(-1px); }
+.btn-pricing:active:not(:disabled) { transform:scale(0.98); }
+.btn-pricing:disabled { opacity:0.6; cursor:not-allowed; }
+.btn-pricing--default { background:var(--bg-overlay); color:var(--text-primary); border:1.5px solid var(--border-default); }
+.btn-pricing--default:hover:not(:disabled) { background:var(--bg-raised); }
+.btn-pricing--pro { background:var(--grad-brand); color:#fff; border:none; }
+.btn-pricing--pro:hover:not(:disabled) { filter:brightness(1.08); }
+@media(max-width:640px){
+  .pricing-grid { grid-template-columns:1fr; }
+  .pricing-card { padding:24px 20px; }
+}
+
+/* Confetti */
+#confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  nav,
+  .sim-section,
+  .shock        { padding-left:20px; padding-right:20px; }
+  .hero         { padding:56px 20px 48px; }
+  .hero h1      { font-size:38px; letter-spacing:-0.04em; }
+  .hero-sub     { font-size:16px; }
+  .stats-row    { gap:24px; }
+  .stat-item .num { font-size:22px; }
+  .sim-wrap     { padding:24px; }
+  .sim-row      { grid-template-columns:1fr; }
+  .shock-grid   { grid-template-columns:1fr; }
+  .shock-banner h2 { font-size:26px; }
+  .email-cta    { padding:28px 20px; }
+  .email-row    { flex-direction:column; align-items:stretch; }
+  .email-input  { width:100%; }
+  .btn-email    { justify-content:center; }
+  .reviews-section { padding:40px 20px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+<header>
+  <nav aria-label="Navigation principale">
+    <div class="nav-inner">
+      <div class="logo-wrap">
+        <div class="logo-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="logo" translate="no">Pre<em>vano</em></span>
+      </div>
+    </div>
+  </nav>
+</header>
+
+
+<main>
+  <section class="hero reveal" aria-labelledby="hero-title">
+    <div class="hero-eyebrow">
+      <div class="logo-icon" style="width:18px;height:18px;border-radius:5px;flex-shrink:0;" aria-hidden="true">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+        </svg>
+      </div>
+      Simulateur de retraite
+    </div>
+    <p class="sim-counter">
+      <span class="sim-counter-dot" aria-hidden="true"></span>
+      <span class="sim-counter-num" id="sim-counter-num">0</span>
+      <span>simulations effectuées ces dernières 24h</span>
+    </p>
+    <h1 id="hero-title">Ce que tu toucheras à la retraite <em>va te surprendre.</em></h1>
+    <p class="hero-sub">Calcule en 60 secondes le montant exact de ta pension — et ce que tu dois faire maintenant pour l'améliorer.</p>
+    <p class="hero-note">Gratuit · Aucune inscription requise · Résultat immédiat</p>
+    <div class="cta-zone">
+      <div class="sp-card sp-card--left" id="sp-left">
+        <span class="sp-dot" aria-hidden="true"></span>
+        <div class="sp-body">
+          <span class="sp-name" id="sp-left-name"></span>
+          <span class="sp-action" id="sp-left-action"></span>
+        </div>
+      </div>
+      <button id="btn-scroll" class="hero-cta" type="button">
+        Calculer ma retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
+      </button>
+      <div class="sp-card sp-card--right" id="sp-right">
+        <span class="sp-dot" aria-hidden="true"></span>
+        <div class="sp-body">
+          <span class="sp-name" id="sp-right-name"></span>
+          <span class="sp-action" id="sp-right-action"></span>
+        </div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-item"><div class="num"><em>-63%</em></div><div class="lbl">Perte de revenu moyenne</div></div>
+      <div class="stat-item"><div class="num">60s</div><div class="lbl">Pour voir ton résultat</div></div>
+      <div class="stat-item"><div class="num"><em>3</em></div><div class="lbl">Actions concrètes générées</div></div>
+    </div>
+  </section>
+
+  <section class="sim-section reveal" id="simulator" aria-labelledby="sim-title">
+    <div class="sim-wrap">
+      <div class="sim-header">
+        <h2 id="sim-title">Ton simulateur personnalisé</h2>
+        <p>Remplis les 5 champs ci-dessous pour obtenir ta projection</p>
+      </div>
+      <div class="sim-progress-wrap">
+        <div class="sim-progress-header">
+          <span class="sim-progress-label">Progression</span>
+          <span class="sim-progress-count" id="progress-count" aria-live="polite">0 / 5</span>
+        </div>
+        <div class="sim-progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="5" aria-label="Champs remplis">
+          <div class="sim-progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+      <div class="sim-row">
+        <div class="field">
+          <label for="age">Ton âge actuel</label>
+          <input type="number" id="age" placeholder="25" min="18" max="64" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="salaire">Salaire net mensuel (€)</label>
+          <input type="number" id="salaire" placeholder="2300" min="500" autocomplete="off">
+        </div>
+      </div>
+      <div class="sim-row">
+        <div class="field">
+          <label for="epargne">Épargne mensuelle (€)</label>
+          <input type="number" id="epargne" placeholder="200" min="0" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="depart">Âge de départ souhaité</label>
+          <input type="number" id="depart" placeholder="64" min="60" max="70" autocomplete="off">
+        </div>
+      </div>
+      <div class="field field--full">
+        <label for="statut">Statut professionnel</label>
+        <select id="statut">
+          <option value="" disabled selected>Choisir...</option>
+          <option value="prive">Salarié secteur privé</option>
+          <option value="fonctionnaire">Fonctionnaire</option>
+          <option value="independant">Indépendant / Freelance</option>
+        </select>
+      </div>
+      <button id="btn-simulate" class="btn-primary" type="button">
+        Voir ma projection retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
+      </button>
+      <p class="sim-error" id="sim-error" role="alert" aria-live="assertive"></p>
+    </div>
+  </section>
+
+  <section class="shock" id="shock-section" aria-live="polite">
+    <div class="shock-banner reveal">
+      <h2 id="shock-headline"></h2>
+      <p id="shock-sub"></p>
+    </div>
+    <div class="shock-grid reveal">
+      <div class="shock-stat">
+        <div class="val" id="stat-salaire">—</div>
+        <div class="lbl">Salaire actuel / mois</div>
+      </div>
+      <div class="shock-stat accent">
+        <div class="val" id="stat-pension">—</div>
+        <div class="lbl">Pension estimée / mois</div>
+      </div>
+      <div class="shock-stat accent">
+        <div class="val" id="stat-gap">—</div>
+        <div class="lbl">Manque à gagner / mois</div>
+      </div>
+    </div>
+
+    <div class="score-card reveal">
+      <p class="score-label">Score de préparation retraite</p>
+      <div class="score-ring-wrap">
+        <div class="score-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="score-ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="score-ring-fill" id="score-ring-fill" cx="60" cy="60" r="50" stroke-dashoffset="314"/>
+          </svg>
+          <div class="score-value" aria-hidden="true">
+            <span class="score-num" id="score-num">0</span>
+            <span class="score-max">/100</span>
+          </div>
+        </div>
+        <span class="score-badge" id="score-badge"></span>
+      </div>
+      <p class="score-tip" id="score-tip"></p>
+    </div>
+
+    <div class="bar-card reveal">
+      <h3>Répartition de tes revenus à la retraite</h3>
+      <div class="bar-track" role="meter" aria-label="Part de pension vs manque à gagner">
+        <div class="bar-fill" id="bar-fill"></div>
+        <div class="bar-labels">
+          <span class="bar-lbl-pension" id="bar-pension-label"></span>
+          <span class="bar-lbl-gap"     id="bar-gap-label"></span>
+        </div>
+      </div>
+      <div class="bar-legend" aria-hidden="true">
+        <div class="leg"><div class="leg-dot" style="background:var(--color-primary)"></div>Pension retraite</div>
+        <div class="leg"><div class="leg-dot" style="background:var(--bg-overlay)"></div>Manque à gagner</div>
+      </div>
+    </div>
+
+    <div class="plan-card reveal">
+      <h3>Ton plan d'action personnalisé</h3>
+      <div class="plan-loading" id="plan-loading">
+        <i class="ti ti-loader-2" aria-hidden="true"></i> Génération de ton plan en cours...
+      </div>
+      <div class="plan-steps" id="plan-steps" style="display:none"></div>
+    </div>
+
+    <div class="pricing-section reveal">
+      <div class="pricing-header">
+        <p class="pricing-eyebrow">Passez à l'action</p>
+        <h3>Débloquez votre plan complet</h3>
+        <p class="pricing-sub">Des outils avancés pour concrétiser votre stratégie retraite.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">
+            <span class="price-amount">9,99€</span>
+            <span class="price-period">/mois</span>
+          </div>
+          <ul class="plan-features">
+            <li>Simulations illimitées</li>
+            <li>Plan d'action personnalisé</li>
+            <li>Rapport PDF téléchargeable</li>
+            <li>Suivi mensuel par email</li>
+          </ul>
+          <button class="btn-pricing btn-pricing--default" id="btn-checkout-starter" type="button">
+            Commencer <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="pricing-card pricing-card--pro">
+          <div class="plan-badge">LE PLUS POPULAIRE</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">
+            <span class="price-amount">14,99€</span>
+            <span class="price-period">/mois</span>
+          </div>
+          <ul class="plan-features">
+            <li>Tout Starter inclus</li>
+            <li>Analyse patrimoniale complète</li>
+            <li>Scénarios départ anticipé &amp; épargne+</li>
+            <li>Suivi personnalisé mensuel</li>
+            <li>Support prioritaire</li>
+          </ul>
+          <button class="btn-pricing btn-pricing--pro" id="btn-checkout-pro" type="button">
+            Commencer <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="email-cta reveal">
+      <h3>Reçois ton plan complet.</h3>
+      <p>Projections détaillées, stratégies d'épargne et alertes personnalisées —<br>dès le lancement de Prevano.</p>
+      <div class="email-row">
+        <input class="email-input" type="email" id="user-email" placeholder="ton@email.com" autocomplete="email">
+        <button id="btn-email" class="btn-email" type="button">
+          M'envoyer le plan <i class="ti ti-send" aria-hidden="true"></i>
+        </button>
+      </div>
+      <p class="email-note">Aucun spam. Uniquement ton plan Prevano.</p>
+    </div>
+  </section>
+
+  <!-- ── Témoignages ── -->
+  <section class="reviews-section reveal" aria-label="Témoignages">
+    <div class="reviews-placeholder">
+      <p>Les premiers témoignages arrivent bientôt.</p>
+      <form class="testimonial-form" id="testimonial-form" novalidate>
+        <input type="text" id="testimonial-name" placeholder="Votre prénom" required maxlength="80">
+        <textarea id="testimonial-text" placeholder="Partagez votre expérience avec Prevano…" required maxlength="1000"></textarea>
+        <button type="submit" class="btn-testimonial">Envoyer</button>
+      </form>
+      <p class="testimonial-thanks" id="testimonial-thanks">Merci pour votre témoignage !</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+'use strict';
+
+/* ─── Sim counter + social proof cards ─────────────────────────── */
+
+(function() {
+  const NAMES = [
+    'Marie C.','Thomas R.','Julien M.','Sophie L.','Antoine B.',
+    'Claire D.','Nicolas P.','Emma G.','Maxime V.','Laura F.',
+    'Pierre H.','Sarah K.','Romain T.','Inès B.','Alexandre D.',
+    'Charlotte M.','Damien L.','Lucie V.','François A.','Camille R.',
+    'Hugo N.','Amélie J.','Sébastien G.','Pauline C.','Kevin S.',
+    'Manon T.','Baptiste F.','Océane H.','Valentin D.','Léa P.',
+  ];
+  const ACTIONS = [
+    'vient de simuler','a calculé sa pension',
+    'a découvert son score','vient de voir son plan',
+    'a simulé son départ à 62 ans','a reçu ses 3 actions',
+  ];
+
+  let simCount = 847 + Math.floor(Math.random() * 40);
+  let nameIdx  = 0;
+
+  /* ── Compteur avec déroulement chiffre par chiffre ── */
+  function animateCounter(el, from, to, duration) {
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const val  = Math.round(from + (to - from) * ease);
+      el.textContent = val.toLocaleString('fr-FR');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function bumpCounter() {
+    simCount++;
+    const el = document.getElementById('sim-counter-num');
+    if (el) {
+      const prev = simCount - 1;
+      animateCounter(el, prev, simCount, 600);
+    }
+    setTimeout(bumpCounter, 9000 + Math.random() * 9000);
+  }
+
+  /* ── Cartes sociales gauche/droite ── */
+  function nextName() { return NAMES[nameIdx++ % NAMES.length]; }
+  function nextAction() { return ACTIONS[Math.floor(Math.random() * ACTIONS.length)]; }
+
+  function rotateCard(cardId, nameId, actionId) {
+    const card   = document.getElementById(cardId);
+    const nameEl = document.getElementById(nameId);
+    const actEl  = document.getElementById(actionId);
+    if (!card) return;
+
+    function show() {
+      nameEl.textContent = nextName();
+      actEl.textContent  = nextAction();
+      card.classList.add('visible');
+      setTimeout(() => {
+        card.classList.remove('visible');
+        setTimeout(show, 1200 + Math.random() * 800);
+      }, 3500 + Math.random() * 1500);
+    }
+    show();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    /* Compteur : animation initiale depuis 0 */
+    const counterEl = document.getElementById('sim-counter-num');
+    if (counterEl) {
+      animateCounter(counterEl, 0, simCount, 1800);
+      setTimeout(bumpCounter, 9000 + Math.random() * 9000);
+    }
+
+    /* Cartes — décalage pour qu'elles n'apparaissent pas en même temps */
+    setTimeout(() => rotateCard('sp-left',  'sp-left-name',  'sp-left-action'),  800);
+    setTimeout(() => rotateCard('sp-right', 'sp-right-name', 'sp-right-action'), 2400);
+  });
+})();
+
+/* ─── Constants ─────────────────────────────────────────────────── */
+
+const API_MODEL = 'claude-sonnet-4-20250514';
+
+/** 2π × r(50) — exact SVG circumference, avoids magic number 314 */
+const SCORE_CIRCUMFERENCE = 2 * Math.PI * 50;
+
+/** Pension replacement-rate parameters per status */
+const RATE_TABLE = {
+  prive:         { base: 0.35, extra: 0.15, fullYears: 43   },
+  fonctionnaire: { base: 0.55, extra: 0.20, fullYears: 41.5 },
+  independant:   { base: 0.25, extra: 0.10, fullYears: 43   },
+};
+
+/** Score weights — must sum to 100 */
+const SCORE_WEIGHTS = {
+  replacement: 40,
+  savings:     30,
+  horizon:     20,
+  statusBonus: { fonctionnaire: 10, prive: 5, independant: 0 },
+};
+
+const SCORE_TIERS = [
+  { threshold: 35,       color: '#E24B4A', cls: 'bad',  label: 'Situation critique',
+    tip: "Ton niveau d'épargne actuel ne compensera pas le manque à la retraite. Il est urgent d'agir dès maintenant." },
+  { threshold: 65,       color: '#FFB400', cls: 'mid',  label: 'À améliorer',
+    tip: "Tu as une base correcte, mais quelques ajustements maintenant feront une grande différence dans 20 ans." },
+  { threshold: Infinity, color: '#22C55E', cls: 'good', label: 'Bonne trajectoire',
+    tip: "Tu es sur la bonne voie. Continue et optimise ton allocation pour sécuriser encore mieux ton avenir." },
+];
+
+const CONFETTI_COLORS = ['#E24B4A','#FF7B6B','#FFB400','#22C55E','#60A5FA','#F5F4F0'];
+const FIELD_IDS       = ['age','salaire','epargne','depart','statut'];
+
+const STATUS_LABELS = {
+  prive:         'salarié du privé',
+  fonctionnaire: 'fonctionnaire',
+  independant:   'indépendant/freelance',
+};
+
+/* ─── Helpers ───────────────────────────────────────────────────── */
+
+const $ = id => document.getElementById(id);
+
+function fmt(n) {
+  return Math.round(n).toLocaleString('fr-FR') + '€';
+}
+
+/* ─── Scroll reveal ─────────────────────────────────────────────── */
+
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(({ target, isIntersecting }) => {
+    if (isIntersecting) { target.classList.add('visible'); revealObserver.unobserve(target); }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ─── Ripple (event delegation — works on all present & future buttons) ── */
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-primary:not(:disabled),.btn-email,.hero-cta,.btn-pricing:not(:disabled)');
+  if (!btn) return;
+  const { left, top, width, height } = btn.getBoundingClientRect();
+  const size = Math.max(width, height);
+  const rip  = document.createElement('span');
+  rip.className  = 'ripple';
+  rip.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - left - size / 2}px;top:${e.clientY - top - size / 2}px`;
+  btn.appendChild(rip);
+  rip.addEventListener('animationend', () => rip.remove(), { once: true });
+});
+
+/* ─── Progress bar ──────────────────────────────────────────────── */
+
+const progressFill  = $('progress-fill');
+const progressCount = $('progress-count');
+const progressTrack = progressFill.closest('[role="progressbar"]');
+
+function updateProgress() {
+  const filled = FIELD_IDS.reduce((n, id) => n + ($(id)?.value ? 1 : 0), 0);
+  progressFill.style.transform = `scaleX(${filled / FIELD_IDS.length})`;
+  progressCount.textContent    = `${filled} / ${FIELD_IDS.length}`;
+  progressTrack.setAttribute('aria-valuenow', filled);
+}
+
+FIELD_IDS.forEach(id => {
+  const el = $(id);
+  if (!el) return;
+  const onUpdate = () => { el.classList.toggle('filled', !!el.value); updateProgress(); };
+  el.addEventListener('input',  onUpdate);
+  el.addEventListener('change', onUpdate);
+});
+
+/* ─── Confetti ──────────────────────────────────────────────────── */
+
+let confettiRaf = null;
+
+function launchConfetti() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (confettiRaf) { cancelAnimationFrame(confettiRaf); confettiRaf = null; }
+
+  const canvas = $('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = Array.from({ length: 120 }, () => ({
+    x:         Math.random() * canvas.width,
+    y:        -10 - Math.random() * 40,
+    r:          4  + Math.random() * 5,
+    d:          1.5 + Math.random() * 2.5,
+    color:      CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    tilt:       Math.random() * 10 - 5,
+    tiltSpeed:  0.1 + Math.random() * 0.15,
+    angle:      0,
+    shape:      Math.random() > 0.5 ? 'rect' : 'circle',
+  }));
+
+  let frame = 0;
+  const maxFrames = 180;
+
+  function draw() {
+    if (document.hidden) { confettiRaf = requestAnimationFrame(draw); return; }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.globalAlpha = Math.max(0, 1 - frame / maxFrames);
+    particles.forEach(p => {
+      p.y += p.d; p.x += Math.sin(p.angle) * 1.2; p.angle += 0.04; p.tilt += p.tiltSpeed;
+      ctx.fillStyle = p.color;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.tilt * Math.PI / 180);
+      if (p.shape === 'rect') ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.6);
+      else { ctx.beginPath(); ctx.arc(0, 0, p.r / 2, 0, Math.PI * 2); ctx.fill(); }
+      ctx.restore();
+    });
+    frame++;
+    if (frame < maxFrames) confettiRaf = requestAnimationFrame(draw);
+    else { ctx.clearRect(0, 0, canvas.width, canvas.height); confettiRaf = null; }
+  }
+  draw();
+}
+
+/* ─── Score ─────────────────────────────────────────────────────── */
+
+function computeScore(sal, pension, ep, annees, statut) {
+  const { fullYears } = RATE_TABLE[statut];
+  const { replacement, savings, horizon, statusBonus } = SCORE_WEIGHTS;
+  let score = 0;
+  score += Math.round((pension / sal) * replacement);
+  score += Math.min(Math.round((ep / sal) * (savings * 10)), savings);
+  score += Math.min(Math.round((annees / fullYears) * horizon), horizon);
+  score += statusBonus[statut] ?? 0;
+  return Math.min(Math.max(score, 5), 100);
+}
+
+function renderScore(score) {
+  const tier  = SCORE_TIERS.find(t => score < t.threshold);
+  const fill  = $('score-ring-fill');
+  const num   = $('score-num');
+
+  // Set exact circumference via JS (avoids the magic-number 314 in HTML)
+  fill.setAttribute('stroke-dasharray', SCORE_CIRCUMFERENCE.toFixed(3));
+  fill.style.stroke          = tier.color;
+  fill.style.strokeDashoffset = (SCORE_CIRCUMFERENCE - (score / 100) * SCORE_CIRCUMFERENCE).toFixed(3);
+
+  $('score-badge').className   = `score-badge ${tier.cls}`;
+  $('score-badge').textContent = tier.label;
+  $('score-tip').textContent   = tier.tip;
+
+  // RAF counter with cubic-ease-out — smoother than setInterval
+  const start    = performance.now();
+  const duration = 900;
+  (function tick(now) {
+    const t    = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    num.textContent = Math.round(ease * score);
+    num.style.color = tier.color;
+    if (t < 1) requestAnimationFrame(tick);
+  })(start);
+}
+
+/* ─── Pension calculation ───────────────────────────────────────── */
+
+function calcPension(sal, annees, statut) {
+  const { base, extra, fullYears } = RATE_TABLE[statut];
+  return Math.round(sal * (base + Math.min(annees / fullYears, 1) * extra));
+}
+
+/* ─── Validation ────────────────────────────────────────────────── */
+
+function validate(age, sal, dep, statut) {
+  if (!age || !sal || !dep || !statut)  return 'Merci de remplir tous les champs.';
+  if (age < 18 || age > 64)            return 'Âge invalide — entre 18 et 64 ans.';
+  if (sal < 500)                        return 'Salaire trop faible (minimum 500 €).';
+  if (dep <= age)                       return "L'âge de départ doit être supérieur à ton âge actuel.";
+  if (dep < 60 || dep > 70)            return 'Âge de départ invalide — entre 60 et 70 ans.';
+  return null;
+}
+
+/* ─── Simulate ──────────────────────────────────────────────────── */
+
+function simulate() {
+  const age    = parseInt($('age').value)     || 0;
+  const sal    = parseInt($('salaire').value)  || 0;
+  const ep     = parseInt($('epargne').value)  || 0;
+  const dep    = parseInt($('depart').value)   || 0;
+  const statut = $('statut').value;
+
+  const errorMsg = validate(age, sal, dep, statut);
+  $('sim-error').textContent = errorMsg ?? '';
+  if (errorMsg) return;
+
+  const annees  = dep - age;
+  const pension = calcPension(sal, annees, statut);
+  const gap     = sal - pension;
+  const pctGap  = Math.round((1 - pension / sal) * 100);
+  const barW    = Math.max(Math.round((pension / sal) * 100), 5);
+
+  // Loading state
+  const btn = $('btn-simulate');
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Calcul en cours...';
+
+  // Populate headline with DOM methods — no innerHTML on dynamic data
+  const headline = $('shock-headline');
+  headline.textContent = '';
+  const em = document.createElement('em');
+  em.textContent = fmt(pension);
+  headline.append('Tu toucheras ', em, '/mois à la retraite.');
+
+  $('shock-sub').textContent      = `Soit ${pctGap}% de moins que ton salaire actuel. Voilà ce que ça signifie concrètement.`;
+  $('stat-salaire').textContent   = `${fmt(sal)}/mois`;
+  $('stat-pension').textContent   = `${fmt(pension)}/mois`;
+  $('stat-gap').textContent       = `-${fmt(gap)}/mois`;
+  $('bar-fill').style.transform   = `scaleX(${barW / 100})`;
+  $('bar-pension-label').textContent = fmt(pension);
+  $('bar-gap-label').textContent     = `Il manque ${fmt(gap)}`;
+
+  const shock = $('shock-section');
+  shock.style.display = 'block';
+  shock.querySelectorAll('.reveal').forEach(el => {
+    el.classList.remove('visible');
+    revealObserver.observe(el);
+  });
+
+  // Double-rAF: guarantees layout is computed before scroll fires
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    shock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    launchConfetti();
+    renderScore(computeScore(sal, pension, ep, annees, statut));
+    btn.disabled  = false;
+    btn.innerHTML = 'Voir ma projection retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+  }));
+
+  generatePlan(age, sal, pension, gap, ep, annees, statut);
+}
+
+/* ─── Generate plan ─────────────────────────────────────────────── */
+
+async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
+  const loading   = $('plan-loading');
+  const container = $('plan-steps');
+  loading.style.display   = 'flex';
+  container.style.display = 'none';
+
+  const prompt = `Tu es expert retraite France. Un(e) ${STATUS_LABELS[statut]} de ${age} ans, ${sal}€ nets/mois, épargne ${ep}€/mois, touchera ~${pension}€/mois à la retraite (manque: ${gap}€/mois, ${annees} ans devant lui/elle). Génère EXACTEMENT 3 actions concrètes et chiffrées. JSON uniquement:\n{"steps":[{"title":"Titre court","desc":"1-2 phrases concrètes chiffrées."},{"title":"...","desc":"..."},{"title":"...","desc":"..."}]}`;
+
+  try {
+    // ⚠️ En production : remplacer par un appel à /api/plan (backend proxy)
+    //    pour ne jamais exposer la clé API Anthropic côté client.
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ model: API_MODEL, max_tokens: 600, messages: [{ role: 'user', content: prompt }] }),
+    });
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+    const data   = await resp.json();
+    const text   = data.content?.find(c => c.type === 'text')?.text ?? '';
+    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+    if (!Array.isArray(parsed?.steps)) throw new Error('Format de réponse inattendu.');
+
+    container.innerHTML = '';
+    parsed.steps.forEach((step, i) => {
+      const div   = document.createElement('div');  div.className = 'plan-step'; div.style.animationDelay = `${i * 0.12}s`;
+      const badge = document.createElement('div');  badge.className = 'step-num'; badge.textContent = i + 1;
+      const body  = document.createElement('div');  body.className = 'step-content';
+      const h4    = document.createElement('h4');   h4.textContent = step.title;
+      const p     = document.createElement('p');    p.textContent  = step.desc;
+      body.append(h4, p);
+      div.append(badge, body);
+      container.appendChild(div);
+    });
+
+    loading.style.display   = 'none';
+    container.style.display = 'flex';
+
+  } catch (err) {
+    console.error('[generatePlan]', err);
+    loading.innerHTML = '<span style="color:var(--text-muted);font-size:13px">Plan disponible au lancement de Prevano.</span>';
+  }
+}
+
+/* ─── Submit email ──────────────────────────────────────────────── */
+
+function submitEmail() {
+  const input = $('user-email');
+  if (!input.validity.valid) { input.focus(); return; }
+  window.open(
+    'https://e1966e2e.sibforms.com/serve/MUIFAOKeyQAhd7aThpwc95y3ddkMyDgzYfLi_BZwCued7LJpHkCH2Io9vTXExUxgZO0qv8f-g4ho7h9GqgsvY9IQ7X7Fxzt0rUNsvW7hHkVp2e7uOnz1jm92tPscAG1Wirbw_o5NMVxC7OEK4sCSA8E-y2-GisBN3qoiMhPcfmizSh6UHTdIukQ2mue3RuoxBUgbFFUj7Y1nviUWLw==',
+    '_blank',
+    'noopener,noreferrer'
+  );
+}
+
+/* ─── Stripe Checkout ───────────────────────────────────────────── */
+
+const STRIPE_PK = 'pk_live_51TdR6lJdUivM9ZOs1nZNLyzsCohFVWHgqTtyxkr6mcwjfuXhIb3VePpIc5D4qORzA5X8Scli3VfrQGzZ6WWwgDEY00tzxRAfQB';
+const PRICE_IDS = {
+  starter: 'price_1TdS3FJdUivM9ZOsgiNgjOnH',
+  pro:     'price_1TdS2kJdUivM9ZOsrMzP99oy',
+};
+
+let _stripe = null;
+function getStripe() { return _stripe || (_stripe = Stripe(STRIPE_PK)); }
+
+async function startCheckout(priceId, btnEl) {
+  btnEl.disabled = true;
+  const saved = btnEl.innerHTML;
+  btnEl.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Redirection…';
+  const base = window.location.href.split('?')[0];
+  try {
+    const { error } = await getStripe().redirectToCheckout({
+      lineItems:  [{ price: priceId, quantity: 1 }],
+      mode:       'subscription',
+      successUrl: base + '?checkout=success',
+      cancelUrl:  base,
+    });
+    if (error) throw error;
+  } catch (err) {
+    console.error('[Stripe]', err);
+    btnEl.disabled  = false;
+    btnEl.innerHTML = saved;
+  }
+}
+
+/* ─── Wire up events (zero inline onclick) ──────────────────────── */
+
+$('btn-scroll').addEventListener('click',    () => $('simulator').scrollIntoView({ behavior: 'smooth' }));
+$('btn-simulate').addEventListener('click',  simulate);
+$('btn-email').addEventListener('click',     submitEmail);
+$('btn-checkout-starter').addEventListener('click', e => startCheckout(PRICE_IDS.starter, e.currentTarget));
+$('btn-checkout-pro').addEventListener('click',     e => startCheckout(PRICE_IDS.pro,     e.currentTarget));
+
+/* ─── Testimonial form ──────────────────────────────────────────── */
+
+document.getElementById('testimonial-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('testimonial-name').value.trim();
+  const text = document.getElementById('testimonial-text').value.trim();
+  if (!name || !text) return;
+  const subject = encodeURIComponent('Témoignage Prevano — ' + name);
+  const body    = encodeURIComponent(name + ' écrit :\n\n' + text);
+  window.location.href = 'mailto:contact@prevano.fr?subject=' + subject + '&body=' + body;
+  this.style.display = 'none';
+  document.getElementById('testimonial-thanks').style.display = 'block';
+});
+</script>
+</body>
+</html>
