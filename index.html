@@ -901,27 +901,20 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
   loading.style.display   = 'flex';
   container.style.display = 'none';
 
-  const prompt = `Tu es expert retraite France. Un(e) ${STATUS_LABELS[statut]} de ${age} ans, ${sal}€ nets/mois, épargne ${ep}€/mois, touchera ~${pension}€/mois à la retraite (manque: ${gap}€/mois, ${annees} ans devant lui/elle). Génère EXACTEMENT 3 actions concrètes et chiffrées. JSON uniquement:\n{"steps":[{"title":"Titre court","desc":"1-2 phrases concrètes chiffrées."},{"title":"...","desc":"..."},{"title":"...","desc":"..."}]}`;
-
   try {
-    // ⚠️ En production : remplacer par un appel à /api/plan (backend proxy)
-    //    pour ne jamais exposer la clé API Anthropic côté client.
-    const resp = await fetch(API_ENDPOINT, {
+    const resp = await fetch('/.netlify/functions/generate-plan', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ model: API_MODEL, max_tokens: PLAN_MAX_TOKENS, messages: [{ role: 'user', content: prompt }] }),
+      body:    JSON.stringify({ age, sal, pension, gap, ep, annees, statut }),
     });
 
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
-    const data   = await resp.json();
-    const text   = data.content?.find(c => c.type === 'text')?.text ?? '';
-    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-
-    if (!Array.isArray(parsed?.steps)) throw new Error('Format de réponse inattendu.');
+    const { steps } = await resp.json();
+    if (!Array.isArray(steps)) throw new Error('Format inattendu');
 
     container.innerHTML = '';
-    parsed.steps.forEach((step, i) => {
+    steps.forEach((step, i) => {
       const div   = document.createElement('div');  div.className = 'plan-step'; div.style.animationDelay = `${i * 0.12}s`;
       const badge = document.createElement('div');  badge.className = 'step-num'; badge.textContent = i + 1;
       const body  = document.createElement('div');  body.className = 'step-content';
