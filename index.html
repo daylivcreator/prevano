@@ -484,9 +484,9 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 
     <div class="pricing-section">
       <div class="pricing-header">
-        <p class="pricing-eyebrow">Passez à l'action</p>
-        <h3>Débloquez votre plan complet</h3>
-        <p class="pricing-sub">Des outils avancés pour concrétiser votre stratégie retraite.</p>
+        <p class="pricing-eyebrow">Early Access</p>
+        <h3>Sois notifié en avant-première</h3>
+        <p class="pricing-sub">Le produit complet arrive bientôt — laisse ton email pour être parmi les premiers.</p>
       </div>
       <div class="pricing-email-row">
         <input type="email" id="pricing-email" class="pricing-email-input" placeholder="ton@email.com" autocomplete="email">
@@ -505,8 +505,8 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
             <li>Rapport PDF téléchargeable</li>
             <li>Suivi mensuel par email</li>
           </ul>
-          <button class="btn-pricing btn-pricing--default" id="btn-checkout-starter" type="button">
-            Commencer <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          <button class="btn-pricing btn-pricing--default" disabled type="button">
+            Bientôt disponible
           </button>
         </div>
         <div class="pricing-card pricing-card--pro">
@@ -523,8 +523,8 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
             <li>Suivi personnalisé mensuel</li>
             <li>Support prioritaire</li>
           </ul>
-          <button class="btn-pricing btn-pricing--pro" id="btn-checkout-pro" type="button">
-            Commencer <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          <button class="btn-pricing btn-pricing--pro" disabled type="button">
+            Bientôt disponible
           </button>
         </div>
       </div>
@@ -966,14 +966,9 @@ $('plan-save-btn').addEventListener('click', () => {
   if (pricingEmail && !pricingEmail.value) pricingEmail.value = input.value.trim();
 });
 
-/* ─── Stripe Checkout ───────────────────────────────────────────── */
+/* ─── Liste d'attente ───────────────────────────────────────────── */
 
-const PRICE_IDS = {
-  starter: 'price_1TdS3FJdUivM9ZOsgiNgjOnH',
-  pro:     'price_1TdS2kJdUivM9ZOsrMzP99oy',
-};
-
-async function startCheckout(priceId, btnEl) {
+async function joinWaitlist(btnEl) {
   const emailInput = $('pricing-email');
   const errorEl    = $('pricing-email-error');
   const savedEmail = $('plan-save-email')?.value.trim();
@@ -992,24 +987,27 @@ async function startCheckout(priceId, btnEl) {
 
   btnEl.disabled = true;
   const saved = btnEl.innerHTML;
-  btnEl.innerHTML = SPINNER_HTML + ' Redirection…';
+  btnEl.innerHTML = SPINNER_HTML + ' Inscription…';
 
   try {
-    const resp = await fetch('/.netlify/functions/create-checkout', {
+    await fetch('/.netlify/functions/save-email', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ priceId, email: emailInput.value.trim() }),
+      body:    JSON.stringify({ email: emailInput.value.trim() }),
     });
 
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.error || `Erreur ${resp.status}`);
-
-    window.location.href = data.url;
+    $('pricing-email-row').style.display = 'none';
+    btnEl.style.display = 'none';
+    const confirm = document.createElement('div');
+    confirm.className = 'plan-save-success';
+    confirm.style.marginTop = '8px';
+    confirm.innerHTML = '<i class="ti ti-circle-check-filled" aria-hidden="true"></i><span>C\'est noté ! Tu seras parmi les premiers informés du lancement.</span>';
+    btnEl.parentNode.insertBefore(confirm, btnEl.nextSibling);
   } catch (err) {
-    console.error('[Stripe]', err);
+    console.error('[waitlist]', err);
     btnEl.disabled      = false;
     btnEl.innerHTML     = saved;
-    errorEl.textContent = err.message || 'Une erreur est survenue. Réessaie dans un instant.';
+    errorEl.textContent = 'Une erreur est survenue. Réessaie dans un instant.';
   }
 }
 
@@ -1028,8 +1026,13 @@ async function startCheckout(priceId, btnEl) {
 
 $('btn-scroll').addEventListener('click',    () => $('simulator').scrollIntoView({ behavior: 'smooth' }));
 $('btn-simulate').addEventListener('click',  simulate);
-$('btn-checkout-starter').addEventListener('click', e => startCheckout(PRICE_IDS.starter, e.currentTarget));
-$('btn-checkout-pro').addEventListener('click',     e => startCheckout(PRICE_IDS.pro,     e.currentTarget));
+const btnWaitlist = document.createElement('button');
+btnWaitlist.type      = 'button';
+btnWaitlist.className = 'btn-pricing btn-pricing--pro';
+btnWaitlist.style.marginTop = '8px';
+btnWaitlist.innerHTML = 'Rejoindre la liste d\'attente <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+$('pricing-email-row').after(btnWaitlist);
+btnWaitlist.addEventListener('click', e => joinWaitlist(e.currentTarget));
 
 /* ─── Testimonial form ──────────────────────────────────────────── */
 
