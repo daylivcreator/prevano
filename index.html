@@ -934,26 +934,32 @@ function generatePlan() {
 
 let _sb      = null;
 let _simData = null;
+let _sbReady = null; // Promise — tous les handlers attendent cette résolution
 
 async function initSupabase() {
-  try {
-    const resp = await fetch('/.netlify/functions/get-config');
-    const { supabaseUrl, supabaseAnonKey } = await resp.json();
-    if (!supabaseUrl || !supabaseAnonKey) return;
+  const resp = await fetch('/.netlify/functions/get-config');
+  if (!resp.ok) throw new Error(`get-config HTTP ${resp.status}`);
 
-    _sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+  const { supabaseUrl, supabaseAnonKey } = await resp.json();
+  if (!supabaseUrl || !supabaseAnonKey) throw new Error('Variables Supabase manquantes dans Netlify');
 
-    const { data: { session } } = await _sb.auth.getSession();
+  _sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session) showNavUser(session.user);
+
+  _sb.auth.onAuthStateChange((_event, session) => {
     if (session) showNavUser(session.user);
+    else hideNavUser();
+  });
 
-    _sb.auth.onAuthStateChange((_event, session) => {
-      if (session) showNavUser(session.user);
-      else hideNavUser();
-    });
-  } catch (err) {
-    console.error('[supabase init]', err);
-  }
+  return _sb;
 }
+
+_sbReady = initSupabase().catch(err => {
+  console.error('[supabase init]', err.message);
+  return null;
+});
 
 function showNavUser(user) {
   $('nav-user-email').textContent = user.email;
@@ -995,11 +1001,17 @@ $('btn-signup').addEventListener('click', async () => {
   if (password.length < 8) {
     errorEl.textContent = 'Mot de passe trop court (min. 8 caractères).'; return;
   }
-  if (!_sb) { errorEl.textContent = 'Service indisponible, réessaie.'; return; }
-
   btn.disabled = true; btn.innerHTML = SPINNER_HTML + ' Création…';
 
-  const { data, error } = await _sb.auth.signUp({ email, password });
+  const sb = await _sbReady;
+  if (!sb) {
+    errorEl.textContent = 'Service indisponible — recharge la page.';
+    btn.disabled = false;
+    btn.innerHTML = 'Créer mon compte <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+    return;
+  }
+
+  const { data, error } = await sb.auth.signUp({ email, password });
 
   if (error) {
     errorEl.textContent = error.message === 'User already registered'
@@ -1011,7 +1023,7 @@ $('btn-signup').addEventListener('click', async () => {
   }
 
   await saveSimulation(data.user?.id);
-  showAuthSuccess('Compte créé — vérifie ton email puis connecte-toi pour accéder à ton espace !');
+  showAuthSuccess('Compte créé — tu recevras ton plan dès le lancement !');
 });
 
 /* Login */
@@ -1026,11 +1038,18 @@ $('btn-login').addEventListener('click', async () => {
   if (!email || password.length < 1) {
     errorEl.textContent = 'Remplis les deux champs.'; return;
   }
-  if (!_sb) { errorEl.textContent = 'Service indisponible, réessaie.'; return; }
 
   btn.disabled = true; btn.innerHTML = SPINNER_HTML + ' Connexion…';
 
-  const { data, error } = await _sb.auth.signInWithPassword({ email, password });
+  const sb = await _sbReady;
+  if (!sb) {
+    errorEl.textContent = 'Service indisponible — recharge la page.';
+    btn.disabled = false;
+    btn.innerHTML = 'Se connecter <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+    return;
+  }
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
   if (error) {
     errorEl.textContent = 'Email ou mot de passe incorrect.';
@@ -1060,7 +1079,6 @@ $('btn-logout').addEventListener('click', async () => {
   if (_sb) await _sb.auth.signOut();
 });
 
-initSupabase();
 
 
 /* ─── Checkout success detection ────────────────────────────────── */
