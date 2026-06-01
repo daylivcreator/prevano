@@ -1,4 +1,4 @@
-const API_MODEL = 'claude-sonnet-4-5';
+const API_MODEL = 'claude-3-5-sonnet-20241022';
 
 const STATUS_LABELS = {
   prive:         'salarié du privé',
