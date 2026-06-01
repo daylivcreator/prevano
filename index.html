@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -173,6 +174,15 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .plan-save-error { font-size:12px; color:var(--color-primary); min-height:18px; margin-top:8px; }
 .plan-save-success { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:#22C55E; padding:14px 18px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:10px; margin-top:4px; }
 .plan-save-success i { font-size:20px; flex-shrink:0; }
+.auth-fields { display:flex; flex-direction:column; gap:10px; }
+.auth-error { font-size:12px; color:var(--color-primary); min-height:18px; margin-top:6px; }
+.auth-switch { font-size:12px; color:var(--text-faint); margin-top:10px; }
+.auth-switch a { color:var(--color-primary); text-decoration:none; font-weight:600; }
+.auth-switch a:hover { text-decoration:underline; }
+.nav-user { display:flex; align-items:center; gap:10px; }
+.nav-user-email { font-size:12px; color:var(--text-muted); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.btn-logout { font-size:11px; font-weight:600; color:var(--text-faint); background:none; border:1px solid var(--border-subtle); padding:4px 10px; border-radius:6px; cursor:pointer; transition:color 0.2s,border-color 0.2s; }
+.btn-logout:hover { color:var(--color-primary); border-color:var(--color-primary-border); }
 @keyframes spin { to { transform:rotate(360deg); } }
 .spin { animation:spin 1s linear infinite; }
 .plan-steps { display:flex; flex-direction:column; gap:12px; }
@@ -292,6 +302,10 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
           </svg>
         </div>
         <span class="logo" translate="no">Pre<em>vano</em></span>
+      </div>
+      <div id="nav-user" class="nav-user" style="display:none">
+        <span class="nav-user-email" id="nav-user-email"></span>
+        <button class="btn-logout" id="btn-logout" type="button">Déconnexion</button>
       </div>
     </div>
   </nav>
@@ -463,18 +477,36 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
       <div class="plan-steps" id="plan-steps" style="display:none"></div>
       <div id="plan-save" style="display:none">
         <p class="pricing-eyebrow" style="margin-bottom:10px">Early Access</p>
-        <p class="plan-save-title">Sois notifié en avant-première</p>
-        <p class="plan-save-desc">Ton plan personnalisé t'attend — laisse ton email pour le recevoir dès le lancement.</p>
-        <div class="plan-save-row" id="plan-save-row">
-          <input type="email" id="plan-save-email" class="plan-save-input" placeholder="ton@email.com" autocomplete="email">
-          <button type="button" id="plan-save-btn" class="plan-save-btn">
-            Rejoindre la liste <i class="ti ti-arrow-right" aria-hidden="true"></i>
-          </button>
+        <p class="plan-save-title">Crée ton compte Prevano</p>
+        <p class="plan-save-desc">Ton plan personnalisé t'attend — crée ton compte pour le recevoir dès le lancement et sauvegarder ta simulation.</p>
+
+        <div id="auth-signup">
+          <div class="auth-fields">
+            <input type="email" id="auth-email" class="plan-save-input" placeholder="ton@email.com" autocomplete="email">
+            <input type="password" id="auth-password" class="plan-save-input" placeholder="Mot de passe (min. 8 caractères)" autocomplete="new-password">
+            <button type="button" id="btn-signup" class="plan-save-btn">
+              Créer mon compte <i class="ti ti-arrow-right" aria-hidden="true"></i>
+            </button>
+          </div>
+          <p class="auth-error" id="signup-error" role="alert" aria-live="assertive"></p>
+          <p class="auth-switch">Déjà un compte ? <a href="#" id="link-show-login">Se connecter</a></p>
         </div>
-        <p class="plan-save-error" id="plan-save-error" role="alert" aria-live="assertive"></p>
+
+        <div id="auth-login" style="display:none">
+          <div class="auth-fields">
+            <input type="email" id="login-email" class="plan-save-input" placeholder="ton@email.com" autocomplete="email">
+            <input type="password" id="login-password" class="plan-save-input" placeholder="Mot de passe" autocomplete="current-password">
+            <button type="button" id="btn-login" class="plan-save-btn">
+              Se connecter <i class="ti ti-arrow-right" aria-hidden="true"></i>
+            </button>
+          </div>
+          <p class="auth-error" id="login-error" role="alert" aria-live="assertive"></p>
+          <p class="auth-switch"><a href="#" id="link-show-signup">Créer un compte</a></p>
+        </div>
+
         <div class="plan-save-success" id="plan-save-success" style="display:none">
           <i class="ti ti-circle-check-filled" aria-hidden="true"></i>
-          <span>C'est noté — tu seras parmi les premiers informés du lancement !</span>
+          <span id="auth-success-msg">Compte créé — tu recevras ton plan dès le lancement !</span>
         </div>
       </div>
     </div>
@@ -846,6 +878,9 @@ function simulate() {
   const gap     = sal - pension;
   const pctGap  = Math.round((1 - pension / sal) * 100);
   const barW    = Math.max(Math.round((pension / sal) * 100), 5);
+  const score   = computeScore(sal, pension, ep, annees, statut);
+
+  _simData = { age, salaire: sal, epargne: ep, depart: dep, statut, pension, gap, score };
 
   // Loading state
   const btn = $('btn-simulate');
@@ -895,37 +930,137 @@ function generatePlan() {
 
 /* ─── Plan save form ────────────────────────────────────────────── */
 
-$('plan-save-btn').addEventListener('click', async () => {
-  const input   = $('plan-save-email');
-  const errorEl = $('plan-save-error');
-  const btn     = $('plan-save-btn');
+/* ─── Supabase Auth ─────────────────────────────────────────────── */
 
-  input.classList.remove('error');
+let _sb      = null;
+let _simData = null;
+
+async function initSupabase() {
+  try {
+    const resp = await fetch('/.netlify/functions/get-config');
+    const { supabaseUrl, supabaseAnonKey } = await resp.json();
+    if (!supabaseUrl || !supabaseAnonKey) return;
+
+    _sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) showNavUser(session.user);
+
+    _sb.auth.onAuthStateChange((_event, session) => {
+      if (session) showNavUser(session.user);
+      else hideNavUser();
+    });
+  } catch (err) {
+    console.error('[supabase init]', err);
+  }
+}
+
+function showNavUser(user) {
+  $('nav-user-email').textContent = user.email;
+  $('nav-user').style.display     = 'flex';
+}
+
+function hideNavUser() {
+  $('nav-user').style.display = 'none';
+}
+
+async function saveSimulation(userId) {
+  if (!_sb || !_simData || !userId) return;
+  try {
+    await _sb.from('simulations').insert({ user_id: userId, ..._simData });
+  } catch (err) {
+    console.error('[saveSimulation]', err);
+  }
+}
+
+function showAuthSuccess(msg) {
+  $('auth-signup').style.display      = 'none';
+  $('auth-login').style.display       = 'none';
+  $('auth-success-msg').textContent   = msg;
+  $('plan-save-success').style.display = 'flex';
+}
+
+/* Signup */
+$('btn-signup').addEventListener('click', async () => {
+  const email    = $('auth-email').value.trim();
+  const password = $('auth-password').value;
+  const errorEl  = $('signup-error');
+  const btn      = $('btn-signup');
+
   errorEl.textContent = '';
 
-  if (!input.value.trim() || !input.validity.valid) {
-    input.classList.add('error');
-    errorEl.textContent = 'Saisis une adresse email valide.';
-    input.focus();
+  if (!email || !$('auth-email').validity.valid) {
+    errorEl.textContent = 'Saisis une adresse email valide.'; return;
+  }
+  if (password.length < 8) {
+    errorEl.textContent = 'Mot de passe trop court (min. 8 caractères).'; return;
+  }
+  if (!_sb) { errorEl.textContent = 'Service indisponible, réessaie.'; return; }
+
+  btn.disabled = true; btn.innerHTML = SPINNER_HTML + ' Création…';
+
+  const { data, error } = await _sb.auth.signUp({ email, password });
+
+  if (error) {
+    errorEl.textContent = error.message === 'User already registered'
+      ? 'Email déjà utilisé — connecte-toi plutôt.'
+      : error.message;
+    btn.disabled = false;
+    btn.innerHTML = 'Créer mon compte <i class="ti ti-arrow-right" aria-hidden="true"></i>';
     return;
   }
 
-  btn.disabled    = true;
-  btn.innerHTML   = SPINNER_HTML + ' Inscription…';
+  await saveSimulation(data.user?.id);
+  showAuthSuccess('Compte créé — vérifie ton email puis connecte-toi pour accéder à ton espace !');
+});
 
-  try {
-    await fetch('/.netlify/functions/save-email', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email: input.value.trim() }),
-    });
-  } catch (err) {
-    console.error('[plan-save]', err);
+/* Login */
+$('btn-login').addEventListener('click', async () => {
+  const email    = $('login-email').value.trim();
+  const password = $('login-password').value;
+  const errorEl  = $('login-error');
+  const btn      = $('btn-login');
+
+  errorEl.textContent = '';
+
+  if (!email || password.length < 1) {
+    errorEl.textContent = 'Remplis les deux champs.'; return;
+  }
+  if (!_sb) { errorEl.textContent = 'Service indisponible, réessaie.'; return; }
+
+  btn.disabled = true; btn.innerHTML = SPINNER_HTML + ' Connexion…';
+
+  const { data, error } = await _sb.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    errorEl.textContent = 'Email ou mot de passe incorrect.';
+    btn.disabled = false;
+    btn.innerHTML = 'Se connecter <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+    return;
   }
 
-  $('plan-save-row').style.display     = 'none';
-  $('plan-save-success').style.display = 'flex';
+  await saveSimulation(data.user?.id);
+  showAuthSuccess('Connecté ! Ton espace Prevano est prêt.');
 });
+
+/* Toggle signup ↔ login */
+$('link-show-login').addEventListener('click', e => {
+  e.preventDefault();
+  $('auth-signup').style.display = 'none';
+  $('auth-login').style.display  = 'block';
+});
+$('link-show-signup').addEventListener('click', e => {
+  e.preventDefault();
+  $('auth-login').style.display  = 'none';
+  $('auth-signup').style.display = 'block';
+});
+
+/* Logout */
+$('btn-logout').addEventListener('click', async () => {
+  if (_sb) await _sb.auth.signOut();
+});
+
+initSupabase();
 
 
 /* ─── Checkout success detection ────────────────────────────────── */
