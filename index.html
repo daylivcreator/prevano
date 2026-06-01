@@ -161,6 +161,7 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .plan-card h3 { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:20px; }
 .plan-loading { display:flex; align-items:center; gap:10px; color:var(--text-muted); font-size:14px; padding:12px 0; }
 .plan-loading i { color:var(--color-primary); font-size:18px; animation:spin 1s linear infinite; }
+.plan-save-title { font-size:18px; font-weight:900; letter-spacing:-0.03em; margin-bottom:8px; }
 .plan-save-desc { font-size:14px; color:var(--text-muted); margin-bottom:16px; line-height:1.6; }
 .plan-save-row { display:flex; gap:10px; flex-wrap:wrap; }
 .plan-save-input { flex:1; min-width:180px; padding:12px 16px; border-radius:10px; border:1.5px solid var(--border-subtle); font-size:14px; color:var(--text-primary); background:var(--bg-raised); outline:none; transition:border-color 0.2s,background-color 0.2s; }
@@ -221,12 +222,6 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .pricing-eyebrow { font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--color-primary); text-transform:uppercase; margin-bottom:8px; }
 .pricing-header h3 { font-size:24px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
 .pricing-sub { font-size:14px; color:var(--text-muted); }
-.pricing-email-row { margin-bottom:20px; }
-.pricing-email-input { width:100%; padding:13px 18px; border-radius:10px; border:1.5px solid var(--border-subtle); font-size:14px; color:var(--text-primary); background:var(--bg-raised); outline:none; transition:border-color 0.2s; }
-.pricing-email-input:focus { border-color:var(--color-primary); background:var(--bg-overlay); }
-.pricing-email-input::placeholder { color:var(--text-faint); }
-.pricing-email-input.error { border-color:var(--color-primary); }
-.pricing-email-error { font-size:12px; color:var(--color-primary); min-height:18px; margin-top:6px; }
 .pricing-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .pricing-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:16px; padding:28px 24px; display:flex; flex-direction:column; gap:20px; position:relative; transition:border-color 0.2s,transform 0.2s; }
 .pricing-card:hover { border-color:var(--border-default); transform:translateY(-2px); }
@@ -467,30 +462,28 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
       </div>
       <div class="plan-steps" id="plan-steps" style="display:none"></div>
       <div id="plan-save" style="display:none">
-        <p class="plan-save-desc">Ton plan d'action personnalisé est réservé aux membres Prevano. Laisse ton email — on te l'envoie dès le lancement.</p>
+        <p class="pricing-eyebrow" style="margin-bottom:10px">Early Access</p>
+        <p class="plan-save-title">Sois notifié en avant-première</p>
+        <p class="plan-save-desc">Ton plan d'action est réservé aux membres. Laisse ton email — on te prévient dès le lancement et on t'envoie ton plan personnalisé.</p>
         <div class="plan-save-row" id="plan-save-row">
           <input type="email" id="plan-save-email" class="plan-save-input" placeholder="ton@email.com" autocomplete="email">
           <button type="button" id="plan-save-btn" class="plan-save-btn">
-            Sauvegarder <i class="ti ti-send" aria-hidden="true"></i>
+            Rejoindre la liste <i class="ti ti-arrow-right" aria-hidden="true"></i>
           </button>
         </div>
         <p class="plan-save-error" id="plan-save-error" role="alert" aria-live="assertive"></p>
         <div class="plan-save-success" id="plan-save-success" style="display:none">
           <i class="ti ti-circle-check-filled" aria-hidden="true"></i>
-          <span>C'est enregistré — on te prévient dès que ton plan est disponible.</span>
+          <span>C'est noté — tu seras parmi les premiers informés du lancement !</span>
         </div>
       </div>
     </div>
 
     <div class="pricing-section">
       <div class="pricing-header">
-        <p class="pricing-eyebrow">Early Access</p>
-        <h3>Sois notifié en avant-première</h3>
-        <p class="pricing-sub">Le produit complet arrive bientôt — laisse ton email pour être parmi les premiers.</p>
-      </div>
-      <div class="pricing-email-row">
-        <input type="email" id="pricing-email" class="pricing-email-input" placeholder="ton@email.com" autocomplete="email">
-        <p class="pricing-email-error" id="pricing-email-error" role="alert"></p>
+        <p class="pricing-eyebrow">Nos offres</p>
+        <h3>Bientôt disponible</h3>
+        <p class="pricing-sub">Le produit complet arrive prochainement.</p>
       </div>
       <div class="pricing-grid">
         <div class="pricing-card">
@@ -902,9 +895,10 @@ function generatePlan() {
 
 /* ─── Plan save form ────────────────────────────────────────────── */
 
-$('plan-save-btn').addEventListener('click', () => {
+$('plan-save-btn').addEventListener('click', async () => {
   const input   = $('plan-save-email');
   const errorEl = $('plan-save-error');
+  const btn     = $('plan-save-btn');
 
   input.classList.remove('error');
   errorEl.textContent = '';
@@ -916,58 +910,23 @@ $('plan-save-btn').addEventListener('click', () => {
     return;
   }
 
-  $('plan-save-row').style.display  = 'none';
-  errorEl.style.display             = 'none';
-  $('plan-save-success').style.display = 'flex';
-
-  const pricingEmail = $('pricing-email');
-  if (pricingEmail && !pricingEmail.value) pricingEmail.value = input.value.trim();
-});
-
-/* ─── Liste d'attente ───────────────────────────────────────────── */
-
-async function joinWaitlist(btnEl) {
-  const emailInput = $('pricing-email');
-  const errorEl    = $('pricing-email-error');
-  const savedEmail = $('plan-save-email')?.value.trim();
-
-  if (!emailInput.value.trim() && savedEmail) emailInput.value = savedEmail;
-
-  emailInput.classList.remove('error');
-  errorEl.textContent = '';
-
-  if (!emailInput.value.trim() || !emailInput.validity.valid) {
-    emailInput.classList.add('error');
-    errorEl.textContent = 'Saisis ton adresse email pour continuer.';
-    emailInput.focus();
-    return;
-  }
-
-  btnEl.disabled = true;
-  const saved = btnEl.innerHTML;
-  btnEl.innerHTML = SPINNER_HTML + ' Inscription…';
+  btn.disabled    = true;
+  btn.innerHTML   = SPINNER_HTML + ' Inscription…';
 
   try {
     await fetch('/.netlify/functions/save-email', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email: emailInput.value.trim() }),
+      body:    JSON.stringify({ email: input.value.trim() }),
     });
-
-    $('pricing-email-row').style.display = 'none';
-    btnEl.style.display = 'none';
-    const confirm = document.createElement('div');
-    confirm.className = 'plan-save-success';
-    confirm.style.marginTop = '8px';
-    confirm.innerHTML = '<i class="ti ti-circle-check-filled" aria-hidden="true"></i><span>C\'est noté ! Tu seras parmi les premiers informés du lancement.</span>';
-    btnEl.parentNode.insertBefore(confirm, btnEl.nextSibling);
   } catch (err) {
-    console.error('[waitlist]', err);
-    btnEl.disabled      = false;
-    btnEl.innerHTML     = saved;
-    errorEl.textContent = 'Une erreur est survenue. Réessaie dans un instant.';
+    console.error('[plan-save]', err);
   }
-}
+
+  $('plan-save-row').style.display     = 'none';
+  $('plan-save-success').style.display = 'flex';
+});
+
 
 /* ─── Checkout success detection ────────────────────────────────── */
 
@@ -984,13 +943,6 @@ async function joinWaitlist(btnEl) {
 
 $('btn-scroll').addEventListener('click',    () => $('simulator').scrollIntoView({ behavior: 'smooth' }));
 $('btn-simulate').addEventListener('click',  simulate);
-const btnWaitlist = document.createElement('button');
-btnWaitlist.type      = 'button';
-btnWaitlist.className = 'btn-pricing btn-pricing--pro';
-btnWaitlist.style.marginTop = '8px';
-btnWaitlist.innerHTML = 'Rejoindre la liste d\'attente <i class="ti ti-arrow-right" aria-hidden="true"></i>';
-$('pricing-email-row').after(btnWaitlist);
-btnWaitlist.addEventListener('click', e => joinWaitlist(e.currentTarget));
 
 /* ─── Testimonial form ──────────────────────────────────────────── */
 
