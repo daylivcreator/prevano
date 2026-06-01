@@ -172,18 +172,6 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .step-content h4 { font-size:14px; font-weight:600; margin-bottom:3px; }
 .step-content p  { font-size:13px; color:var(--text-muted); line-height:1.55; }
 
-/* Email CTA */
-.email-cta { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:16px; padding:40px; text-align:center; }
-.email-cta h3 { font-size:26px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
-.email-cta p  { font-size:14px; color:var(--text-muted); margin-bottom:28px; line-height:1.65; }
-.email-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-.email-input { padding:13px 18px; border-radius:10px; border:1.5px solid var(--border-subtle); font-size:14px; width:270px; outline:none; color:var(--text-primary); background:var(--bg-raised); transition:border-color 0.2s; }
-.email-input:focus { border-color:var(--color-primary); }
-.email-input::placeholder { color:var(--text-faint); }
-.btn-email { background:var(--color-primary); color:#fff; border:none; padding:13px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s; display:flex; align-items:center; gap:6px; position:relative; overflow:hidden; }
-.btn-email:hover  { background:var(--color-primary-dark); transform:translateY(-1px); }
-.btn-email:active { transform:scale(0.98); }
-.email-note { font-size:11px; color:var(--text-faint); margin-top:14px; }
 
 /* ── Sim counter ── */
 .sim-counter { display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:20px; font-size:13px; color:var(--text-muted); }
@@ -266,10 +254,6 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
   .sim-row      { grid-template-columns:1fr; }
   .shock-grid   { grid-template-columns:1fr; }
   .shock-banner h2 { font-size:26px; }
-  .email-cta    { padding:28px 20px; }
-  .email-row    { flex-direction:column; align-items:stretch; }
-  .email-input  { width:100%; }
-  .btn-email    { justify-content:center; }
   .reviews-section { padding:40px 20px; }
 }
 </style>
@@ -498,17 +482,6 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
       </div>
     </div>
 
-    <div class="email-cta reveal">
-      <h3>Reçois ton plan complet.</h3>
-      <p>Projections détaillées, stratégies d'épargne et alertes personnalisées —<br>dès le lancement de Prevano.</p>
-      <div class="email-row">
-        <input class="email-input" type="email" id="user-email" placeholder="ton@email.com" autocomplete="email">
-        <button id="btn-email" class="btn-email" type="button">
-          M'envoyer le plan <i class="ti ti-send" aria-hidden="true"></i>
-        </button>
-      </div>
-      <p class="email-note">Aucun spam. Uniquement ton plan Prevano.</p>
-    </div>
   </section>
 
   <!-- ── Témoignages ── -->
@@ -920,18 +893,6 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
   }
 }
 
-/* ─── Submit email ──────────────────────────────────────────────── */
-
-function submitEmail() {
-  const input = $('user-email');
-  if (!input.validity.valid) { input.focus(); return; }
-  window.open(
-    'https://e1966e2e.sibforms.com/serve/MUIFAOKeyQAhd7aThpwc95y3ddkMyDgzYfLi_BZwCued7LJpHkCH2Io9vTXExUxgZO0qv8f-g4ho7h9GqgsvY9IQ7X7Fxzt0rUNsvW7hHkVp2e7uOnz1jm92tPscAG1Wirbw_o5NMVxC7OEK4sCSA8E-y2-GisBN3qoiMhPcfmizSh6UHTdIukQ2mue3RuoxBUgbFFUj7Y1nviUWLw==',
-    '_blank',
-    'noopener,noreferrer'
-  );
-}
-
 /* ─── Stripe Checkout ───────────────────────────────────────────── */
 
 const STRIPE_PK = 'pk_live_51TdR6lJdUivM9ZOs1nZNLyzsCohFVWHgqTtyxkr6mcwjfuXhIb3VePpIc5D4qORzA5X8Scli3VfrQGzZ6WWwgDEY00tzxRAfQB';
@@ -967,7 +928,6 @@ async function startCheckout(priceId, btnEl) {
 
 $('btn-scroll').addEventListener('click',    () => $('simulator').scrollIntoView({ behavior: 'smooth' }));
 $('btn-simulate').addEventListener('click',  simulate);
-$('btn-email').addEventListener('click',     submitEmail);
 $('btn-checkout-starter').addEventListener('click', e => startCheckout(PRICE_IDS.starter, e.currentTarget));
 $('btn-checkout-pro').addEventListener('click',     e => startCheckout(PRICE_IDS.pro,     e.currentTarget));
 
