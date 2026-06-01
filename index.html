@@ -99,6 +99,10 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .field input:focus,.field select:focus { border-color:var(--color-primary); background:var(--bg-overlay); }
 .field input.filled,.field select.filled { border-color:rgba(226,75,74,0.4); }
 .field input::placeholder { color:var(--text-faint); }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) inset !important; -webkit-text-fill-color:var(--text-primary) !important; transition:background-color 5000s ease-in-out 0s; }
 .field select option { background:var(--bg-raised); color:var(--text-primary); }
 .field--full { margin-bottom:20px; }
 
