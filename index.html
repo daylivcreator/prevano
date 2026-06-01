@@ -737,6 +737,9 @@ document.addEventListener('click', e => {
   rip.addEventListener('animationend', () => rip.remove(), { once: true });
 });
 
+/* Réinitialise les valeurs mémorisées par le navigateur */
+FIELD_IDS.forEach(id => { const el = $(id); if (el) el.value = ''; });
+
 /* ─── Progress bar ──────────────────────────────────────────────── */
 
 const progressFill  = $('progress-fill');
