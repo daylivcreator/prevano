@@ -166,6 +166,7 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
 .plan-card h3 { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:20px; }
 .plan-loading { display:flex; align-items:center; gap:10px; color:var(--text-muted); font-size:14px; padding:12px 0; }
 .plan-loading i { color:var(--color-primary); font-size:18px; animation:spin 1s linear infinite; }
+.plan-save-eyebrow { margin-bottom:10px; }
 .plan-save-title { font-size:18px; font-weight:900; letter-spacing:-0.03em; margin-bottom:8px; }
 .plan-save-desc { font-size:14px; color:var(--text-muted); margin-bottom:16px; line-height:1.6; }
 .plan-save-row { display:flex; gap:10px; flex-wrap:wrap; }
@@ -480,7 +481,7 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
       </div>
       <div class="plan-steps" id="plan-steps" style="display:none"></div>
       <div id="plan-save" style="display:none">
-        <p class="pricing-eyebrow" style="margin-bottom:10px">Early Access</p>
+        <p class="pricing-eyebrow plan-save-eyebrow">Early Access</p>
         <p class="plan-save-title">Crée ton compte Prevano</p>
         <p class="plan-save-desc">Ton plan personnalisé t'attend — crée ton compte pour le recevoir dès le lancement et sauvegarder ta simulation.</p>
 
@@ -664,9 +665,6 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
 
 /* ─── Constants ─────────────────────────────────────────────────── */
 
-const API_MODEL    = 'claude-sonnet-4-20250514';
-const API_ENDPOINT = 'https://api.anthropic.com/v1/messages';
-const PLAN_MAX_TOKENS = 600;
 const SPINNER_HTML = '<i class="ti ti-loader-2 spin" aria-hidden="true"></i>';
 
 /** 2π × r(50) — exact SVG circumference, avoids magic number 314 */
@@ -708,6 +706,11 @@ const STATUS_LABELS = {
 /* ─── Helpers ───────────────────────────────────────────────────── */
 
 const $ = id => document.getElementById(id);
+
+/* ─── Supabase state (déclaré tôt — utilisé dans simulate() et les handlers auth) ── */
+let _sb      = null;
+let _simData = null;
+let _sbReady = null;
 
 function fmt(n) {
   return Math.round(n).toLocaleString('fr-FR') + '€';
@@ -887,9 +890,8 @@ function simulate() {
   const gap     = sal - pension;
   const pctGap  = Math.round((1 - pension / sal) * 100);
   const barW    = Math.max(Math.round((pension / sal) * 100), 5);
-  const score   = computeScore(sal, pension, ep, annees, statut);
-
-  _simData = { age, salaire: sal, epargne: ep, depart: dep, statut, pension, gap, score };
+  const score = computeScore(sal, pension, ep, annees, statut);
+  _simData    = { age, salaire: sal, epargne: ep, depart: dep, statut, pension, gap, score };
 
   // Loading state
   const btn = $('btn-simulate');
@@ -922,7 +924,7 @@ function simulate() {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     shock.scrollIntoView({ behavior: 'smooth', block: 'start' });
     launchConfetti();
-    renderScore(computeScore(sal, pension, ep, annees, statut));
+    renderScore(score);
     btn.disabled  = false;
     btn.innerHTML = 'Voir ma projection retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>';
   }));
@@ -937,13 +939,7 @@ function generatePlan() {
   $('plan-save').style.display    = 'block';
 }
 
-/* ─── Plan save form ────────────────────────────────────────────── */
-
 /* ─── Supabase Auth ─────────────────────────────────────────────── */
-
-let _sb      = null;
-let _simData = null;
-let _sbReady = null; // Promise — tous les handlers attendent cette résolution
 
 async function initSupabase() {
   const resp = await fetch('/.netlify/functions/get-config');
@@ -1088,8 +1084,6 @@ $('btn-logout').addEventListener('click', async () => {
   if (_sb) await _sb.auth.signOut();
 });
 
-
-
 /* ─── Checkout success detection ────────────────────────────────── */
 
 (function () {
@@ -1115,7 +1109,7 @@ document.getElementById('testimonial-form').addEventListener('submit', function(
   if (!name || !text) return;
   const subject = encodeURIComponent('Témoignage Prevano — ' + name);
   const body    = encodeURIComponent(name + ' écrit :\n\n' + text);
-  window.location.href = 'mailto:contact@prevano.fr?subject=' + subject + '&body=' + body;
+  window.location.href = 'mailto:prevano.app@outlook.fr?subject=' + subject + '&body=' + body;
   this.style.display = 'none';
   document.getElementById('testimonial-thanks').style.display = 'block';
 });
