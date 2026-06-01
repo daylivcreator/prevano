@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
-<script src="https://js.stripe.com/v3/"></script>
 <style>
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -254,6 +253,13 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
   .pricing-card { padding:24px 20px; }
 }
 
+/* ── Checkout success banner ── */
+.checkout-success-banner { display:none; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); border-radius:14px; padding:18px 24px; max-width:1100px; margin:20px 48px 0; align-items:center; gap:16px; }
+.checkout-success-banner i { font-size:26px; color:#22C55E; flex-shrink:0; }
+.checkout-success-banner strong { display:block; font-size:15px; font-weight:700; color:#22C55E; margin-bottom:3px; }
+.checkout-success-banner span { font-size:13px; color:var(--text-muted); line-height:1.5; }
+@media(max-width:640px){ .checkout-success-banner { margin:16px 20px 0; } }
+
 /* Confetti */
 #confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
 
@@ -298,6 +304,13 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 
 
 <main>
+  <div id="checkout-success-banner" class="checkout-success-banner" role="alert" aria-live="polite">
+    <i class="ti ti-circle-check-filled" aria-hidden="true"></i>
+    <div>
+      <strong>Paiement confirmé — bienvenue sur Prevano !</strong>
+      <span>Tu vas recevoir un email de confirmation dans quelques minutes. Ton plan est en cours de préparation.</span>
+    </div>
+  </div>
   <section class="hero reveal" aria-labelledby="hero-title">
     <div class="hero-eyebrow">
       <div class="logo-icon" style="width:18px;height:18px;border-radius:5px;flex-shrink:0;" aria-hidden="true">
@@ -955,19 +968,15 @@ $('plan-save-btn').addEventListener('click', () => {
 
 /* ─── Stripe Checkout ───────────────────────────────────────────── */
 
-const STRIPE_PK = 'pk_live_51TdR6lJdUivM9ZOs1nZNLyzsCohFVWHgqTtyxkr6mcwjfuXhIb3VePpIc5D4qORzA5X8Scli3VfrQGzZ6WWwgDEY00tzxRAfQB';
 const PRICE_IDS = {
   starter: 'price_1TdS3FJdUivM9ZOsgiNgjOnH',
   pro:     'price_1TdS2kJdUivM9ZOsrMzP99oy',
 };
 
-let _stripe = null;
-function getStripe() { return _stripe || (_stripe = Stripe(STRIPE_PK)); }
-
 async function startCheckout(priceId, btnEl) {
-  const emailInput  = $('pricing-email');
-  const errorEl     = $('pricing-email-error');
-  const savedEmail  = $('plan-save-email')?.value.trim();
+  const emailInput = $('pricing-email');
+  const errorEl    = $('pricing-email-error');
+  const savedEmail = $('plan-save-email')?.value.trim();
 
   if (!emailInput.value.trim() && savedEmail) emailInput.value = savedEmail;
 
@@ -984,22 +993,36 @@ async function startCheckout(priceId, btnEl) {
   btnEl.disabled = true;
   const saved = btnEl.innerHTML;
   btnEl.innerHTML = SPINNER_HTML + ' Redirection…';
-  const base = window.location.href.split('?')[0];
+
   try {
-    const { error } = await getStripe().redirectToCheckout({
-      lineItems:     [{ price: priceId, quantity: 1 }],
-      mode:          'subscription',
-      customerEmail: emailInput.value.trim(),
-      successUrl:    base + '?checkout=success',
-      cancelUrl:     base,
+    const resp = await fetch('/.netlify/functions/create-checkout', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ priceId, email: emailInput.value.trim() }),
     });
-    if (error) throw error;
+
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || `Erreur ${resp.status}`);
+
+    window.location.href = data.url;
   } catch (err) {
     console.error('[Stripe]', err);
-    btnEl.disabled  = false;
-    btnEl.innerHTML = saved;
+    btnEl.disabled      = false;
+    btnEl.innerHTML     = saved;
+    errorEl.textContent = err.message || 'Une erreur est survenue. Réessaie dans un instant.';
   }
 }
+
+/* ─── Checkout success detection ────────────────────────────────── */
+
+(function () {
+  if (new URLSearchParams(window.location.search).get('checkout') !== 'success') return;
+  history.replaceState(null, '', window.location.pathname);
+  const banner = $('checkout-success-banner');
+  if (!banner) return;
+  banner.style.display = 'flex';
+  requestAnimationFrame(() => banner.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+})();
 
 /* ─── Wire up events (zero inline onclick) ──────────────────────── */
 
