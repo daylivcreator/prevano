@@ -467,7 +467,7 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
       </div>
       <div class="plan-steps" id="plan-steps" style="display:none"></div>
       <div id="plan-save" style="display:none">
-        <p class="plan-save-desc">Ton plan est en cours de préparation — laisse ton email pour le recevoir dès qu'il est prêt et être notifié des mises à jour.</p>
+        <p class="plan-save-desc">Ton plan d'action personnalisé est réservé aux membres Prevano. Laisse ton email — on te l'envoie dès le lancement.</p>
         <div class="plan-save-row" id="plan-save-row">
           <input type="email" id="plan-save-email" class="plan-save-input" placeholder="ton@email.com" autocomplete="email">
           <button type="button" id="plan-save-btn" class="plan-save-btn">
@@ -890,49 +890,14 @@ function simulate() {
     btn.innerHTML = 'Voir ma projection retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>';
   }));
 
-  generatePlan(age, sal, pension, gap, ep, annees, statut);
+  generatePlan();
 }
 
 /* ─── Generate plan ─────────────────────────────────────────────── */
 
-async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
-  const loading   = $('plan-loading');
-  const container = $('plan-steps');
-  loading.style.display   = 'flex';
-  container.style.display = 'none';
-
-  try {
-    const resp = await fetch('/.netlify/functions/generate-plan', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ age, sal, pension, gap, ep, annees, statut }),
-    });
-
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-
-    const { steps } = await resp.json();
-    if (!Array.isArray(steps)) throw new Error('Format inattendu');
-
-    container.innerHTML = '';
-    steps.forEach((step, i) => {
-      const div   = document.createElement('div');  div.className = 'plan-step'; div.style.animationDelay = `${i * 0.12}s`;
-      const badge = document.createElement('div');  badge.className = 'step-num'; badge.textContent = i + 1;
-      const body  = document.createElement('div');  body.className = 'step-content';
-      const h4    = document.createElement('h4');   h4.textContent = step.title;
-      const p     = document.createElement('p');    p.textContent  = step.desc;
-      body.append(h4, p);
-      div.append(badge, body);
-      container.appendChild(div);
-    });
-
-    loading.style.display   = 'none';
-    container.style.display = 'flex';
-
-  } catch (err) {
-    console.error('[generatePlan]', err);
-    loading.style.display = 'none';
-    $('plan-save').style.display = 'block';
-  }
+function generatePlan() {
+  $('plan-loading').style.display = 'none';
+  $('plan-save').style.display    = 'block';
 }
 
 /* ─── Plan save form ────────────────────────────────────────────── */
