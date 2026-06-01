@@ -211,6 +211,12 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .pricing-eyebrow { font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--color-primary); text-transform:uppercase; margin-bottom:8px; }
 .pricing-header h3 { font-size:24px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
 .pricing-sub { font-size:14px; color:var(--text-muted); }
+.pricing-email-row { margin-bottom:20px; }
+.pricing-email-input { width:100%; padding:13px 18px; border-radius:10px; border:1.5px solid var(--border-subtle); font-size:14px; color:var(--text-primary); background:var(--bg-raised); outline:none; transition:border-color 0.2s; }
+.pricing-email-input:focus { border-color:var(--color-primary); background:var(--bg-overlay); }
+.pricing-email-input::placeholder { color:var(--text-faint); }
+.pricing-email-input.error { border-color:var(--color-primary); }
+.pricing-email-error { font-size:12px; color:var(--color-primary); min-height:18px; margin-top:6px; }
 .pricing-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .pricing-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:16px; padding:28px 24px; display:flex; flex-direction:column; gap:20px; position:relative; transition:border-color 0.2s,transform 0.2s; }
 .pricing-card:hover { border-color:var(--border-default); transform:translateY(-2px); }
@@ -443,6 +449,10 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
         <p class="pricing-eyebrow">Passez à l'action</p>
         <h3>Débloquez votre plan complet</h3>
         <p class="pricing-sub">Des outils avancés pour concrétiser votre stratégie retraite.</p>
+      </div>
+      <div class="pricing-email-row">
+        <input type="email" id="pricing-email" class="pricing-email-input" placeholder="ton@email.com" autocomplete="email">
+        <p class="pricing-email-error" id="pricing-email-error" role="alert"></p>
       </div>
       <div class="pricing-grid">
         <div class="pricing-card">
@@ -905,16 +915,30 @@ let _stripe = null;
 function getStripe() { return _stripe || (_stripe = Stripe(STRIPE_PK)); }
 
 async function startCheckout(priceId, btnEl) {
+  const emailInput = $('pricing-email');
+  const errorEl    = $('pricing-email-error');
+
+  emailInput.classList.remove('error');
+  errorEl.textContent = '';
+
+  if (!emailInput.value.trim() || !emailInput.validity.valid) {
+    emailInput.classList.add('error');
+    errorEl.textContent = 'Saisis ton adresse email pour continuer.';
+    emailInput.focus();
+    return;
+  }
+
   btnEl.disabled = true;
   const saved = btnEl.innerHTML;
   btnEl.innerHTML = SPINNER_HTML + ' Redirection…';
   const base = window.location.href.split('?')[0];
   try {
     const { error } = await getStripe().redirectToCheckout({
-      lineItems:  [{ price: priceId, quantity: 1 }],
-      mode:       'subscription',
-      successUrl: base + '?checkout=success',
-      cancelUrl:  base,
+      lineItems:     [{ price: priceId, quantity: 1 }],
+      mode:          'subscription',
+      customerEmail: emailInput.value.trim(),
+      successUrl:    base + '?checkout=success',
+      cancelUrl:     base,
     });
     if (error) throw error;
   } catch (err) {
