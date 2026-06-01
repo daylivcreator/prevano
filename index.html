@@ -401,7 +401,7 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
         </div>
         <div class="field">
           <label for="depart">Âge de départ souhaité</label>
-          <input type="number" id="depart" placeholder="64" min="60" max="70" autocomplete="off">
+          <input type="number" id="depart" placeholder="64" min="60" max="70" autocomplete="prevano-depart">
         </div>
       </div>
       <div class="field field--full">
@@ -737,8 +737,10 @@ document.addEventListener('click', e => {
   rip.addEventListener('animationend', () => rip.remove(), { once: true });
 });
 
-/* Réinitialise les valeurs mémorisées par le navigateur */
-FIELD_IDS.forEach(id => { const el = $(id); if (el) el.value = ''; });
+/* Réinitialise après l'autofill navigateur (qui se déclenche ~100ms après le chargement) */
+function clearFields() { FIELD_IDS.forEach(id => { const el = $(id); if (el) el.value = ''; }); }
+clearFields();
+setTimeout(clearFields, 200);
 
 /* ─── Progress bar ──────────────────────────────────────────────── */
 
