@@ -363,16 +363,18 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
       <div class="plan-steps" id="plan-steps" style="display:none"></div>
     </div>
 
-    <div class="email-cta reveal">
-      <h3>Reçois ton plan complet.</h3>
-      <p>Projections détaillées, stratégies d'épargne et alertes personnalisées —<br>rejoins Prevano dès maintenant.</p>
-      <div class="email-row">
-        <input class="email-input" type="email" id="user-email" placeholder="ton@email.com" autocomplete="email">
-        <button id="btn-email" class="btn-email" type="button">
-          M'envoyer le plan <i class="ti ti-send" aria-hidden="true"></i>
-        </button>
+    <div class="email-cta reveal" id="cta-account">
+      <h3>Sauvegarde ton plan.</h3>
+      <p>Crée ton compte gratuitement pour retrouver tes résultats,<br>suivre ta progression et accéder aux stratégies avancées.</p>
+      <div class="email-row" id="cta-buttons">
+        <a href="/signup.html" class="btn-email">
+          Créer mon compte <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        </a>
+        <a href="/login.html" class="btn-email" style="background:var(--bg-raised);border:1px solid var(--border-default);color:var(--text-primary)">
+          Se connecter
+        </a>
       </div>
-      <p class="email-note">Sans spam · Uniquement ton plan Prevano.</p>
+      <p class="email-note">Gratuit · Aucune CB requise</p>
     </div>
   </section>
 </main>
@@ -708,22 +710,30 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
   }
 }
 
-/* ─── Submit email ──────────────────────────────────────────────── */
+/* ─── CTA dynamique selon connexion ────────────────────────────── */
 
-function submitEmail() {
-  const input = $('user-email');
-  if (!input.validity.valid) { input.focus(); return; }
-  window.open(
-    'https://e1966e2e.sibforms.com/serve/MUIFAOKeyQAhd7aThpwc95y3ddkMyDgzYfLi_BZwCued7LJpHkCH2Io9vTXExUxgZO0qv8f-g4ho7h9GqgsvY9IQ7X7Fxzt0rUNsvW7hHkVp2e7uOnz1jm92tPscAG1Wirbw_o5NMVxC7OEK4sCSA8E-y2-GisBN3qoiMhPcfmizSh6UHTdIukQ2mue3RuoxBUgbFFUj7Y1nviUWLw==',
-    '_blank', 'noopener,noreferrer'
-  );
+async function updateCta() {
+  const ctaButtons = $('cta-buttons');
+  if (!ctaButtons) return;
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (res.ok) {
+      const { user } = await res.json();
+      ctaButtons.innerHTML = `
+        <a href="/profil.html" class="btn-email">
+          Mon espace Prevano <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        </a>`;
+      const note = ctaButtons.closest('.email-cta')?.querySelector('.email-note');
+      if (note) note.textContent = `Connecté en tant que ${escHtml(user.firstName)}`;
+    }
+  } catch { /* non connecté — on garde les boutons par défaut */ }
 }
 
 /* ─── Events ────────────────────────────────────────────────────── */
 
 $('btn-scroll').addEventListener('click',   () => $('simulator').scrollIntoView({ behavior: 'smooth' }));
 $('btn-simulate').addEventListener('click', simulate);
-$('btn-email').addEventListener('click',    submitEmail);
+updateCta();
 </script>
 </body>
 </html>
