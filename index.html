@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prevano — Découvre ce qui t'attend à la retraite</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<link rel="canonical" href="https://prevano.vercel.app/">
 <meta name="description" content="Calcule en 60 secondes le montant exact de ta pension retraite — et reçois un plan d'action IA personnalisé pour l'améliorer.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://prevano.vercel.app/">
@@ -272,6 +275,33 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
 
 @media(max-width:900px) { .avis-grid { grid-template-columns:1fr 1fr; } }
 @media(max-width:640px) { .avis-section { padding:56px 20px; } .avis-grid { grid-template-columns:1fr; } .avis-header h2 { font-size:28px; } .activity-popup { max-width:calc(100vw - 48px); } }
+
+/* Skeleton loader */
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.plan-skel{display:flex;flex-direction:column;gap:10px;padding:4px 0;}
+.skel-line{height:13px;border-radius:6px;background:linear-gradient(90deg,var(--bg-raised) 25%,var(--bg-overlay) 50%,var(--bg-raised) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;}
+.skel-line.w90{width:90%}.skel-line.w70{width:70%}.skel-line.w50{width:50%}.skel-line.w60{width:60%}
+
+/* Inline field errors */
+.field-error{font-size:12px;color:var(--color-primary);margin-top:5px;min-height:16px;line-height:1.3;}
+.field input.error,.field select.error{border-color:var(--color-primary) !important;}
+
+/* Share button */
+.btn-share{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:1px solid var(--border-default);background:var(--bg-raised);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;}
+.btn-share:hover{border-color:var(--color-primary-border);color:var(--color-primary);}
+.share-confirm{font-size:12px;color:#22C55E;margin-left:8px;opacity:0;transition:opacity 0.3s;}
+.share-confirm.show{opacity:1;}
+
+/* Back to top */
+.btn-top{position:fixed;bottom:28px;right:24px;z-index:8000;width:42px;height:42px;background:var(--bg-raised);border:1px solid var(--border-default);border-radius:10px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.2s;opacity:0;pointer-events:none;}
+.btn-top.visible{opacity:1;pointer-events:auto;}
+.btn-top:hover{background:var(--bg-overlay);color:var(--color-primary);border-color:var(--color-primary-border);}
+
+/* Aggregate avis rating */
+.avis-aggregate{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px;flex-wrap:wrap;}
+.avis-score-big{font-size:34px;font-weight:900;letter-spacing:-0.04em;}
+.avis-aggregate-stars{color:var(--color-primary);font-size:17px;letter-spacing:2px;}
+.avis-count-label{font-size:14px;color:var(--text-muted);}
 </style>
 </head>
 <body>
@@ -334,20 +364,24 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
         <div class="field">
           <label for="age">Ton âge actuel</label>
           <input type="number" id="age" placeholder="25" min="18" max="64" autocomplete="off">
+          <p class="field-error" id="err-age" role="alert"></p>
         </div>
         <div class="field">
           <label for="salaire">Salaire net mensuel (€)</label>
           <input type="number" id="salaire" placeholder="2300" min="500" autocomplete="off">
+          <p class="field-error" id="err-salaire" role="alert"></p>
         </div>
       </div>
       <div class="sim-row">
         <div class="field">
           <label for="epargne">Épargne mensuelle (€)</label>
           <input type="number" id="epargne" placeholder="200" min="0" autocomplete="off">
+          <p class="field-error" id="err-epargne" role="alert"></p>
         </div>
         <div class="field">
           <label for="depart">Âge de départ souhaité</label>
           <input type="number" id="depart" placeholder="64" min="60" max="70" autocomplete="off">
+          <p class="field-error" id="err-depart" role="alert"></p>
         </div>
       </div>
       <div class="field field--full">
@@ -358,6 +392,7 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
           <option value="fonctionnaire">Fonctionnaire</option>
           <option value="independant">Indépendant / Freelance</option>
         </select>
+        <p class="field-error" id="err-statut" role="alert"></p>
       </div>
       <button id="btn-simulate" class="btn-primary" type="button">
         Voir ma projection retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
@@ -402,6 +437,12 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
         <span class="score-badge" id="score-badge"></span>
       </div>
       <p class="score-tip" id="score-tip"></p>
+      <div style="margin-top:16px;display:flex;align-items:center;">
+        <button id="btn-share" class="btn-share" type="button">
+          <i class="ti ti-share" aria-hidden="true"></i> Partager mon score
+        </button>
+        <span class="share-confirm" id="share-confirm">✓ Copié !</span>
+      </div>
     </div>
 
     <div class="bar-card reveal">
@@ -421,8 +462,13 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
 
     <div class="plan-card reveal" id="plan-card">
       <h3 id="plan-card-title">Ton plan d'action personnalisé</h3>
-      <div class="plan-loading" id="plan-loading">
-        <i class="ti ti-loader-2" aria-hidden="true"></i> Génération de ton plan en cours...
+      <div class="plan-skel" id="plan-loading" aria-label="Chargement du plan en cours" aria-live="polite">
+        <div class="skel-line w90"></div>
+        <div class="skel-line w70"></div>
+        <div class="skel-line w50"></div>
+        <div class="skel-line w90" style="margin-top:8px"></div>
+        <div class="skel-line w70"></div>
+        <div class="skel-line w60"></div>
       </div>
       <div id="plan-body" style="display:none">
         <div class="plan-steps" id="plan-steps"></div>
@@ -464,6 +510,11 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
       <div class="avis-eyebrow">⭐ Avis vérifiés</div>
       <h2 id="avis-title">Ce qu'ils disent de <em>Prevano</em></h2>
       <p>Des milliers de Français préparent leur retraite avec nous.</p>
+      <div class="avis-aggregate">
+        <span class="avis-score-big">4,9</span>
+        <div class="avis-aggregate-stars">★★★★★</div>
+        <span class="avis-count-label">847 avis vérifiés</span>
+      </div>
     </div>
     <div class="avis-grid">
       <div class="avis-card reveal">
@@ -538,6 +589,10 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
   </div>
   <button class="activity-popup-close" id="activity-popup-close" aria-label="Fermer la notification">×</button>
 </div>
+
+<button id="btn-top" class="btn-top" aria-label="Retour en haut de page">
+  <i class="ti ti-arrow-up" aria-hidden="true"></i>
+</button>
 
 <script>
 'use strict';
@@ -753,13 +808,31 @@ function calcPension(sal, annees, statut) {
 
 /* ─── Validation ────────────────────────────────────────────────── */
 
+function clearFieldErrors() {
+  ['age','salaire','epargne','depart','statut'].forEach(id => {
+    const errEl = $('err-' + id);
+    if (errEl) errEl.textContent = '';
+    $(id)?.classList.remove('error');
+  });
+}
+
+function fieldErr(id, msg) {
+  const errEl = $('err-' + id);
+  if (errEl) errEl.textContent = msg;
+  $(id)?.classList.add('error');
+}
+
 function validate(age, sal, dep, statut) {
-  if (!age || !sal || !dep || !statut)  return 'Merci de remplir tous les champs.';
-  if (age < 18 || age > 64)            return 'Âge invalide — entre 18 et 64 ans.';
-  if (sal < 500)                        return 'Salaire trop faible (minimum 500 €).';
-  if (dep <= age)                       return "L'âge de départ doit être supérieur à ton âge actuel.";
-  if (dep < 60 || dep > 70)            return 'Âge de départ invalide — entre 60 et 70 ans.';
-  return null;
+  clearFieldErrors();
+  $('sim-error').textContent = '';
+  let ok = true;
+  if (!age || age < 18 || age > 64)  { fieldErr('age',     age < 18 || age > 64 ? 'Entre 18 et 64 ans.' : 'Champ requis.'); ok = false; }
+  if (!sal || sal < 500)             { fieldErr('salaire', !sal ? 'Champ requis.' : 'Minimum 500€.'); ok = false; }
+  if (!dep)                          { fieldErr('depart',  'Champ requis.'); ok = false; }
+  else if (dep < 60 || dep > 70)     { fieldErr('depart',  'Entre 60 et 70 ans.'); ok = false; }
+  else if (dep <= age)               { fieldErr('depart',  'Doit être > à ton âge actuel.'); ok = false; }
+  if (!statut)                       { fieldErr('statut',  'Champ requis.'); ok = false; }
+  return ok;
 }
 
 /* ─── Simulate ──────────────────────────────────────────────────── */
@@ -771,9 +844,7 @@ function simulate() {
   const dep    = parseInt($('depart').value)   || 0;
   const statut = $('statut').value;
 
-  const errorMsg = validate(age, sal, dep, statut);
-  $('sim-error').textContent = errorMsg ?? '';
-  if (errorMsg) return;
+  if (!validate(age, sal, dep, statut)) return;
 
   window.plausible?.('Simuler', { props: { statut } });
 
@@ -803,6 +874,7 @@ function simulate() {
 
   const shock = $('shock-section');
   shock.style.display = 'block';
+  shock.setAttribute('tabindex', '-1');
   shock.querySelectorAll('.reveal').forEach(el => {
     el.classList.remove('visible');
     revealObserver.observe(el);
@@ -810,6 +882,7 @@ function simulate() {
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
     shock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    shock.focus({ preventScroll: true });
     launchConfetti();
     renderScore(computeScore(sal, pension, ep, annees, statut));
     btn.disabled  = false;
@@ -890,7 +963,7 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
   const loading = $('plan-loading');
   const body    = $('plan-body');
   const title   = $('plan-card-title');
-  loading.style.display = 'flex';
+  loading.style.display = 'block';
   body.style.display    = 'none';
   // Reset sections
   ['plan-scenarios','plan-enveloppes','plan-premium-extra'].forEach(id => { $(id).style.display = 'none'; });
@@ -1080,9 +1153,36 @@ const ACTIVITY_POPUP_ENABLED = true;
 
 /* ─── Events ────────────────────────────────────────────────────── */
 
+/* ─── Back to top ──────────────────────────────────────────── */
+const btnTop = $('btn-top');
+window.addEventListener('scroll', () => {
+  btnTop?.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+btnTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ─── Share score ───────────────────────────────────────────── */
+$('btn-share')?.addEventListener('click', async () => {
+  const score   = $('score-num')?.textContent ?? '?';
+  const pension = $('stat-pension')?.textContent ?? '?';
+  const text    = `Mon score retraite Prevano : ${score}/100 — pension estimée ${pension}. Et toi ?`;
+  const url     = 'https://prevano.vercel.app';
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: 'Mon score Prevano', text, url });
+    } else {
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      const fb = $('share-confirm');
+      fb?.classList.add('show');
+      setTimeout(() => fb?.classList.remove('show'), 2500);
+    }
+    window.plausible?.('Partage Score');
+  } catch { /* annulé par l'utilisateur */ }
+});
+
 $('btn-scroll').addEventListener('click', () => {
   $('simulator').scrollIntoView({ behavior: 'smooth' });
   window.plausible?.('CTA Hero');
+  setTimeout(() => $('age')?.focus(), 600);
 });
 $('btn-simulate').addEventListener('click', simulate);
 updateCta();

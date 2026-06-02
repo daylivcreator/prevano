@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tarifs — Prevano</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<link rel="canonical" href="https://prevano.vercel.app/tarifs.html">
 <meta name="description" content="Starter, Coach Pro ou Daily Finance — l'offre Prevano adaptée à ta situation pour sécuriser ta retraite dès aujourd'hui.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://prevano.vercel.app/tarifs.html">
@@ -120,6 +123,24 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
   .faq-title{font-size:24px;}
   footer{padding:16px 20px;}
 }
+/* Comparison table */
+.compare-section{padding:0 48px 64px;max-width:1100px;margin:0 auto;}
+.compare-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:24px;color:var(--text-muted);}
+.compare-wrap{overflow-x:auto;}
+.compare-table{width:100%;border-collapse:collapse;min-width:560px;}
+.compare-table th{padding:14px 20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-faint);border-bottom:1px solid var(--border-default);text-align:center;}
+.compare-table th:first-child{text-align:left;}
+.compare-table th.col-featured{color:var(--color-primary);}
+.compare-table td{padding:13px 20px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--border-subtle);text-align:center;}
+.compare-table td:first-child{text-align:left;color:var(--text-primary);font-weight:500;}
+.compare-table tr:last-child td{border-bottom:none;}
+.compare-table tr:hover td{background:var(--bg-raised);}
+.check-yes{color:var(--color-primary);font-size:16px;}
+.check-no{color:var(--text-faint);font-size:16px;}
+/* Annual teaser */
+.annual-teaser{text-align:center;padding:0 48px 48px;font-size:13px;color:var(--text-faint);}
+.annual-teaser strong{color:var(--text-muted);}
+@media(max-width:640px){.compare-section,.annual-teaser{padding-left:20px;padding-right:20px;}}
 </style>
 </head>
 <body>
@@ -212,6 +233,37 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
 
     </div>
   </section>
+
+  <section class="compare-section" aria-label="Comparaison des offres">
+    <p class="compare-title">Comparaison des offres</p>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Fonctionnalité</th>
+            <th>Starter</th>
+            <th class="col-featured">Coach Pro</th>
+            <th>Daily Finance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Simulateur retraite illimité</td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Calculateur de budget personnel</td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Plan quotidien d'optimisation des dépenses</td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Suivi mensuel de progression</td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Coach IA investissement & épargne</td><td><span class="check-no">—</span></td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Conseils PEA · Assurance-vie · Immobilier</td><td><span class="check-no">—</span></td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Mise à jour mensuelle du plan</td><td><span class="check-no">—</span></td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Support prioritaire 48h</td><td><span class="check-no">—</span></td><td><span class="check-yes">✓</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Leçons quotidiennes (5 min/jour)</td><td><span class="check-no">—</span></td><td><span class="check-no">—</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Streak, badges, progression gamifiée</td><td><span class="check-no">—</span></td><td><span class="check-no">—</span></td><td><span class="check-yes">✓</span></td></tr>
+          <tr><td>Accès prioritaire nouvelles fonctionnalités</td><td><span class="check-no">—</span></td><td><span class="check-no">—</span></td><td><span class="check-yes">✓</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="annual-teaser"><i class="ti ti-calendar-event" aria-hidden="true"></i> <strong>Facturation annuelle bientôt disponible</strong> — 2 mois offerts par an</p>
 
   <div class="guarantee">
     <p><i class="ti ti-shield-check" aria-hidden="true"></i> Paiement sécurisé par Stripe · Annulation à tout moment · Sans engagement</p>
