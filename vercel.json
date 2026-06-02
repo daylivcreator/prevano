@@ -1,7 +1,5 @@
 {
   "framework": null,
-  "buildCommand": "",
-  "outputDirectory": ".",
   "headers": [
     {
       "source": "/(.*\\.(?:png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$)",
