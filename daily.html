@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Finance — Prevano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input,button{font-family:inherit;font-size:inherit;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-inner{max-width:1100px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--grad-brand);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo em{font-style:normal;}
+.nav-links{display:flex;align-items:center;gap:14px;}
+.nav-link{font-size:14px;color:var(--text-muted);text-decoration:none;transition:color .2s;}
+.nav-link:hover{color:var(--text-primary);}
+.btn-nav-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border-default);padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-nav-ghost:hover{border-color:var(--color-primary);color:var(--color-primary);}
+/* Main */
+main{flex:1;padding:40px 48px 80px;max-width:800px;margin:0 auto;width:100%;}
+/* Streak bar */
+.streak-bar{display:flex;align-items:center;gap:20px;background:var(--bg-surface);border:1px solid var(--border-default);border-radius:14px;padding:16px 24px;margin-bottom:28px;flex-wrap:wrap;}
+.streak-left{display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.streak-fire{font-size:32px;line-height:1;}
+.streak-num{font-size:28px;font-weight:900;letter-spacing:-0.04em;}
+.streak-label{font-size:12px;color:var(--text-muted);margin-top:1px;}
+/* Level section */
+.level-section{flex:1;min-width:120px;}
+.level-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.level-name{font-size:12px;font-weight:700;color:var(--text-primary);}
+.level-next{font-size:11px;color:var(--text-faint);}
+.level-bar-track{height:6px;background:var(--bg-overlay);border-radius:100px;overflow:hidden;}
+.level-bar-fill{height:100%;background:var(--grad-brand);border-radius:100px;transition:width .7s cubic-bezier(.25,.8,.25,1);}
+/* Streak right */
+.streak-right{display:flex;gap:20px;align-items:center;flex-shrink:0;}
+.stat-mini{text-align:center;}
+.stat-mini .n{font-size:18px;font-weight:900;letter-spacing:-0.03em;}
+.stat-mini .l{font-size:11px;color:var(--text-faint);font-weight:500;text-transform:uppercase;letter-spacing:.05em;}
+.best-theme-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;white-space:nowrap;}
+.best-theme-investissement{background:rgba(96,165,250,0.15);color:#60A5FA;}
+.best-theme-epargne{background:rgba(52,211,153,0.15);color:#34D399;}
+.best-theme-fiscalite{background:rgba(251,191,36,0.15);color:#FBBF24;}
+.best-theme-patrimoine{background:rgba(167,139,250,0.15);color:#A78BFA;}
+/* Lesson card */
+.lesson-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:16px;padding:32px;margin-bottom:24px;}
+.lesson-meta{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.theme-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.04em;}
+.theme-investissement{background:rgba(96,165,250,0.12);color:#60A5FA;}
+.theme-epargne{background:rgba(52,211,153,0.12);color:#34D399;}
+.theme-fiscalite{background:rgba(251,191,36,0.12);color:#FBBF24;}
+.theme-patrimoine{background:rgba(167,139,250,0.12);color:#A78BFA;}
+.lesson-day{font-size:12px;color:var(--text-faint);font-weight:500;margin-left:auto;}
+.lesson-title{font-size:22px;font-weight:900;letter-spacing:-0.03em;margin-bottom:20px;line-height:1.25;}
+.lesson-body p{font-size:14px;color:var(--text-muted);line-height:1.75;margin-bottom:14px;}
+.lesson-body p:last-child{margin-bottom:0;}
+/* Quiz */
+.quiz-section{margin-top:28px;}
+.quiz-divider{border:none;border-top:1px solid var(--border-subtle);margin-bottom:24px;}
+.quiz-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:6px;}
+.quiz-question{font-size:15px;font-weight:600;margin-bottom:16px;line-height:1.5;}
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-option{background:var(--bg-raised);border:1.5px solid var(--border-subtle);border-radius:10px;padding:13px 16px;font-size:13px;color:var(--text-muted);cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:10px;width:100%;}
+.quiz-option:hover:not(:disabled){border-color:var(--border-default);color:var(--text-primary);}
+.quiz-option.selected{border-color:var(--color-primary-border);color:var(--text-primary);background:var(--color-primary-subtle);}
+.quiz-option.correct{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#22C55E;}
+.quiz-option.wrong{border-color:rgba(226,75,74,.4);background:rgba(226,75,74,.08);color:var(--color-primary);}
+.quiz-option:disabled{cursor:default;}
+.quiz-icon{font-size:16px;flex-shrink:0;}
+.quiz-feedback{margin-top:12px;font-size:13px;font-weight:600;padding:10px 14px;border-radius:8px;}
+.quiz-feedback.ok{background:rgba(34,197,94,.1);color:#22C55E;}
+.quiz-feedback.ko{background:rgba(226,75,74,.1);color:var(--color-primary);}
+/* Action concrète */
+.action-section{margin-top:24px;}
+.action-divider{border:none;border-top:1px solid var(--border-subtle);margin-bottom:20px;}
+.action-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:8px;}
+.action-box{background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:16px 18px;font-size:13px;color:var(--text-muted);line-height:1.65;display:flex;gap:12px;}
+.action-icon{font-size:18px;color:var(--color-primary);flex-shrink:0;margin-top:1px;}
+/* Complete button */
+.complete-row{margin-top:24px;display:flex;align-items:center;gap:12px;}
+.btn-complete{flex:1;padding:14px;background:var(--color-primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s,transform .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-complete:hover:not(:disabled){background:var(--color-primary-dark);transform:translateY(-1px);}
+.btn-complete:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.btn-complete.done{background:rgba(34,197,94,.15);color:#22C55E;border:1px solid rgba(34,197,94,.3);}
+.complete-hint{font-size:12px;color:var(--text-faint);}
+/* New badge toast */
+.badge-toast{position:fixed;bottom:24px;right:24px;background:var(--bg-surface);border:1px solid var(--color-primary-border);border-radius:14px;padding:16px 20px;box-shadow:0 8px 32px rgba(0,0,0,.5);display:flex;align-items:center;gap:14px;z-index:9000;transform:translateY(120%);transition:transform .4s cubic-bezier(.25,.8,.25,1);max-width:300px;}
+.badge-toast.show{transform:translateY(0);}
+.badge-toast-icon{font-size:28px;}
+.badge-toast-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.badge-toast-sub{font-size:12px;color:var(--text-muted);}
+/* Badges section */
+.badges-section{margin-top:0;}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:16px;}
+.badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.badge-card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:12px;padding:18px;text-align:center;transition:border-color .2s;}
+.badge-card.unlocked{border-color:var(--color-primary-border);}
+.badge-card:hover.unlocked{transform:translateY(-1px);}
+.badge-emoji{font-size:28px;margin-bottom:8px;display:block;filter:grayscale(1);opacity:.35;transition:filter .3s,opacity .3s;}
+.badge-card.unlocked .badge-emoji{filter:none;opacity:1;}
+.badge-name{font-size:12px;font-weight:700;margin-bottom:3px;color:var(--text-faint);}
+.badge-card.unlocked .badge-name{color:var(--text-primary);}
+.badge-cond{font-size:11px;color:var(--text-faint);line-height:1.45;}
+/* Plan guard */
+.plan-guard{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;text-align:center;}
+.guard-icon{width:64px;height:64px;background:var(--bg-raised);border:1px solid var(--border-default);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+.guard-title{font-size:24px;font-weight:900;letter-spacing:-0.04em;margin-bottom:8px;}
+.guard-sub{font-size:14px;color:var(--text-muted);margin-bottom:28px;max-width:400px;line-height:1.65;}
+.btn-upgrade{background:var(--color-primary);color:#fff;border:none;padding:13px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .2s;}
+.btn-upgrade:hover{background:var(--color-primary-dark);transform:translateY(-1px);}
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,var(--bg-raised) 25%,var(--bg-overlay) 50%,var(--bg-raised) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* Footer */
+footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:auto;}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-size:12px;color:var(--text-faint);text-decoration:none;}
+.footer-link:hover{color:var(--text-muted);}
+.footer-copy{font-size:12px;color:var(--text-faint);}
+@media(max-width:640px){
+  nav,main,footer{padding-left:20px;padding-right:20px;}
+  main{padding-top:28px;padding-bottom:60px;}
+  .badges-grid{grid-template-columns:repeat(2,1fr);}
+  .streak-right{gap:16px;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo-wrap">
+      <div class="logo-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+        </svg>
+      </div>
+      <span class="logo" translate="no">Pre<em>vano</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="/"            class="nav-link">Simulateur</a>
+      <a href="/profil.html" class="nav-link">Mon profil</a>
+      <button id="btn-logout" class="btn-nav-ghost">Déconnexion</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <!-- Loading -->
+  <div id="page-loading">
+    <div class="skeleton" style="height:76px;border-radius:14px;margin-bottom:28px;"></div>
+    <div class="skeleton" style="height:380px;border-radius:16px;margin-bottom:24px;"></div>
+    <div class="skeleton" style="height:200px;border-radius:16px;"></div>
+  </div>
+
+  <!-- Plan guard -->
+  <div id="plan-guard" style="display:none" class="plan-guard">
+    <div class="guard-icon"><i class="ti ti-flame" style="color:var(--color-primary);font-size:28px"></i></div>
+    <h1 class="guard-title">Daily Finance</h1>
+    <p class="guard-sub">Une leçon par jour, 5 minutes, pour maîtriser ton argent — investissement, épargne, fiscalité, patrimoine. Streak, badges et progression gamifiée. Disponible avec l'offre Daily Finance.</p>
+    <a href="/tarifs.html" class="btn-upgrade">
+      <i class="ti ti-bolt" aria-hidden="true"></i> Passer à Daily Finance — 34,99€/mois
+    </a>
+  </div>
+
+  <!-- Daily content -->
+  <div id="daily-content" style="display:none">
+
+    <!-- Streak bar -->
+    <div class="streak-bar" id="streak-bar">
+      <div class="streak-left">
+        <span class="streak-fire" aria-hidden="true">🔥</span>
+        <div>
+          <div class="streak-num" id="streak-num">0</div>
+          <div class="streak-label">jours d'affilée</div>
+        </div>
+      </div>
+
+      <div class="level-section">
+        <div class="level-header">
+          <span class="level-name" id="level-name">Découvreur</span>
+          <span class="level-next" id="level-next"></span>
+        </div>
+        <div class="level-bar-track">
+          <div class="level-bar-fill" id="level-bar-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="streak-right">
+        <div class="stat-mini">
+          <div class="n" id="total-done">0</div>
+          <div class="l">leçons</div>
+        </div>
+        <div class="stat-mini" id="best-theme-stat" style="display:none">
+          <div id="best-theme-badge" class="best-theme-badge">—</div>
+          <div class="l">thème fort</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lesson card -->
+    <div class="lesson-card" id="lesson-card"></div>
+
+    <!-- Badges -->
+    <div class="badges-section" id="badges-section" style="display:none">
+      <div class="lesson-card" style="padding:28px">
+        <div class="section-title">Mes badges</div>
+        <div class="badges-grid" id="badges-grid"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/cgv.html"              class="footer-link">CGV</a>
+      <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
+      <a href="/contact.html"          class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2026 Prevano</span>
+  </div>
+</footer>
+
+<!-- Badge toast -->
+<div id="badge-toast" class="badge-toast" role="alert" aria-live="assertive">
+  <span class="badge-toast-icon" id="badge-toast-icon"></span>
+  <div>
+    <div class="badge-toast-title">Nouveau badge débloqué !</div>
+    <div class="badge-toast-sub" id="badge-toast-label"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ─── Leçons ─────────────────────────────────────────────────────────────── */
+const LESSONS = [
+  /* ── Investissement (0-6) ── */
+  {
+    theme: 'investissement', themeLabel: 'Investissement',
+    title: 'Commencer à investir avec 50€/mois',
+    body: [
+      "Le meilleur investissement est celui qu'on commence. Même une petite somme régulière peut transformer ton patrimoine sur le long terme.",
+      "50€/mois investis en ETF World sur 30 ans à 7%/an en moyenne : tu accumules environ 60 000€ pour seulement 18 000€ versés. Les 42 000€ restants sont les intérêts composés qui travaillent pour toi.",
+      "La clé ? La régularité, pas le montant. Un versement automatique mensuel, même modeste, bat un gros versement ponctuel retardé de 5 ans.",
+    ],
+    quiz: {
+      question: "Quel est l'effet principal des intérêts composés sur le long terme ?",
+      options: [
+        "Doubler votre argent chaque année sans risque",
+        "Faire croître exponentiellement votre capital avec le temps",
+        "Éliminer le risque de perte en bourse",
+      ],
+      correct: 1,
+    },
+    action: "Ouvre un PEA ou une assurance-vie et programme un virement automatique mensuel — même 50€.",
+  },
+  {
+    theme: 'investissement', themeLabel: 'Investissement',
+    title: 'Le PEA : l'arme fiscale de l'investisseur français',
+    body: [
+      "Le Plan d'Épargne en Actions (PEA) permet d'investir en actions et ETF européens avec une fiscalité imbattable : après 5 ans, tes gains ne sont soumis qu'aux prélèvements sociaux (17,2%) — pas d'impôt sur le revenu.",
+      "Sur un compte-titres classique, la flat tax de 30% s'applique. Sur un PEA après 5 ans, c'est 17,2%. Sur 100 000€ de plus-values, ça représente 12 800€ d'économie.",
+      "Plafond de versement : 150 000€. Conseil : ouvre ton PEA le plus tôt possible, même avec 100€, pour commencer à faire courir le délai de 5 ans.",
+    ],
+    quiz: {
+      question: "Après combien d'années les gains du PEA sont-ils exonérés d'impôt sur le revenu ?",
+      options: ["3 ans", "5 ans", "8 ans"],
+      correct: 1,
+    },
+    action: "Vérifie si tu as déjà un PEA ouvert. Si non, ouvre-en un dès aujourd'hui — même avec 100€ pour démarrer le compteur.",
+  },
+  {
+    theme: 'investissement', themeLabel: 'Investissement',
+    title: 'ETF vs fonds actifs : où vont tes frais ?',
+    body: [
+      "Un fonds actif géré par des professionnels prélève en moyenne 1,5 à 2% de frais annuels. Un ETF (fonds indiciel coté) réplique un indice pour 0,1 à 0,3% seulement.",
+      "Sur 20 ans avec 200€/mois investis, la différence de 1,5% de frais représente plus de 15 000€ perdus. Et les études montrent que 80% des fonds actifs sous-performent leur indice de référence sur le long terme.",
+      "Conclusion : la majorité des investisseurs particuliers s'en sortent mieux avec un simple ETF World ou S&P500 qu'avec des fonds actifs coûteux.",
+    ],
+    quiz: {
+      question: "Quelle est la principale différence entre un ETF et un fonds actif ?",
+      options: [
+        "Les ETF sont toujours plus risqués",
+        "Les ETF ont des frais de gestion beaucoup plus faibles",
+        "Les ETF garantissent un meilleur rendement",
+      ],
+      correct: 1,
+    },
+    action: "Compare les frais (TER) de tes placements actuels sur leurs fiches produit. Cherche la ligne 'frais courants'.",
+  },
+  {
+    theme: 'investissement', themeLabel: 'Investissement',
+    title: 'La diversification : ne pas mettre tous ses œufs dans le même panier',
+    body: [
+      "Un ETF MSCI World investit dans ~1 600 entreprises de 23 pays en une seule transaction. Si une entreprise fait faillite, son impact sur ton portefeuille est infime.",
+      "En achetant une seule action, même d'une grande entreprise, tu prends un risque concentré. Des géants comme Enron, Kodak ou Nokia ont un jour valu des milliards avant de s'effondrer.",
+      "La diversification ne supprime pas le risque, mais elle le répartit intelligemment. C'est l'une des rares stratégies qui réduit le risque sans sacrifier le rendement espéré.",
+    ],
+    quiz: {
+      question: "Quel instrument offre la meilleure diversification pour un investisseur particulier ?",
+      options: [
+        "Une action d'une grande entreprise française",
+        "Un portefeuille de 10 actions françaises",
+        "Un ETF MSCI World couvrant 1 600 entreprises mondiales",
+      ],
+      correct: 2,
+    },
+    action: "Vérifie si tes investissements sont diversifiés géographiquement. Si tout est en France, tu prends un risque pays inutile.",
+  },
+  {
+    theme: 'investissement', themeLabel: 'Investissement',
+    title: 'L'immobilier sans acheter : les SCPI',
+    body: [
+      "Les SCPI (Sociétés Civiles de Placement Immobilier) permettent d'investir dans l'immobilier professionnel (bureaux, commerces, entrepôts) à partir de 1 000€, sans gestion et sans emprunt.",
+      "Rendement moyen des SCPI : entre 4 et 5,5%/an distribués trimestriellement. Tu achètes des parts, la société gère tout — locataires, travaux, comptabilité.",
+      "Avantage clé : tu peux accéder aux SCPI via ton assurance-vie et bénéficier de la fiscalité avantageuse de l'enveloppe après 8 ans. Inconvénient : liquidité limitée, risque de perte en capital.",
+    ],
+    quiz: {
+      question: "Quel est le principal avantage des SCPI pour un investisseur ?",
+      options: [
+        "Investir dans l'immobilier sans contraintes de gestion",
+        "Garantir un rendement fixe sans risque",
+        "Être totalement exonéré d'impôts",
+      ],
+      correct: 0,
+    },
+    action: "Recherche les meilleures SCPI sur un comparateur indépendant. Regarde le taux de distribution sur valeur de marché (TDVM) des 5 dernières années.",
+  },
+  {
+    theme: 'investissement', themeLabel: 'Investissement',
+    title: 'La volatilité : ton alliée sur le long terme',
+    body: [
+      "La bourse peut perdre 30 à 50% lors d'une crise — 2008, 2020, 2022. Ces chutes font peur. Pourtant, depuis 1900, les marchés actions ont toujours récupéré et progressé sur le long terme.",
+      "Sur 20 ans glissants, un portefeuille en ETF World a généré du positif dans 95% des cas historiques. La volatilité courte terme ne change pas la tendance longue terme.",
+      "Mieux encore : quand les marchés baissent et que tu continues tes versements programmés, tu achètes plus de parts au même prix. La baisse devient une opportunité pour les investisseurs réguliers.",
+    ],
+    quiz: {
+      question: "Quelle est la meilleure réaction face à un krach boursier pour un investisseur long terme ?",
+      options: [
+        "Vendre immédiatement pour limiter les pertes",
+        "Tout mettre sur livret d'épargne en attendant",
+        "Continuer ses versements programmés, voire les augmenter",
+      ],
+      correct: 2,
+    },
+    action: "Définis ton horizon d'investissement. Si c'est pour la retraite dans 20+ ans, une baisse aujourd'hui est une opportunité, pas une raison de paniquer.",
+  },
+  {
+    theme: 'investissement', themeLabel: 'Investissement',
+    title: 'Le DCA : investir sans stresser le marché',
+    body: [
+      "Le Dollar-Cost Averaging (DCA), ou investissement programmé, consiste à investir la même somme chaque mois quelle que soit la situation du marché. Résultat : tu achètes naturellement plus de parts quand les prix sont bas.",
+      "Exemple : 200€/mois sur 12 mois. En janvier le cours est à 100€ (tu achètes 2 parts), en mars il chute à 50€ (tu en achètes 4). Tu accumules plus de parts aux meilleurs prix sans avoir à 'timer' le marché.",
+      "95% des investisseurs professionnels ne battent pas le marché sur le long terme. Pour un particulier, le DCA avec des ETF indiciels est probablement la stratégie la plus efficace et la moins stressante.",
+    ],
+    quiz: {
+      question: "Quel est le principal avantage de la méthode DCA ?",
+      options: [
+        "Acheter toujours au prix le plus bas",
+        "Réduire l'impact du mauvais timing de marché",
+        "Garantir un rendement minimum",
+      ],
+      correct: 1,
+    },
+    action: "Programme un virement automatique vers ton PEA ou assurance-vie le jour après chaque virement de salaire.",
+  },
+
+  /* ── Épargne (7-13) ── */
+  {
+    theme: 'epargne', themeLabel: 'Épargne',
+    title: 'Livret A vs inflation : la vérité qui dérange',
+    body: [
+      "Avec un Livret A à 2,4% et une inflation à 3-4%, ton épargne perd du pouvoir d'achat chaque année. 10 000€ laissés 10 ans sur Livret A ne valent plus que ~8 500€ en termes réels.",
+      "Le Livret A reste indispensable pour une chose : l'épargne d'urgence. Son atout majeur est la disponibilité immédiate et la garantie de capital. Mais ce n'est pas un outil de construction de patrimoine.",
+      "Pour tout ce qui dépasse 3-6 mois de dépenses courantes, d'autres enveloppes (PEA, assurance-vie, PER) offrent de meilleures perspectives de rendement réel à long terme.",
+    ],
+    quiz: {
+      question: "Pour quel usage le Livret A est-il le mieux adapté ?",
+      options: [
+        "Construire un patrimoine significatif sur 20 ans",
+        "Constituer une épargne d'urgence accessible immédiatement",
+        "Préparer sa retraite en toute sécurité",
+      ],
+      correct: 1,
+    },
+    action: "Calcule combien tu as sur ton Livret A. Si c'est plus de 3-6 mois de dépenses, l'excédent mérite une enveloppe plus performante.",
+  },
+  {
+    theme: 'epargne', themeLabel: 'Épargne',
+    title: 'Le PER : épargne retraite et économie fiscale maintenant',
+    body: [
+      "Le Plan d'Épargne Retraite (PER) est une enveloppe bloquée jusqu'à la retraite, mais avec un avantage immédiat : les versements sont déductibles de ton revenu imposable.",
+      "Exemple concret : 3 000€ versés sur un PER avec une tranche marginale à 30% = 900€ d'impôt économisé dès cette année. C'est un rendement garanti de 30% sur ta mise, avant même que l'argent soit investi.",
+      "À la retraite, sortie en capital (en une fois ou progressivement) ou en rente viagère. Le capital est alors imposable — mais en retraite, ta tranche d'imposition sera souvent plus faible qu'en activité.",
+    ],
+    quiz: {
+      question: "Quel est l'avantage fiscal immédiat du PER ?",
+      options: [
+        "Une garantie de capital à 100%",
+        "Une déduction fiscale sur les versements cette année",
+        "Un rendement annuel garanti de 5%",
+      ],
+      correct: 1,
+    },
+    action: "Consulte ta dernière déclaration de revenus pour trouver ta tranche marginale d'imposition et estimer ton économie potentielle avec un PER.",
+  },
+  {
+    theme: 'epargne', themeLabel: 'Épargne',
+    title: 'L'assurance-vie : l'enveloppe polyvalente',
+    body: [
+      "L'assurance-vie n'est pas une assurance décès — c'est une enveloppe d'investissement permettant d'accéder à des fonds euros (capital garanti, ~2-3%/an) et des unités de compte (ETF, SCPI, actions).",
+      "Après 8 ans : abattement annuel de 4 600€ sur les gains pour une personne seule, 9 200€ pour un couple. Au-delà, taux réduit de 24,7% (contre 30% avant 8 ans).",
+      "Avantage succession souvent méconnu : jusqu'à 152 500€ transmis hors droits de succession par bénéficiaire désigné. Idéal pour organiser sa transmission sans testament.",
+    ],
+    quiz: {
+      question: "Quel est l'abattement annuel sur les gains d'une assurance-vie après 8 ans pour une personne seule ?",
+      options: ["1 500€", "4 600€", "9 200€"],
+      correct: 1,
+    },
+    action: "Vérifie la date d'ouverture de ton contrat d'assurance-vie. Si elle approche des 8 ans, planifie tes retraits après cet anniversaire.",
+  },
+  {
+    theme: 'epargne', themeLabel: 'Épargne',
+    title: 'L'épargne d'urgence : ton filet de sécurité',
+    body: [
+      "Sans épargne d'urgence, la moindre dépense imprévue (panne de voiture, frais médicaux, chômage) te force à puiser dans tes investissements au pire moment ou à contracter un crédit coûteux.",
+      "La règle : 3 mois de dépenses courantes si tu as un emploi stable, 6 mois si tu es en CDD, indépendant ou que ton secteur est instable. Soit entre 6 000€ et 15 000€ selon ta situation.",
+      "Placement idéal : Livret A ou LDDS — taux acceptable, capital garanti, disponible sous 48h. Ce n'est pas un investissement, c'est une assurance contre les aléas de la vie.",
+    ],
+    quiz: {
+      question: "Combien de mois de dépenses doit couvrir une épargne d'urgence idéale ?",
+      options: ["1 mois", "3 à 6 mois", "12 mois minimum"],
+      correct: 1,
+    },
+    action: "Calcule tes dépenses mensuelles incontournables. Fixe-toi un objectif d'épargne d'urgence et vérifie où tu en es.",
+  },
+  {
+    theme: 'epargne', themeLabel: 'Épargne',
+    title: 'La règle des 50/30/20 pour ton budget',
+    body: [
+      "50% de tes revenus nets pour les besoins (loyer, courses, transport, santé), 30% pour les envies (restaurants, loisirs, shopping), 20% pour l'épargne et le remboursement de dettes.",
+      "Un salarié à 2 500€ nets devrait épargner 500€/mois. Si c'est impossible, c'est que les dépenses fixes (loyer trop élevé ?) ou les envies empiètent sur l'épargne.",
+      "Cette règle n'est pas rigide — elle sert de boussole. Si tu épargnes 30%, parfait. Si tu ne peux faire que 10%, identifie le poste à réduire en priorité.",
+    ],
+    quiz: {
+      question: "Dans la règle 50/30/20, quel pourcentage est dédié à l'épargne ?",
+      options: ["10%", "30%", "20%"],
+      correct: 2,
+    },
+    action: "Calcule tes ratios actuels. Quel pourcentage de tes revenus va à l'épargne ce mois-ci ?",
+  },
+  {
+    theme: 'epargne', themeLabel: 'Épargne',
+    title: 'Les intérêts composés : le huitième miracle',
+    body: [
+      "200€/mois investis à 7%/an pendant 30 ans = 226 000€. Les 10 premières années génèrent 36 000€. Les 10 dernières en génèrent 113 000€. L'accélération est exponentielle.",
+      "Le secret : les intérêts générés produisent eux-mêmes des intérêts. Chaque euro gagné travaille à son tour. Plus le temps passe, plus cet effet boule de neige s'emballe.",
+      "Commencer 10 ans plus tard avec le même effort mensuel divise presque par 2,5 le capital final. Chaque année de retard représente une perte irréversible de puissance de capitalisation.",
+    ],
+    quiz: {
+      question: "Que se passe-t-il avec les intérêts composés sur le long terme ?",
+      options: [
+        "Ils restent constants chaque année",
+        "Ils diminuent progressivement avec le temps",
+        "Ils s'accélèrent de façon exponentielle avec le temps",
+      ],
+      correct: 2,
+    },
+    action: "Utilise un simulateur d'intérêts composés en ligne pour visualiser la différence entre commencer aujourd'hui vs dans 5 ans.",
+  },
+  {
+    theme: 'epargne', themeLabel: 'Épargne',
+    title: 'Retraite : commencer à 30 ans vs 40 ans',
+    body: [
+      "À 30 ans, 200€/mois sur 35 ans à 6%/an = 284 000€. À 40 ans, 200€/mois sur 25 ans = 138 000€. La différence de départ de 10 ans engendre 146 000€ de moins — pour le même effort mensuel.",
+      "Pire : pour atteindre le même objectif en commençant 10 ans plus tard, il faut presque doubler son épargne mensuelle. 10 ans de retard = effort doublé pour le même résultat.",
+      "La bonne nouvelle : il n'est jamais trop tard pour commencer. Même à 50 ans, chaque euro épargné compte. Mais les bénéfices marginaux de commencer maintenant plutôt que demain sont réels.",
+    ],
+    quiz: {
+      question: "Quel est le meilleur moment pour commencer à épargner pour la retraite ?",
+      options: [
+        "Quand les taux d'intérêt sont au plus haut",
+        "Le plus tôt possible, même avec de petites sommes",
+        "À 50 ans, quand les revenus sont au maximum",
+      ],
+      correct: 1,
+    },
+    action: "Ouvre un PER dès aujourd'hui avec au minimum 50€/mois. L'important n'est pas le montant, c'est de démarrer le compteur.",
+  },
+
+  /* ── Fiscalité (14-20) ── */
+  {
+    theme: 'fiscalite', themeLabel: 'Fiscalité',
+    title: 'Flat tax ou barème IR : lequel choisir ?',
+    body: [
+      "La flat tax (Prélèvement Forfaitaire Unique, PFU) de 30% s'applique automatiquement à tous les revenus du capital : dividendes, intérêts, plus-values. Elle comprend 17,2% de prélèvements sociaux + 12,8% d'IR.",
+      "Elle est avantageuse si ta tranche marginale d'imposition (TMI) est de 30% ou plus. En dessous — TMI à 11% — le barème progressif peut être plus favorable.",
+      "Pour opter pour le barème, il faut le cocher explicitement dans ta déclaration. Le calcul s'applique à l'ensemble de tes revenus du capital de l'année, pas au choix par produit.",
+    ],
+    quiz: {
+      question: "À quel taux total est fixée la flat tax (PFU) en France ?",
+      options: ["17,2%", "30%", "45%"],
+      correct: 1,
+    },
+    action: "Vérifie ta tranche marginale d'imposition sur ta dernière déclaration de revenus (avis d'imposition, ligne 'taux effectif').",
+  },
+  {
+    theme: 'fiscalite', themeLabel: 'Fiscalité',
+    title: 'Réduire ses impôts légalement avec le PER',
+    body: [
+      "Le PER est l'outil de défiscalisation le plus puissant pour les salariés. Les versements sont déductibles de ton revenu imposable dans la limite d'un plafond annuel.",
+      "Plafond de déduction : 10% des revenus professionnels nets de l'année précédente, dans la limite de 10% de 8 PASS (soit ~35 000€ en 2025). Les plafonds non utilisés des 3 dernières années sont reportables.",
+      "Exemple : TMI 30%, versement PER de 5 000€ = 1 500€ d'impôt économisé. C'est un rendement garanti de 30% sur ta mise, avant investissement. Impossible à battre à court terme.",
+    ],
+    quiz: {
+      question: "Comment calcule-t-on le plafond de déduction du PER pour un salarié ?",
+      options: [
+        "1 000€ fixe par an",
+        "10% des revenus professionnels nets (avec plafond)",
+        "Il n'y a pas de plafond de déduction",
+      ],
+      correct: 1,
+    },
+    action: "Consulte ton avis d'imposition N-1 pour trouver ton plafond d'épargne retraite disponible. Il figure en bas de page.",
+  },
+  {
+    theme: 'fiscalite', themeLabel: 'Fiscalité',
+    title: 'La fiscalité de l'assurance-vie expliquée',
+    body: [
+      "Avant 8 ans : 30% flat tax sur les gains retirés (ou barème sur option). Après 8 ans : abattement annuel de 4 600€ pour une personne seule (9 200€ en couple), puis 24,7% seulement.",
+      "Les contrats ouverts avant 1998 bénéficient d'une exonération totale sur les versements d'avant 1998. Les versements de 1998 à 2017 ont leur propre régime intermédiaire (7,5% après 8 ans).",
+      "En cas de décès, le capital transmis aux bénéficiaires désignés bénéficie d'un abattement de 152 500€ par bénéficiaire — entièrement hors succession civile.",
+    ],
+    quiz: {
+      question: "Quel est le taux d'imposition sur les gains d'une assurance-vie après 8 ans et au-delà de l'abattement ?",
+      options: ["30% flat tax", "24,7% (7,5% IR + 17,2% PS)", "17,2% uniquement"],
+      correct: 1,
+    },
+    action: "Calcule tes gains sur ton contrat d'assurance-vie. Si tu approches des 8 ans, planifie tes rachats pour profiter de l'abattement.",
+  },
+  {
+    theme: 'fiscalite', themeLabel: 'Fiscalité',
+    title: 'Plus-values immobilières : quand paie-t-on ?',
+    body: [
+      "La résidence principale est totalement exonérée de plus-value. Pour un bien locatif ou une résidence secondaire, des abattements progressifs s'appliquent selon la durée de détention.",
+      "Exonération d'IR à partir de 22 ans de détention. Exonération totale (IR + prélèvements sociaux) à partir de 30 ans. Avant 6 ans : pas d'abattement.",
+      "La plus-value imposable = prix de vente - prix d'achat - travaux (prouvés) - frais d'acquisition (forfait 7,5% ou frais réels). Ne pas confondre avec les revenus fonciers annuels.",
+    ],
+    quiz: {
+      question: "Après combien d'années de détention une plus-value immobilière locative est-elle totalement exonérée ?",
+      options: ["15 ans", "22 ans", "30 ans"],
+      correct: 2,
+    },
+    action: "Calcule depuis combien d'années tu détiens tes biens immobiliers. Cela impacte directement la fiscalité d'une éventuelle revente.",
+  },
+  {
+    theme: 'fiscalite', themeLabel: 'Fiscalité',
+    title: 'Le PEA : zéro impôt sur le revenu après 5 ans',
+    body: [
+      "Dans un PEA, dividendes et plus-values s'accumulent sans imposition pendant la durée de vie du contrat. Tant que tu n'effectues pas de retrait, aucun impôt n'est dû.",
+      "Après 5 ans, les retraits ne sont soumis qu'aux prélèvements sociaux de 17,2% — pas d'IR. Sur 100 000€ de plus-values, l'économie vs un compte-titres est de 12 800€.",
+      "Piège à éviter : retirer de l'argent avant 5 ans clôture le plan. Une seule erreur annule l'avantage fiscal et t'oblige à tout recommencer. Traite le PEA comme un compte intouchable pendant 5 ans.",
+    ],
+    quiz: {
+      question: "Quel est le risque d'effectuer un retrait sur un PEA avant 5 ans ?",
+      options: [
+        "Une pénalité de 10% sur le montant retiré",
+        "La clôture du plan et la perte de l'avantage fiscal",
+        "Aucun risque, c'est autorisé",
+      ],
+      correct: 1,
+    },
+    action: "Vérifie la date d'ouverture de ton PEA. Si tu n'en as pas, ouvre-en un aujourd'hui même avec 1€ pour démarrer le compteur des 5 ans.",
+  },
+  {
+    theme: 'fiscalite', themeLabel: 'Fiscalité',
+    title: 'Le plafond global des niches fiscales',
+    body: [
+      "Toutes les réductions d'impôt (hors exceptions) sont soumises à un plafond global de 10 000€/an. Au-delà, l'excédent ne s'impute pas. Cela concerne : investissement Pinel, FCPI/FIP, emploi à domicile, etc.",
+      "Certains dispositifs bénéficient d'un plafond majoré (18 000€) comme le Girardin industriel ou Sofica. Et certains (PER, dons, Malraux) sont hors plafond.",
+      "Conséquence pratique : si tu as déjà 8 000€ de réductions d'impôt, l'ajout d'un nouveau dispositif dans le plafond global ne te rapportera que 2 000€ max.",
+    ],
+    quiz: {
+      question: "Quel est le plafond général des niches fiscales applicables à l'impôt sur le revenu ?",
+      options: ["5 000€", "10 000€", "20 000€"],
+      correct: 1,
+    },
+    action: "Liste tes réductions d'impôt actuelles pour estimer si tu as encore de la marge sous le plafond des niches fiscales.",
+  },
+  {
+    theme: 'fiscalite', themeLabel: 'Fiscalité',
+    title: 'Donation et succession : anticiper pour transmettre',
+    body: [
+      "Chaque parent peut donner 100 000€ par enfant tous les 15 ans sans droits de donation. Une donation faite aujourd'hui purge la succession future à hauteur du montant donné.",
+      "L'assurance-vie reste la reine de la transmission : jusqu'à 152 500€ par bénéficiaire désigné transmis hors droits et hors succession civile. Pour les versements après 70 ans, les règles sont différentes.",
+      "Le démembrement de propriété (donner la nue-propriété, conserver l'usufruit) permet de transmettre avec une valeur fiscale réduite — de 30 à 50% selon l'âge — tout en conservant les revenus du bien.",
+    ],
+    quiz: {
+      question: "Quel est le montant de l'abattement de donation parent-enfant renouvelable tous les 15 ans ?",
+      options: ["50 000€", "100 000€", "150 000€"],
+      correct: 1,
+    },
+    action: "Vérifie si tu as effectué une donation dans les 15 dernières années. Si non, tu disposes de l'abattement complet.",
+  },
+
+  /* ── Patrimoine (21-27) ── */
+  {
+    theme: 'patrimoine', themeLabel: 'Patrimoine',
+    title: 'Construire son patrimoine par décennie',
+    body: [
+      "À 30 ans : priorité à la résidence principale (si le marché le permet), premiers placements réguliers, constitution de l'épargne de précaution. L'objectif est de poser les bases.",
+      "À 40 ans : accélération des versements sur PEA et PER, diversification immobilière (locatif), éventuellement SCPI. Le patrimoine commence à prendre de l'ampleur.",
+      "À 50-60 ans : sécurisation progressive (réduire la part actions au profit d'obligations), optimisation fiscale, préparation de la succession. L'objectif passe de l'accumulation à la préservation.",
+    ],
+    quiz: {
+      question: "Quelle est la priorité patrimoniale principale à 30 ans ?",
+      options: [
+        "Maximiser les placements spéculatifs",
+        "Établir les bases : résidence et premiers placements diversifiés",
+        "Tout sécuriser en fonds euros",
+      ],
+      correct: 1,
+    },
+    action: "Identifie ta phase patrimoniale actuelle et liste les 2-3 objectifs prioritaires pour les 5 prochaines années.",
+  },
+  {
+    theme: 'patrimoine', themeLabel: 'Patrimoine',
+    title: 'Immobilier locatif : micro-foncier ou régime réel ?',
+    body: [
+      "Micro-foncier (loyers bruts < 15 000€/an) : abattement automatique de 30%, sans justificatifs. Simple, mais tu ne peux déduire aucune charge réelle au-delà du forfait.",
+      "Régime réel : déduction de toutes les charges (intérêts d'emprunt, travaux, assurances, frais de gestion) + possibilité de créer un déficit foncier imputable sur le revenu global jusqu'à 10 700€/an.",
+      "Le régime réel devient rentable dès que tes charges dépassent 30% des loyers, ou si tu as des travaux importants. Une simple simulation chiffrée permet de trancher.",
+    ],
+    quiz: {
+      question: "Quel est le seuil de revenus fonciers bruts pour accéder au régime micro-foncier ?",
+      options: ["5 000€/an", "15 000€/an", "30 000€/an"],
+      correct: 1,
+    },
+    action: "Calcule le ratio charges/loyers bruts de ton bien locatif. Si c'est plus de 30%, le régime réel t'est probablement favorable.",
+  },
+  {
+    theme: 'patrimoine', themeLabel: 'Patrimoine',
+    title: 'Le démembrement de propriété : une stratégie puissante',
+    body: [
+      "Décomposer la propriété en nue-propriété (droit de revendre) et usufruit (droit d'habiter ou de percevoir les loyers). Donner la nue-propriété à ses enfants tout en conservant l'usufruit permet de transmettre à moindre coût fiscal.",
+      "La valeur de la nue-propriété est réduite selon un barème fiscal basé sur l'âge de l'usufruitier : à 60 ans, la nue-propriété vaut 50% de la pleine propriété. C'est 50% d'assiette taxable en moins.",
+      "À terme, quand l'usufruit s'éteint (décès), les enfants récupèrent la pleine propriété sans droits supplémentaires. L'économie peut atteindre plusieurs dizaines de milliers d'euros.",
+    ],
+    quiz: {
+      question: "Quel est l'avantage fiscal du démembrement de propriété pour la transmission ?",
+      options: [
+        "Exonération totale de droits de succession",
+        "Réduction de la base taxable grâce à la valeur réduite de la nue-propriété",
+        "Permettre la vente immédiate du bien sans impôt",
+      ],
+      correct: 1,
+    },
+    action: "Si tu as des biens immobiliers et des enfants, consulte un notaire pour évaluer l'opportunité du démembrement selon ton âge.",
+  },
+  {
+    theme: 'patrimoine', themeLabel: 'Patrimoine',
+    title: 'La SCI : outil de transmission ou piège ?',
+    body: [
+      "La Société Civile Immobilière (SCI) est utile pour : détenir l'immobilier à plusieurs sans indivision, faciliter la donation progressive de parts, et parfois choisir l'IS pour amortir les biens.",
+      "Ses limites : frais de constitution (1 500-3 000€), comptabilité annuelle, et à l'IS, une fiscalité sur les plus-values calculée après amortissement (souvent lourde à la revente).",
+      "Verdict : la SCI n'a de sens que si tu détiens plusieurs biens, souhaites les transmettre progressivement, ou si tu gères l'immobilier à plusieurs. Pour un bien unique en famille, souvent trop complexe.",
+    ],
+    quiz: {
+      question: "Dans quel cas la SCI est-elle particulièrement pertinente ?",
+      options: [
+        "Pour un seul appartement locatif en nom propre",
+        "Pour détenir plusieurs biens et faciliter leur transmission familiale",
+        "Pour éviter de payer l'impôt sur les revenus fonciers",
+      ],
+      correct: 1,
+    },
+    action: "Liste ton patrimoine immobilier et tes objectifs de transmission. Si tu as plusieurs biens et des héritiers, demande un avis à un notaire sur la SCI.",
+  },
+  {
+    theme: 'patrimoine', themeLabel: 'Patrimoine',
+    title: 'Prévoyance : le parent pauvre du patrimoine',
+    body: [
+      "1 actif sur 3 n'a pas de couverture prévoyance suffisante. En cas d'invalidité totale ou partielle, les indemnités journalières de la Sécurité sociale couvrent souvent moins de 50% du salaire net.",
+      "Pour les TNS (indépendants, chefs d'entreprise), la protection est encore moindre. Un contrat prévoyance individuelle (Madelin pour les TNS) peut maintenir 70-80% du salaire pour 30-60€/mois.",
+      "Ne pas confondre avec l'assurance décès : la prévoyance couvre l'invalidité et l'incapacité de travail pendant que tu es vivant. C'est souvent plus important financièrement que la protection décès.",
+    ],
+    quiz: {
+      question: "Pour qui la prévoyance individuelle est-elle particulièrement indispensable ?",
+      options: [
+        "Les fonctionnaires déjà couverts par l'État",
+        "Les salariés avec accord collectif de prévoyance complet",
+        "Les travailleurs non-salariés et les salariés sans bonne couverture collective",
+      ],
+      correct: 2,
+    },
+    action: "Vérifie ton taux d'indemnisation en cas d'invalidité dans ta convention collective ou ton contrat prévoyance actuel.",
+  },
+  {
+    theme: 'patrimoine', themeLabel: 'Patrimoine',
+    title: 'L'effet de levier immobilier : s'enrichir avec l'argent des autres',
+    body: [
+      "C'est le seul actif où tu peux emprunter 80-90% du prix d'achat à taux fixe. Si tu apportes 20 000€ pour acheter 200 000€, et que le bien génère 4%/an de rendement locatif net, ton rendement sur fonds propres dépasse 15-20%/an.",
+      "En plus, si le bien prend 2% de valeur par an sur 200 000€ = 4 000€ de plus-value/an. Rapporté à tes 20 000€ d'apport, c'est encore 20% de rendement sur ta mise — sans compter les loyers.",
+      "L'effet de levier amplifie aussi les pertes : si le bien perd de la valeur ET que les loyers ne couvrent pas le crédit, la situation peut devenir difficile. D'où l'importance d'une sélection rigoureuse.",
+    ],
+    quiz: {
+      question: "Quel est le principal avantage de l'effet de levier dans l'immobilier ?",
+      options: [
+        "Éviter de payer des intérêts bancaires",
+        "Maximiser le rendement sur son capital propre grâce au crédit",
+        "Garantir un rendement positif quoi qu'il arrive",
+      ],
+      correct: 1,
+    },
+    action: "Calcule le rendement brut d'un projet locatif hypothétique : loyer annuel / prix d'achat. Un ratio supérieur à 5% est un point de départ acceptable.",
+  },
+  {
+    theme: 'patrimoine', themeLabel: 'Patrimoine',
+    title: 'Faire son bilan patrimonial : où en suis-je ?',
+    body: [
+      "Le bilan patrimonial, c'est un état des lieux : actif (ce que tu possèdes) moins passif (ce que tu dois) = patrimoine net. Immobilier, placements, épargne, véhicule, objets de valeur côté actif ; crédits, dettes, impôts à payer côté passif.",
+      "L'exercice permet de repérer les déséquilibres : trop de cash non investi, concentration excessive sur un seul actif (l'immobilier souvent), oubli de certains passifs, sous-assurance.",
+      "Idéalement, le faire une fois par an. Les wealth managers le font pour leurs clients à 1 000€/heure. Tu peux le faire toi-même en 2 heures avec un tableau. L'important est de commencer.",
+    ],
+    quiz: {
+      question: "Comment calcule-t-on le patrimoine net ?",
+      options: [
+        "Revenus annuels × 10",
+        "Total actifs − Total passifs (dettes et crédits)",
+        "Valeur immobilière uniquement",
+      ],
+      correct: 1,
+    },
+    action: "Ouvre un tableau et liste tous tes actifs avec leur valeur estimée, puis toutes tes dettes. Calcule ton patrimoine net aujourd'hui.",
+  },
+];
+
+const BADGES = [
+  { id:'debutant', emoji:'🌱', name:'Débutant',  cond:'1ère leçon complétée',     minTotal:1,   minStreak:0   },
+  { id:'regulier', emoji:'📅', name:'Régulier',  cond:'7 jours d\'affilée',       minTotal:0,   minStreak:7   },
+  { id:'assidu',   emoji:'🏆', name:'Assidu',    cond:'30 jours d\'affilée',      minTotal:0,   minStreak:30  },
+  { id:'expert',   emoji:'⭐', name:'Expert',    cond:'50 leçons complétées',     minTotal:50,  minStreak:0   },
+  { id:'maitre',   emoji:'💎', name:'Maître',    cond:'100 leçons complétées',    minTotal:100, minStreak:0   },
+  { id:'legende',  emoji:'🔥', name:'Légende',   cond:'365 jours d\'affilée',     minTotal:0,   minStreak:365 },
+];
+
+/* ─── Niveaux ─────────────────────────────────────────────────────────────── */
+const LEVELS = [
+  { name: 'Découvreur', min: 0,   max: 9   },
+  { name: 'Initié',     min: 10,  max: 24  },
+  { name: 'Confirmé',   min: 25,  max: 49  },
+  { name: 'Expert',     min: 50,  max: 99  },
+  { name: 'Maître',     min: 100, max: null },
+];
+
+function getLevel(total) {
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (total >= LEVELS[i].min) return LEVELS[i];
+  }
+  return LEVELS[0];
+}
+
+function updateLevelBar(total) {
+  const level    = getLevel(total);
+  const isCapped = level.max === null;
+  const progress = isCapped ? 100 : Math.round(((total - level.min) / (level.max - level.min + 1)) * 100);
+  const nextAt   = isCapped ? null : level.max + 1;
+
+  document.getElementById('level-name').textContent       = level.name;
+  document.getElementById('level-bar-fill').style.width   = progress + '%';
+  document.getElementById('level-next').textContent       = isCapped
+    ? 'Niveau max'
+    : `${total}/${nextAt} leçons`;
+}
+
+const THEME_LABELS = {
+  investissement: 'Investissement',
+  epargne:        'Épargne',
+  fiscalite:      'Fiscalité',
+  patrimoine:     'Patrimoine',
+};
+
+function updateBestTheme(best_theme) {
+  if (!best_theme || !THEME_LABELS[best_theme]) return;
+  const badge = document.getElementById('best-theme-badge');
+  const stat  = document.getElementById('best-theme-stat');
+  badge.textContent = THEME_LABELS[best_theme];
+  badge.className   = 'best-theme-badge best-theme-' + best_theme;
+  stat.style.display = 'block';
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let quizAnswered = false;
+let quizCorrect  = false;
+
+function renderLesson(lesson, todayDone) {
+  const themeColors = {
+    investissement: 'theme-investissement',
+    epargne:        'theme-epargne',
+    fiscalite:      'theme-fiscalite',
+    patrimoine:     'theme-patrimoine',
+  };
+  const themeIcons = {
+    investissement: 'ti-trending-up',
+    epargne:        'ti-piggy-bank',
+    fiscalite:      'ti-receipt-tax',
+    patrimoine:     'ti-building-bank',
+  };
+
+  const bodyHtml = lesson.body.map(p => `<p>${escHtml(p)}</p>`).join('');
+  const optionsHtml = lesson.quiz.options.map((o, i) => `
+    <button class="quiz-option" data-idx="${i}" ${todayDone ? 'disabled' : ''}>
+      <span class="quiz-icon" aria-hidden="true"></span>
+      ${escHtml(o)}
+    </button>
+  `).join('');
+
+  const today = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+
+  document.getElementById('lesson-card').innerHTML = `
+    <div class="lesson-meta">
+      <span class="theme-badge ${themeColors[lesson.theme]}">
+        <i class="ti ${themeIcons[lesson.theme]}" aria-hidden="true"></i>
+        ${escHtml(lesson.themeLabel)}
+      </span>
+      <span class="lesson-day">${today}</span>
+    </div>
+    <h1 class="lesson-title">${escHtml(lesson.title)}</h1>
+    <div class="lesson-body">${bodyHtml}</div>
+
+    <div class="quiz-section">
+      <hr class="quiz-divider">
+      <div class="quiz-label">Quiz</div>
+      <div class="quiz-question">${escHtml(lesson.quiz.question)}</div>
+      <div class="quiz-options" id="quiz-options" role="group" aria-label="Options de réponse">
+        ${optionsHtml}
+      </div>
+      <div id="quiz-feedback" class="quiz-feedback" style="display:none"></div>
+    </div>
+
+    <div class="action-section">
+      <hr class="action-divider">
+      <div class="action-label">Action concrète du jour</div>
+      <div class="action-box">
+        <i class="ti ti-arrow-right action-icon" aria-hidden="true"></i>
+        <span>${escHtml(lesson.action)}</span>
+      </div>
+    </div>
+
+    <div class="complete-row">
+      <button class="btn-complete ${todayDone ? 'done' : ''}" id="btn-complete" ${todayDone ? 'disabled' : ''}>
+        ${todayDone
+          ? '<i class="ti ti-circle-check" aria-hidden="true"></i> Leçon complétée !'
+          : '<i class="ti ti-check" aria-hidden="true"></i> Marquer comme terminé'
+        }
+      </button>
+    </div>
+  `;
+
+  if (todayDone) {
+    quizAnswered = true;
+    markQuizDone(lesson.quiz.correct, null, true);
+  }
+
+  bindQuiz(lesson.quiz.correct);
+  bindComplete(lesson);
+}
+
+function markQuizDone(correctIdx, selectedIdx, skipAnim) {
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === correctIdx) btn.classList.add('correct');
+    else if (i === selectedIdx) btn.classList.add('wrong');
+
+    const icon = btn.querySelector('.quiz-icon');
+    if (i === correctIdx)         icon.textContent = '✓';
+    else if (i === selectedIdx)   icon.textContent = '✗';
+  });
+
+  const fb = document.getElementById('quiz-feedback');
+  fb.style.display = 'block';
+
+  if (skipAnim) {
+    fb.className = 'quiz-feedback ok';
+    fb.textContent = 'Bonne réponse !';
+    return;
+  }
+
+  if (selectedIdx === correctIdx) {
+    fb.className    = 'quiz-feedback ok';
+    fb.textContent  = '✓ Bonne réponse !';
+    quizCorrect     = true;
+  } else {
+    fb.className    = 'quiz-feedback ko';
+    fb.textContent  = '✗ Pas tout à fait — la bonne réponse est surlignée en vert.';
+    quizCorrect     = false;
+  }
+}
+
+function bindQuiz(correctIdx) {
+  document.getElementById('quiz-options')?.addEventListener('click', (e) => {
+    if (quizAnswered) return;
+    const btn = e.target.closest('.quiz-option');
+    if (!btn) return;
+    quizAnswered = true;
+    markQuizDone(correctIdx, Number(btn.dataset.idx), false);
+  });
+}
+
+function bindComplete(lesson) {
+  document.getElementById('btn-complete')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-complete');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Enregistrement…';
+
+    try {
+      const lessonIndex = Math.floor(Date.now() / 86_400_000) % 28;
+      const res  = await fetch('/api/daily-complete', {
+        method:      'POST',
+        headers:     { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body:        JSON.stringify({ lesson_index: lessonIndex, quiz_correct: quizCorrect }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Marquer comme terminé';
+        return;
+      }
+
+      btn.className   = 'btn-complete done';
+      btn.innerHTML   = '<i class="ti ti-circle-check" aria-hidden="true"></i> Leçon complétée !';
+
+      document.getElementById('streak-num').textContent = data.streak;
+      document.getElementById('total-done').textContent = data.total_completed;
+
+      updateLevelBar(data.total_completed);
+      renderBadges(data.total_completed, data.streak);
+
+      if (data.new_badge) showBadgeToast(data.new_badge);
+    } catch {
+      btn.disabled  = false;
+      btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Marquer comme terminé';
+    }
+  });
+}
+
+function renderBadges(total, streak) {
+  const grid = document.getElementById('badges-grid');
+  grid.innerHTML = BADGES.map(b => {
+    const unlocked = (b.minTotal > 0 && total >= b.minTotal) || (b.minStreak > 0 && streak >= b.minStreak);
+    return `
+      <div class="badge-card ${unlocked ? 'unlocked' : ''}" title="${escHtml(b.cond)}">
+        <span class="badge-emoji">${b.emoji}</span>
+        <div class="badge-name">${escHtml(b.name)}</div>
+        <div class="badge-cond">${escHtml(b.cond)}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('badges-section').style.display = 'block';
+}
+
+function showBadgeToast(label) {
+  const badge = BADGES.find(b => b.name === label);
+  if (!badge) return;
+  document.getElementById('badge-toast-icon').textContent  = badge.emoji;
+  document.getElementById('badge-toast-label').textContent = badge.name + ' — ' + badge.cond;
+  const toast = document.getElementById('badge-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 5000);
+}
+
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+  location.replace('/');
+});
+
+async function init() {
+  try {
+    const meRes = await fetch('/api/auth/me', { credentials:'include' });
+    if (!meRes.ok) { location.replace('/login.html?next=/daily.html'); return; }
+    const { user } = await meRes.json();
+
+    document.getElementById('page-loading').style.display = 'none';
+
+    if (user.plan !== 'premium') {
+      document.getElementById('plan-guard').style.display = 'flex';
+      return;
+    }
+
+    document.getElementById('daily-content').style.display = 'block';
+
+    const progRes = await fetch('/api/daily-progress', { credentials:'include' });
+    if (!progRes.ok) throw new Error('progress fetch failed');
+    const prog = await progRes.json();
+
+    document.getElementById('streak-num').textContent = prog.streak;
+    document.getElementById('total-done').textContent = prog.total_completed;
+
+    updateLevelBar(prog.total_completed);
+    updateBestTheme(prog.best_theme);
+
+    const lesson = LESSONS[prog.lesson_index] ?? LESSONS[0];
+    renderLesson(lesson, prog.today_done);
+    renderBadges(prog.total_completed, prog.streak);
+  } catch {
+    location.replace('/login.html?next=/daily.html');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

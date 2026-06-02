@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur Budget — Prevano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input,button,select{font-family:inherit;font-size:inherit;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --grad-text:linear-gradient(135deg,#E24B4A 0%,#FF8C72 55%,#FFB347 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-inner{max-width:1200px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--grad-brand);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo em{font-style:normal;}
+.nav-links{display:flex;align-items:center;gap:14px;}
+.nav-link{font-size:14px;color:var(--text-muted);text-decoration:none;transition:color .2s;}
+.nav-link:hover{color:var(--text-primary);}
+.btn-nav-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border-default);padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-nav-ghost:hover{border-color:var(--color-primary);color:var(--color-primary);}
+/* Main layout */
+main{flex:1;padding:40px 48px 80px;max-width:1200px;margin:0 auto;width:100%;}
+.page-header{margin-bottom:36px;}
+.page-header h1{font-size:28px;font-weight:900;letter-spacing:-0.04em;margin-bottom:6px;}
+.page-header p{font-size:14px;color:var(--text-muted);}
+/* Budget layout */
+.budget-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;}
+/* Form card */
+.form-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:16px;padding:28px;}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-faint);margin:24px 0 14px;display:flex;align-items:center;gap:8px;}
+.section-label:first-child{margin-top:0;}
+.section-label i{font-size:15px;color:var(--color-primary);}
+.fields-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-faint);}
+.field input{padding:11px 14px;border-radius:9px;border:1.5px solid var(--border-subtle);color:var(--text-primary);background:var(--bg-raised);outline:none;transition:border-color .2s,background .2s;width:100%;}
+.field input:focus{border-color:var(--color-primary);background:var(--bg-overlay);}
+.field input.filled{border-color:rgba(226,75,74,0.35);}
+.field input::placeholder{color:var(--text-faint);}
+.form-divider{border:none;border-top:1px solid var(--border-subtle);margin:20px 0 0;}
+.btn-generate{width:100%;padding:14px;background:var(--color-primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s,transform .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;}
+.btn-generate:hover:not(:disabled){background:var(--color-primary-dark);transform:translateY(-1px);}
+.btn-generate:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.form-error{font-size:13px;color:var(--color-primary);text-align:center;margin-top:10px;min-height:18px;}
+/* Summary & results card */
+.summary-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:16px;padding:28px;position:sticky;top:72px;}
+.summary-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-faint);margin-bottom:20px;}
+.summary-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border-subtle);}
+.summary-row:last-of-type{border-bottom:none;}
+.summary-key{font-size:13px;color:var(--text-muted);}
+.summary-val{font-size:13px;font-weight:700;}
+.summary-val.positive{color:#22C55E;}
+.summary-val.negative{color:var(--color-primary);}
+/* Score + progress */
+.score-section{margin-top:20px;}
+.score-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.score-label{font-size:12px;font-weight:600;color:var(--text-muted);}
+.score-num{font-size:22px;font-weight:900;letter-spacing:-0.04em;}
+.progress-track{height:8px;background:var(--bg-overlay);border-radius:100px;overflow:hidden;margin-bottom:6px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#E24B4A,#FF7B6B);border-radius:100px;transition:width .7s cubic-bezier(.25,.8,.25,1);}
+.progress-legend{font-size:11px;color:var(--text-faint);}
+.progress-legend strong{color:var(--text-muted);}
+/* Plan steps */
+.results-divider{border:none;border-top:1px solid var(--border-subtle);margin:20px 0;}
+.results-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-faint);margin-bottom:14px;}
+.plan-steps{display:flex;flex-direction:column;gap:10px;}
+.plan-step{background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;transition:border-color .2s;opacity:0;transform:translateY(8px);animation:stepIn .4s ease forwards;}
+@keyframes stepIn{to{opacity:1;transform:none;}}
+.plan-step:hover{border-color:var(--color-primary-border);}
+.step-num{width:26px;height:26px;background:var(--color-primary);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;}
+.step-content h4{font-size:13px;font-weight:600;margin-bottom:3px;}
+.step-content p{font-size:12px;color:var(--text-muted);line-height:1.55;}
+.plan-loading{display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px;padding:8px 0;}
+.plan-loading i{color:var(--color-primary);font-size:17px;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* Gap badge */
+.gap-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;margin-top:4px;}
+.gap-ok{background:rgba(34,197,94,0.12);color:#22C55E;}
+.gap-warn{background:var(--color-primary-subtle);color:var(--color-primary);}
+/* Plan guard */
+.plan-guard{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;text-align:center;}
+.guard-icon{width:64px;height:64px;background:var(--bg-raised);border:1px solid var(--border-default);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 24px;}
+.guard-title{font-size:24px;font-weight:900;letter-spacing:-0.04em;margin-bottom:8px;}
+.guard-sub{font-size:14px;color:var(--text-muted);margin-bottom:28px;max-width:400px;line-height:1.6;}
+.btn-upgrade{background:var(--color-primary);color:#fff;border:none;padding:13px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .2s;}
+.btn-upgrade:hover{background:var(--color-primary-dark);transform:translateY(-1px);}
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,var(--bg-raised) 25%,var(--bg-overlay) 50%,var(--bg-raised) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* Footer */
+footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:auto;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-size:12px;color:var(--text-faint);text-decoration:none;}
+.footer-link:hover{color:var(--text-muted);}
+.footer-copy{font-size:12px;color:var(--text-faint);}
+@media(max-width:900px){
+  .budget-layout{grid-template-columns:1fr;}
+  .summary-card{position:static;}
+}
+@media(max-width:640px){
+  nav,main,footer{padding-left:20px;padding-right:20px;}
+  main{padding-top:28px;padding-bottom:60px;}
+  .fields-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo-wrap">
+      <div class="logo-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+        </svg>
+      </div>
+      <span class="logo" translate="no">Pre<em>vano</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="/"           class="nav-link">Simulateur</a>
+      <a href="/profil.html" class="nav-link">Mon profil</a>
+      <button id="btn-logout" class="btn-nav-ghost">Déconnexion</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <!-- Loading skeleton -->
+  <div id="page-loading">
+    <div style="margin-bottom:32px">
+      <div class="skeleton" style="height:28px;width:260px;margin-bottom:10px"></div>
+      <div class="skeleton" style="height:14px;width:380px"></div>
+    </div>
+    <div class="budget-layout">
+      <div class="form-card">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="skeleton" style="height:12px;width:120px"></div>
+          <div class="fields-row">
+            <div class="skeleton" style="height:44px"></div>
+            <div class="skeleton" style="height:44px"></div>
+          </div>
+          <div class="skeleton" style="height:12px;width:140px;margin-top:12px"></div>
+          <div class="fields-row">
+            <div class="skeleton" style="height:44px"></div>
+            <div class="skeleton" style="height:44px"></div>
+            <div class="skeleton" style="height:44px"></div>
+            <div class="skeleton" style="height:44px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="skeleton" style="height:12px;width:100px"></div>
+          <div class="skeleton" style="height:18px"></div>
+          <div class="skeleton" style="height:18px"></div>
+          <div class="skeleton" style="height:18px"></div>
+          <div class="skeleton" style="height:8px;margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan guard (free) -->
+  <div id="plan-guard" style="display:none">
+    <div class="plan-guard">
+      <div class="guard-icon"><i class="ti ti-chart-pie-2" style="color:var(--color-primary)"></i></div>
+      <h1 class="guard-title">Calculateur Budget</h1>
+      <p class="guard-sub">Analyse et optimise ton budget mensuel avec un plan d'action IA personnalisé en 5 étapes concrètes. Disponible dès l'offre Starter.</p>
+      <a href="/tarifs.html" class="btn-upgrade">
+        <i class="ti ti-bolt" aria-hidden="true"></i> Passer à Starter — 9,99€/mois
+      </a>
+    </div>
+  </div>
+
+  <!-- Budget content -->
+  <div id="budget-content" style="display:none">
+    <div class="page-header">
+      <h1>Mon calculateur budget</h1>
+      <p>Saisis ton budget mensuel pour générer ton plan d'optimisation personnalisé.</p>
+    </div>
+
+    <div class="budget-layout">
+      <!-- Form -->
+      <div class="form-card">
+        <form id="budget-form" novalidate>
+
+          <div class="section-label"><i class="ti ti-trending-up" aria-hidden="true"></i>Revenus</div>
+          <div class="fields-row">
+            <div class="field">
+              <label for="f-salaire">Salaire net</label>
+              <input type="number" id="f-salaire" name="salaire" min="0" max="50000" placeholder="2 500" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="f-secondaires">Revenus secondaires</label>
+              <input type="number" id="f-secondaires" name="secondaires" min="0" max="50000" placeholder="0" inputmode="numeric">
+            </div>
+          </div>
+          <div class="fields-row" style="margin-top:10px">
+            <div class="field">
+              <label for="f-autres-revenus">Autres revenus</label>
+              <input type="number" id="f-autres-revenus" name="autres_revenus" min="0" max="50000" placeholder="0" inputmode="numeric">
+            </div>
+          </div>
+
+          <hr class="form-divider">
+          <div class="section-label"><i class="ti ti-home-2" aria-hidden="true"></i>Dépenses fixes</div>
+          <div class="fields-row">
+            <div class="field">
+              <label for="f-loyer">Loyer / crédit immo</label>
+              <input type="number" id="f-loyer" name="loyer" min="0" max="50000" placeholder="900" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="f-assurances">Assurances</label>
+              <input type="number" id="f-assurances" name="assurances" min="0" max="50000" placeholder="150" inputmode="numeric">
+            </div>
+          </div>
+          <div class="fields-row" style="margin-top:10px">
+            <div class="field">
+              <label for="f-abonnements">Abonnements</label>
+              <input type="number" id="f-abonnements" name="abonnements" min="0" max="50000" placeholder="80" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="f-transport">Transport</label>
+              <input type="number" id="f-transport" name="transport" min="0" max="50000" placeholder="120" inputmode="numeric">
+            </div>
+          </div>
+
+          <hr class="form-divider">
+          <div class="section-label"><i class="ti ti-shopping-bag" aria-hidden="true"></i>Dépenses variables</div>
+          <div class="fields-row">
+            <div class="field">
+              <label for="f-alimentation">Alimentation</label>
+              <input type="number" id="f-alimentation" name="alimentation" min="0" max="50000" placeholder="400" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="f-loisirs">Loisirs</label>
+              <input type="number" id="f-loisirs" name="loisirs" min="0" max="50000" placeholder="100" inputmode="numeric">
+            </div>
+          </div>
+          <div class="fields-row" style="margin-top:10px">
+            <div class="field">
+              <label for="f-restaurants">Restaurants / sorties</label>
+              <input type="number" id="f-restaurants" name="restaurants" min="0" max="50000" placeholder="150" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="f-shopping">Shopping</label>
+              <input type="number" id="f-shopping" name="shopping" min="0" max="50000" placeholder="80" inputmode="numeric">
+            </div>
+          </div>
+
+          <hr class="form-divider">
+          <div class="section-label"><i class="ti ti-piggy-bank" aria-hidden="true"></i>Épargne</div>
+          <div class="fields-row">
+            <div class="field">
+              <label for="f-epargne">Épargne actuelle (€/mois)</label>
+              <input type="number" id="f-epargne" name="epargne" min="0" max="50000" placeholder="200" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="f-objectif">Objectif d'épargne (€/mois)</label>
+              <input type="number" id="f-objectif" name="objectif" min="0" max="50000" placeholder="400" inputmode="numeric">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-generate" id="btn-generate">
+            <i class="ti ti-sparkles" aria-hidden="true"></i>
+            Générer mon plan d'optimisation
+          </button>
+          <p class="form-error" id="form-error" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <!-- Summary + results -->
+      <div class="summary-card" id="summary-card">
+        <div class="summary-title">Budget mensuel</div>
+
+        <div class="summary-row">
+          <span class="summary-key">Revenus totaux</span>
+          <span class="summary-val" id="s-revenus">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Dépenses totales</span>
+          <span class="summary-val" id="s-depenses">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Balance</span>
+          <span class="summary-val" id="s-balance">—</span>
+        </div>
+
+        <div class="score-section">
+          <div class="score-header">
+            <span class="score-label">Progression vers l'objectif</span>
+            <span class="score-num" id="s-score">—</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="s-progress" style="width:0%"></div>
+          </div>
+          <p class="progress-legend" id="s-legend"></p>
+        </div>
+
+        <!-- Loading -->
+        <div id="results-loading" style="display:none">
+          <hr class="results-divider">
+          <div class="plan-loading">
+            <i class="ti ti-loader-2" aria-hidden="true"></i>
+            Analyse en cours…
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results-section" style="display:none">
+          <hr class="results-divider">
+          <div class="results-title">Plan d'optimisation</div>
+          <div class="plan-steps" id="plan-steps"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/cgv.html"              class="footer-link">CGV</a>
+      <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
+      <a href="/contact.html"          class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2026 Prevano</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmt(n) {
+  return Number.isFinite(n) ? n.toLocaleString('fr-FR') + '€' : '—';
+}
+
+function readForm() {
+  function v(id) { return Math.max(0, Number(document.getElementById(id).value) || 0); }
+  return {
+    revenus: {
+      salaire:        v('f-salaire'),
+      secondaires:    v('f-secondaires'),
+      autres_revenus: v('f-autres-revenus'),
+    },
+    depenses: {
+      loyer:          v('f-loyer'),
+      assurances:     v('f-assurances'),
+      abonnements:    v('f-abonnements'),
+      transport:      v('f-transport'),
+      alimentation:   v('f-alimentation'),
+      loisirs:        v('f-loisirs'),
+      restaurants:    v('f-restaurants'),
+      shopping:       v('f-shopping'),
+    },
+    epargne:  v('f-epargne'),
+    objectif: v('f-objectif'),
+  };
+}
+
+function fillForm(data) {
+  function set(id, val) {
+    const el = document.getElementById(id);
+    if (el && val) { el.value = val; el.classList.add('filled'); }
+  }
+  const r = data.revenus ?? {};
+  const d = data.depenses ?? {};
+  set('f-salaire',      r.salaire);
+  set('f-secondaires',  r.secondaires);
+  set('f-autres-revenus', r.autres_revenus);
+  set('f-loyer',        d.loyer);
+  set('f-assurances',   d.assurances);
+  set('f-abonnements',  d.abonnements);
+  set('f-transport',    d.transport);
+  set('f-alimentation', d.alimentation);
+  set('f-loisirs',      d.loisirs);
+  set('f-restaurants',  d.restaurants);
+  set('f-shopping',     d.shopping);
+  set('f-epargne',      data.epargne);
+  set('f-objectif',     data.objectif);
+}
+
+function updateSummary() {
+  const data    = readForm();
+  const revTot  = Object.values(data.revenus).reduce((a, v) => a + v, 0);
+  const depTot  = Object.values(data.depenses).reduce((a, v) => a + v, 0);
+  const balance = revTot - depTot - data.epargne;
+  const score   = data.objectif > 0
+    ? Math.min(100, Math.round((data.epargne / data.objectif) * 100))
+    : (data.epargne > 0 ? 100 : 0);
+  const gap     = Math.max(0, data.objectif - data.epargne);
+
+  document.getElementById('s-revenus').textContent  = revTot  ? fmt(revTot)  : '—';
+  document.getElementById('s-depenses').textContent = depTot  ? fmt(depTot)  : '—';
+
+  const balEl = document.getElementById('s-balance');
+  if (revTot || depTot) {
+    balEl.textContent = (balance >= 0 ? '+' : '') + balance.toLocaleString('fr-FR') + '€';
+    balEl.className   = 'summary-val ' + (balance >= 0 ? 'positive' : 'negative');
+  } else {
+    balEl.textContent = '—';
+    balEl.className   = 'summary-val';
+  }
+
+  document.getElementById('s-score').textContent = (revTot || depTot || data.epargne) ? score + '/100' : '—';
+  document.getElementById('s-progress').style.width = score + '%';
+
+  const legendEl = document.getElementById('s-legend');
+  if (data.epargne || data.objectif) {
+    legendEl.innerHTML = `Épargne actuelle <strong>${fmt(data.epargne)}</strong> · Objectif <strong>${fmt(data.objectif)}</strong>`
+      + (gap > 0 ? ` · Manque <strong style="color:var(--color-primary)">${fmt(gap)}</strong>` : '');
+  } else {
+    legendEl.innerHTML = '';
+  }
+}
+
+function renderSteps(steps) {
+  const container = document.getElementById('plan-steps');
+  container.innerHTML = steps.map((s, i) => `
+    <div class="plan-step" style="animation-delay:${i * 0.08}s">
+      <div class="step-num">${i + 1}</div>
+      <div class="step-content">
+        <h4>${escHtml(s.title)}</h4>
+        <p>${escHtml(s.desc)}</p>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('results-section').style.display = 'block';
+}
+
+document.getElementById('budget-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('form-error');
+  errEl.textContent = '';
+
+  const data = readForm();
+  const hasRevenu = Object.values(data.revenus).some(v => v > 0);
+  if (!hasRevenu) { errEl.textContent = 'Saisis au moins ton salaire net.'; return; }
+
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Génération en cours…';
+  document.getElementById('results-loading').style.display = 'block';
+  document.getElementById('results-section').style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/budget-plan', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify(data),
+    });
+    const result = await res.json();
+    document.getElementById('results-loading').style.display = 'none';
+
+    if (!res.ok) {
+      errEl.textContent = result.error ?? 'Erreur lors de la génération.';
+      return;
+    }
+
+    updateSummary();
+    renderSteps(result.steps);
+    document.getElementById('summary-card').scrollIntoView({ behavior:'smooth', block:'start' });
+  } catch {
+    document.getElementById('results-loading').style.display = 'none';
+    errEl.textContent = 'Erreur de connexion. Réessaie.';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-sparkles" aria-hidden="true"></i> Régénérer le plan';
+  }
+});
+
+// Live update on input
+document.getElementById('budget-form').addEventListener('input', updateSummary);
+
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+  location.replace('/');
+});
+
+async function init() {
+  try {
+    const meRes = await fetch('/api/auth/me', { credentials:'include' });
+    if (!meRes.ok) { location.replace('/login.html?next=/budget.html'); return; }
+    const { user } = await meRes.json();
+
+    document.getElementById('page-loading').style.display = 'none';
+
+    const PAID = new Set(['starter', 'pro', 'premium']);
+    if (!PAID.has(user.plan)) {
+      document.getElementById('plan-guard').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('budget-content').style.display = 'block';
+
+    const entryRes = await fetch('/api/budget-entry', { credentials:'include' });
+    if (entryRes.ok) {
+      const { entry } = await entryRes.json();
+      if (entry) { fillForm(entry); updateSummary(); }
+    }
+  } catch {
+    location.replace('/login.html?next=/budget.html');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
