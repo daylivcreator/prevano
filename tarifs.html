@@ -7,6 +7,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<meta name="description" content="Starter, Coach Pro ou Daily Finance — l'offre Prevano adaptée à ta situation pour sécuriser ta retraite dès aujourd'hui.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://prevano.vercel.app/tarifs.html">
+<meta property="og:title" content="Tarifs — Prevano">
+<meta property="og:description" content="Starter, Coach Pro ou Daily Finance — l'offre Prevano adaptée à ta situation pour sécuriser ta retraite dès aujourd'hui.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tarifs — Prevano">
+<meta name="twitter:description" content="Starter, Coach Pro ou Daily Finance — l'offre Prevano adaptée à ta situation pour sécuriser ta retraite dès aujourd'hui.">
+<script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 input,button{font-family:inherit;font-size:inherit;}
@@ -87,9 +96,26 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
 .activity-popup-close:hover{color:var(--text-primary);}
 @media(max-width:640px){.activity-popup{max-width:calc(100vw - 48px);}}
 @media(max-width:900px){.plans-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto;}.plan-card.featured{border-color:var(--color-primary-border);}}
+/* Sim badge */
+.sim-badge{display:inline-flex;align-items:center;gap:8px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:100px;padding:8px 18px;font-size:13px;color:var(--text-muted);margin-bottom:8px;}
+.sim-badge i{color:var(--color-primary);}
+.sim-badge strong{color:var(--text-primary);}
+/* FAQ */
+.faq-section{padding:64px 48px 80px;max-width:1100px;margin:0 auto;}
+.faq-title{font-size:32px;font-weight:900;letter-spacing:-0.04em;text-align:center;margin-bottom:40px;}
+.faq-list{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:4px;}
+.faq-item{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:12px;overflow:hidden;transition:border-color 0.2s;}
+.faq-item[open]{border-color:var(--color-primary-border);}
+.faq-q{padding:20px 24px;font-size:14px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;list-style:none;gap:16px;user-select:none;}
+.faq-q::-webkit-details-marker{display:none;}
+.faq-q::after{content:'+';font-size:20px;font-weight:300;color:var(--color-primary);flex-shrink:0;transition:transform 0.2s;}
+.faq-item[open] .faq-q::after{transform:rotate(45deg);}
+.faq-a{padding:0 24px 20px;font-size:13px;color:var(--text-muted);line-height:1.75;border-top:1px solid var(--border-subtle);padding-top:16px;}
+.faq-a a{color:var(--color-primary);text-decoration:none;}
 @media(max-width:640px){
-  nav,.pricing-hero,.plans-section,.guarantee{padding-left:20px;padding-right:20px;}
+  nav,.pricing-hero,.plans-section,.guarantee,.faq-section{padding-left:20px;padding-right:20px;}
   .pricing-hero h1{font-size:32px;}
+  .faq-title{font-size:24px;}
   footer{padding:16px 20px;}
 }
 </style>
@@ -120,6 +146,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
   <section class="pricing-hero">
     <h1>Construis ta retraite<br><em>sans mauvaises surprises.</em></h1>
     <p>Choisis l'offre adaptée à ta situation et commence à sécuriser ton avenir dès aujourd'hui.</p>
+    <div class="sim-badge"><i class="ti ti-users" aria-hidden="true"></i> <strong>12 847</strong> simulations réalisées ce mois</div>
   </section>
 
   <div id="cancel-msg" style="display:none" class="cancel-banner">
@@ -187,6 +214,34 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
   <div class="guarantee">
     <p><i class="ti ti-shield-check" aria-hidden="true"></i> Paiement sécurisé par Stripe · Annulation à tout moment · Sans engagement</p>
   </div>
+
+  <section class="faq-section" aria-labelledby="faq-title">
+    <h2 class="faq-title" id="faq-title">Questions fréquentes</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-q">Quelle différence avec mon conseiller bancaire ?</summary>
+        <p class="faq-a">Un conseiller bancaire est limité aux produits de sa banque. Prevano est indépendant — il analyse toute ta situation et recommande les meilleurs outils selon ton profil (PEA, PER, assurance-vie) sans commission et sans biais de vente.</p>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Sans engagement — comment ça marche exactement ?</summary>
+        <p class="faq-a">Tu souscris mois par mois. Tu peux annuler à tout moment depuis ton espace profil, sans frais et sans justificatif. La résiliation prend effet à la fin de la période en cours.</p>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Le simulateur de retraite est-il vraiment précis ?</summary>
+        <p class="faq-a">Il utilise les taux officiels de la CNAV et les règles du système de retraite français. Les utilisateurs qui ont comparé avec leur relevé de carrière constatent un écart moyen inférieur à 5%.</p>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Mes données financières sont-elles en sécurité ?</summary>
+        <p class="faq-a">Tes données sont chiffrées, hébergées en Europe, et ne sont jamais revendues à des tiers. Prevano est conforme RGPD. Consulte nos <a href="/mentions-legales.html">mentions légales</a> pour le détail complet.</p>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Puis-je changer d'offre ou annuler ?</summary>
+        <p class="faq-a">Oui, à tout moment depuis ton espace profil. Le changement d'offre prend effet immédiatement avec un pro-rata calculé automatiquement. L'annulation est simple et instantanée.</p>
+      </details>
+    </div>
+  </section>
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quelle différence avec mon conseiller bancaire ?","acceptedAnswer":{"@type":"Answer","text":"Un conseiller bancaire est limité aux produits de sa banque. Prevano est indépendant — il analyse toute ta situation et recommande les meilleurs outils selon ton profil sans commission."}},{"@type":"Question","name":"Sans engagement — comment ça marche ?","acceptedAnswer":{"@type":"Answer","text":"Tu souscris mois par mois. Tu peux annuler à tout moment depuis ton espace profil, sans frais et sans justificatif."}},{"@type":"Question","name":"Le simulateur est-il précis ?","acceptedAnswer":{"@type":"Answer","text":"Il utilise les taux officiels de la CNAV. Les utilisateurs constatent un écart moyen inférieur à 5% avec leur relevé de carrière."}},{"@type":"Question","name":"Mes données sont-elles sécurisées ?","acceptedAnswer":{"@type":"Answer","text":"Tes données sont chiffrées, hébergées en Europe, jamais revendues. Prevano est conforme RGPD."}},{"@type":"Question","name":"Puis-je changer d'offre ?","acceptedAnswer":{"@type":"Answer","text":"Oui, à tout moment depuis ton espace profil. Le changement prend effet immédiatement avec un pro-rata automatique."}}]}</script>
 </main>
 
 <footer>
@@ -196,7 +251,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
       <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
       <a href="/contact.html"          class="footer-link">Contact</a>
     </div>
-    <span class="footer-copy">© 2025 Prevano · Tous droits réservés</span>
+    <span class="footer-copy">© 2026 Prevano · Tous droits réservés</span>
   </div>
 </footer>
 
@@ -310,6 +365,9 @@ const ACTIVITY_POPUP_ENABLED = true;
   if (!ACTIVITY_POPUP_ENABLED) return;
   if (window.innerWidth < 380) return;
 
+  const POPUP_CLOSE_KEY = 'prv_popup_closes';
+  if (parseInt(localStorage.getItem(POPUP_CLOSE_KEY) || '0') >= 2) return;
+
   const PAGE_LOAD = Date.now();
   const MAX_SHOWS = 4;
 
@@ -363,6 +421,9 @@ const ACTIVITY_POPUP_ENABLED = true;
   document.getElementById('activity-popup-close')?.addEventListener('click', () => {
     popup.classList.remove('show');
     popup.setAttribute('aria-hidden', 'true');
+    const c = parseInt(localStorage.getItem(POPUP_CLOSE_KEY) || '0') + 1;
+    localStorage.setItem(POPUP_CLOSE_KEY, String(c));
+    if (c >= 2) showCount = MAX_SHOWS;
   });
 
   function schedule() {

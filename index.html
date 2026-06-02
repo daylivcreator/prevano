@@ -7,6 +7,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<meta name="description" content="Calcule en 60 secondes le montant exact de ta pension retraite — et reçois un plan d'action IA personnalisé pour l'améliorer.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://prevano.vercel.app/">
+<meta property="og:title" content="Prevano — Découvre ce qui t'attend à la retraite">
+<meta property="og:description" content="Calcule en 60 secondes le montant exact de ta pension retraite — et reçois un plan d'action IA personnalisé pour l'améliorer.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Prevano — Découvre ce qui t'attend à la retraite">
+<meta name="twitter:description" content="Calcule en 60 secondes le montant exact de ta pension retraite — et reçois un plan d'action IA personnalisé pour l'améliorer.">
+<script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Prevano","description":"Simulateur de retraite IA personnalisé","url":"https://prevano.vercel.app","applicationCategory":"FinanceApplication","inLanguage":"fr","offers":{"@type":"Offer","price":"9.99","priceCurrency":"EUR"}}</script>
 <style>
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -513,7 +523,7 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
       <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
       <a href="/contact.html"          class="footer-link">Contact</a>
     </div>
-    <span class="footer-copy">© 2025 Prevano · Tous droits réservés</span>
+    <span class="footer-copy">© 2026 Prevano · Tous droits réservés</span>
   </div>
 </footer>
 
@@ -982,6 +992,9 @@ const ACTIVITY_POPUP_ENABLED = true;
   if (!ACTIVITY_POPUP_ENABLED) return;
   if (window.innerWidth < 380) return;
 
+  const POPUP_CLOSE_KEY = 'prv_popup_closes';
+  if (parseInt(localStorage.getItem(POPUP_CLOSE_KEY) || '0') >= 2) return;
+
   const PAGE_LOAD = Date.now();
   const MAX_SHOWS = 4;
 
@@ -1034,6 +1047,9 @@ const ACTIVITY_POPUP_ENABLED = true;
   $('activity-popup-close')?.addEventListener('click', () => {
     popup.classList.remove('show');
     popup.setAttribute('aria-hidden', 'true');
+    const c = parseInt(localStorage.getItem(POPUP_CLOSE_KEY) || '0') + 1;
+    localStorage.setItem(POPUP_CLOSE_KEY, String(c));
+    if (c >= 2) showCount = MAX_SHOWS;
   });
 
   function schedule() {
