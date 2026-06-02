@@ -283,11 +283,11 @@ async function sendMessage(text) {
   showTyping();
 
   try {
-    const res = await fetch('/api/coach', {
+    const res = await fetch('/api/features', {
       method:      'POST',
       headers:     { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body:        JSON.stringify({ message: text, history: history.slice(-20) }),
+      body:        JSON.stringify({ type: 'coach', message: text, history: history.slice(-20) }),
     });
     const data = await res.json();
     removeTyping();
@@ -384,7 +384,7 @@ document.getElementById('btn-refresh-plan').addEventListener('click', async () =
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Chargement…';
 
   try {
-    const simRes = await fetch('/api/simulation', { credentials:'include' });
+    const simRes = await fetch('/api/features?t=simulation', { credentials:'include' });
     const simData = await simRes.json();
 
     if (!simRes.ok || !simData.simulation) {

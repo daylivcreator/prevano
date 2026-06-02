@@ -941,11 +941,11 @@ function bindComplete(lesson) {
 
     try {
       const lessonIndex = Math.floor(Date.now() / 86_400_000) % 28;
-      const res  = await fetch('/api/daily-complete', {
+      const res  = await fetch('/api/features', {
         method:      'POST',
         headers:     { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body:        JSON.stringify({ lesson_index: lessonIndex, quiz_correct: quizCorrect }),
+        body:        JSON.stringify({ type: 'daily', lesson_index: lessonIndex, quiz_correct: quizCorrect }),
       });
       const data = await res.json();
 
@@ -1017,7 +1017,7 @@ async function init() {
 
     document.getElementById('daily-content').style.display = 'block';
 
-    const progRes = await fetch('/api/daily-progress', { credentials:'include' });
+    const progRes = await fetch('/api/features?t=daily', { credentials:'include' });
     if (!progRes.ok) throw new Error('progress fetch failed');
     const prog = await progRes.json();
 

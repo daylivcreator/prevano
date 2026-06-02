@@ -466,11 +466,11 @@ document.getElementById('budget-form').addEventListener('submit', async (e) => {
   document.getElementById('results-section').style.display = 'none';
 
   try {
-    const res  = await fetch('/api/budget-plan', {
+    const res  = await fetch('/api/features', {
       method:      'POST',
       headers:     { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body:        JSON.stringify(data),
+      body:        JSON.stringify({ type: 'budget', ...data }),
     });
     const result = await res.json();
     document.getElementById('results-loading').style.display = 'none';
@@ -516,7 +516,7 @@ async function init() {
 
     document.getElementById('budget-content').style.display = 'block';
 
-    const entryRes = await fetch('/api/budget-entry', { credentials:'include' });
+    const entryRes = await fetch('/api/features?t=budget', { credentials:'include' });
     if (entryRes.ok) {
       const { entry } = await entryRes.json();
       if (entry) { fillForm(entry); updateSummary(); }
