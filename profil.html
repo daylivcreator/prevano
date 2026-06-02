@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon profil — Prevano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input,button{font-family:inherit;font-size:inherit;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-inner{max-width:1100px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--grad-brand);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo em{font-style:normal;}
+.nav-links{display:flex;align-items:center;gap:14px;}
+.nav-link{font-size:14px;color:var(--text-muted);text-decoration:none;transition:color 0.2s;}
+.nav-link:hover{color:var(--text-primary);}
+.btn-nav{background:transparent;color:var(--text-muted);border:1px solid var(--border-default);padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-nav:hover{border-color:var(--color-primary);color:var(--color-primary);}
+/* Main */
+main{flex:1;padding:48px 48px 80px;max-width:1100px;margin:0 auto;width:100%;}
+.page-title{font-size:28px;font-weight:900;letter-spacing:-0.04em;margin-bottom:8px;}
+.page-sub{font-size:14px;color:var(--text-muted);margin-bottom:40px;}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+/* Cards */
+.card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:16px;padding:28px;}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-faint);margin-bottom:20px;}
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-subtle);}
+.info-row:last-child{border-bottom:none;}
+.info-label{font-size:13px;color:var(--text-muted);}
+.info-value{font-size:13px;font-weight:600;}
+/* Plan badge */
+.plan-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:0.04em;}
+.plan-free   {background:var(--bg-overlay);color:var(--text-muted);}
+.plan-starter{background:rgba(96,165,250,0.15);color:#60A5FA;}
+.plan-pro    {background:rgba(167,139,250,0.15);color:#A78BFA;}
+.plan-premium{background:var(--color-primary-subtle);color:var(--color-primary);}
+/* Status badge */
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;}
+.status-active {color:#22C55E;}
+.status-past_due{color:#FFB400;}
+.status-canceled{color:var(--color-primary);}
+/* Buttons */
+.btn-primary{background:var(--color-primary);color:#fff;border:none;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:background-color 0.2s,transform 0.2s;display:inline-flex;align-items:center;gap:8px;margin-top:4px;}
+.btn-primary:hover{background:var(--color-primary-dark);transform:translateY(-1px);}
+.btn-secondary{background:transparent;color:var(--text-muted);border:1px solid var(--border-default);padding:11px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;margin-top:4px;}
+.btn-secondary:hover{border-color:var(--color-primary);color:var(--color-primary);}
+.btn-danger{background:transparent;color:var(--color-primary);border:1px solid var(--color-primary-border);padding:11px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;margin-top:4px;}
+.btn-danger:hover{background:var(--color-primary-subtle);}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+/* Success banner */
+.success-banner{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:10px;font-size:14px;color:#22C55E;}
+/* Loading skeleton */
+.skeleton{background:linear-gradient(90deg,var(--bg-raised) 25%,var(--bg-overlay) 50%,var(--bg-raised) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:14px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* Footer */
+footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-size:12px;color:var(--text-faint);text-decoration:none;}
+.footer-link:hover{color:var(--text-muted);}
+.footer-copy{font-size:12px;color:var(--text-faint);}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media(max-width:700px){
+  nav,.main-wrap{padding-left:20px;padding-right:20px;}
+  main{padding:32px 20px 60px;}
+  .profile-grid{grid-template-columns:1fr;}
+  .btn-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo-wrap">
+        <div class="logo-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="logo" translate="no">Pre<em>vano</em></span>
+      </a>
+      <div class="nav-links">
+        <a href="/tarifs.html" class="nav-link">Tarifs</a>
+        <a href="/"            class="nav-link">Simulateur</a>
+        <button id="btn-logout" class="btn-nav">Déconnexion</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div id="success-banner" style="display:none" class="success-banner" role="alert">
+    <i class="ti ti-circle-check" aria-hidden="true"></i>
+    <span>Ton abonnement a bien été activé. Bienvenue dans Prevano !</span>
+  </div>
+
+  <h1 class="page-title" id="page-title">Mon profil</h1>
+  <p class="page-sub" id="page-sub">Gérer ton compte et ton abonnement</p>
+
+  <div class="profile-grid" id="profile-grid">
+    <!-- Skeleton -->
+    <div class="card">
+      <div class="card-title">Informations</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="skeleton" style="width:80%"></div>
+        <div class="skeleton" style="width:60%"></div>
+        <div class="skeleton" style="width:70%"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Abonnement</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="skeleton" style="width:50%"></div>
+        <div class="skeleton" style="width:80%"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/cgv.html"              class="footer-link">CGV</a>
+      <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
+      <a href="/contact.html"          class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2025 Prevano</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const PLAN_LABELS = { free:'Gratuit', starter:'Starter', pro:'Pro', premium:'Premium' };
+const SUB_LABELS  = { active:'Actif', past_due:'Paiement en attente', canceled:'Annulé', trialing:'Période d\'essai' };
+
+function planBadge(plan) {
+  return `<span class="plan-badge plan-${plan}"><i class="ti ti-${plan==='free'?'star':'bolt'}" aria-hidden="true"></i>${PLAN_LABELS[plan] ?? plan}</span>`;
+}
+
+function statusBadge(status) {
+  if (!status) return '<span class="status-badge" style="color:var(--text-faint)">—</span>';
+  const cls = ['active','trialing'].includes(status) ? 'status-active' : status === 'past_due' ? 'status-past_due' : 'status-canceled';
+  const icon = status === 'active' ? 'ti-circle-check' : status === 'past_due' ? 'ti-alert-circle' : 'ti-circle-x';
+  return `<span class="status-badge ${cls}"><i class="ti ${icon}" aria-hidden="true"></i>${SUB_LABELS[status] ?? status}</span>`;
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+}
+
+function renderProfile(user) {
+  const grid = document.getElementById('profile-grid');
+  const hasPaid = user.plan !== 'free';
+
+  grid.innerHTML = `
+    <div class="card">
+      <div class="card-title">Informations du compte</div>
+      <div class="info-row"><span class="info-label">Prénom</span><span class="info-value">${escHtml(user.firstName)}</span></div>
+      <div class="info-row"><span class="info-label">Email</span><span class="info-value">${escHtml(user.email)}</span></div>
+      <div class="info-row"><span class="info-label">Membre depuis</span><span class="info-value">${formatDate(user.createdAt)}</span></div>
+      <div class="btn-row">
+        <a href="/forgot-password.html" class="btn-secondary">
+          <i class="ti ti-lock" aria-hidden="true"></i> Changer de mot de passe
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Abonnement</div>
+      <div class="info-row"><span class="info-label">Offre actuelle</span><span class="info-value">${planBadge(user.plan)}</span></div>
+      <div class="info-row"><span class="info-label">Statut</span><span class="info-value">${statusBadge(user.subscriptionStatus)}</span></div>
+      ${hasPaid ? `<div class="info-row"><span class="info-label">Renouvellement</span><span class="info-value">${formatDate(user.periodEnd)}</span></div>` : ''}
+      <div class="btn-row">
+        ${hasPaid
+          ? `<button id="btn-portal" class="btn-primary"><i class="ti ti-credit-card" aria-hidden="true"></i> Gérer ma facturation</button>`
+          : `<a href="/tarifs.html" class="btn-primary"><i class="ti ti-bolt" aria-hidden="true"></i> Passer à l'offre payante</a>`
+        }
+      </div>
+    </div>
+  `;
+
+  document.getElementById('page-title').textContent = `Bonjour, ${escHtml(user.firstName)} !`;
+
+  document.getElementById('btn-portal')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-portal');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Chargement…';
+    try {
+      const res  = await fetch('/api/stripe/portal', { method:'POST', credentials:'include' });
+      const data = await res.json();
+      if (data.url) location.href = data.url;
+    } catch { btn.disabled = false; btn.innerHTML = '<i class="ti ti-credit-card" aria-hidden="true"></i> Gérer ma facturation'; }
+  });
+}
+
+async function init() {
+  // Afficher le banner succès si redirection depuis Stripe
+  if (new URLSearchParams(location.search).get('success') === '1') {
+    document.getElementById('success-banner').style.display = 'flex';
+    history.replaceState({}, '', '/profil.html');
+  }
+
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!res.ok) { location.replace('/login.html?next=/profil.html'); return; }
+    const { user } = await res.json();
+    renderProfile(user);
+  } catch { location.replace('/login.html?next=/profil.html'); }
+}
+
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+  location.replace('/');
+});
+
+init();
+</script>
+</body>
+</html>

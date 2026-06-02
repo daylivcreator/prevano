@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,22 +21,20 @@ input, select, button, textarea { font-family: inherit; font-size: inherit; }
   --grad-brand:  linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
   --grad-text:   linear-gradient(135deg,#E24B4A 0%,#FF8C72 55%,#FFB347 100%);
   --grad-bar:    linear-gradient(90deg,#E24B4A,#FF7B6B);
-
   --bg-base:    #0C0C0B;
   --bg-surface: #141413;
   --bg-raised:  #1C1C1A;
   --bg-overlay: #242422;
-
   --text-primary: #F5F4F0;
   --text-muted:   #A8A79F;
   --text-faint:   #5F5E5A;
-
   --border-subtle:  rgba(255,255,255,0.07);
   --border-default: rgba(255,255,255,0.12);
 }
 
 /* ── Base ── */
-body { font-family:'Inter',sans-serif; background:var(--bg-base); color:var(--text-primary); font-size:15px; line-height:1.6; min-height:100vh; }
+body { font-family:'Inter',sans-serif; background:var(--bg-base); color:var(--text-primary); font-size:15px; line-height:1.6; min-height:100vh; display:flex; flex-direction:column; }
+main { flex:1; }
 
 /* ── Scroll reveal ── */
 .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.6s ease,transform 0.6s ease; will-change:opacity,transform; }
@@ -51,10 +48,15 @@ body { font-family:'Inter',sans-serif; background:var(--bg-base); color:var(--te
 /* ── Nav ── */
 nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:rgba(12,12,11,0.95); backdrop-filter:blur(12px); position:sticky; top:0; z-index:100; }
 .nav-inner { max-width:1100px; margin:0 auto; height:56px; display:flex; align-items:center; justify-content:space-between; }
-.logo-wrap { display:flex; align-items:center; gap:10px; }
+.logo-wrap { display:flex; align-items:center; gap:10px; text-decoration:none; }
 .logo-icon { width:34px; height:34px; background:var(--grad-brand); border-radius:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px rgba(226,75,74,0.45),0 2px 8px rgba(0,0,0,0.3); flex-shrink:0; }
 .logo { font-size:18px; font-weight:900; letter-spacing:-0.05em; line-height:1; background:var(--grad-brand); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 10px rgba(226,75,74,0.3)); }
 .logo em { font-style:normal; font-weight:900; }
+.nav-links { display:flex; align-items:center; gap:14px; }
+.nav-link { font-size:14px; color:var(--text-muted); text-decoration:none; transition:color 0.2s; white-space:nowrap; }
+.nav-link:hover { color:var(--text-primary); }
+.btn-nav { background:var(--color-primary); color:#fff !important; border:none; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; text-decoration:none; transition:background-color 0.2s; display:inline-flex; align-items:center; white-space:nowrap; }
+.btn-nav:hover { background:var(--color-primary-dark); }
 
 /* ── Hero ── */
 .hero { padding:80px 48px 72px; max-width:1100px; margin:0 auto; text-align:center; }
@@ -74,7 +76,7 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .stats-row { display:flex; justify-content:center; gap:48px; margin-top:56px; padding-top:40px; border-top:1px solid var(--border-subtle); }
 .stat-item { text-align:center; }
 .stat-item .num { font-size:30px; font-weight:900; letter-spacing:-0.04em; }
-.stat-item .num em { font-style:normal; background:var(--grad-brand); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.stat-item .num em { font-style:normal; background:linear-gradient(135deg,#E24B4A 0%,#FF8C72 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .stat-item .lbl { font-size:12px; color:var(--text-faint); margin-top:2px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; }
 
 /* ── Simulator ── */
@@ -84,7 +86,6 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .sim-header h2 { font-size:25px; font-weight:900; letter-spacing:-0.04em; margin-bottom:6px; }
 .sim-header p { font-size:14px; color:var(--text-muted); }
 
-/* Progress bar */
 .sim-progress-wrap { margin-bottom:28px; }
 .sim-progress-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .sim-progress-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-faint); }
@@ -92,21 +93,15 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .sim-progress-track { height:6px; background:var(--bg-overlay); border-radius:100px; overflow:hidden; }
 .sim-progress-fill { height:100%; background:var(--grad-bar); border-radius:100px; transform:scaleX(0); transform-origin:left; transition:transform 0.4s cubic-bezier(.25,.8,.25,1); will-change:transform; }
 
-/* Fields */
 .sim-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
 .field label { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-faint); margin-bottom:8px; display:block; }
 .field input,.field select { width:100%; padding:13px 16px; border-radius:10px; border:1.5px solid var(--border-subtle); color:var(--text-primary); background:var(--bg-raised); outline:none; transition:border-color 0.2s,background-color 0.2s; }
 .field input:focus,.field select:focus { border-color:var(--color-primary); background:var(--bg-overlay); }
 .field input.filled,.field select.filled { border-color:rgba(226,75,74,0.4); }
 .field input::placeholder { color:var(--text-faint); }
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) inset !important; -webkit-text-fill-color:var(--text-primary) !important; transition:background-color 5000s ease-in-out 0s; }
 .field select option { background:var(--bg-raised); color:var(--text-primary); }
 .field--full { margin-bottom:20px; }
 
-/* Buttons */
 .btn-primary { width:100%; padding:15px; background:var(--color-primary); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s,opacity 0.2s; margin-top:8px; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:0.01em; position:relative; overflow:hidden; }
 .btn-primary:hover:not(:disabled) { background:var(--color-primary-dark); transform:translateY(-1px); }
 .btn-primary:active:not(:disabled) { transform:scale(0.98); }
@@ -115,7 +110,6 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
 .btn-primary:hover:not(:disabled) i { transform:translateX(4px); }
 .sim-error { font-size:13px; color:var(--color-primary); text-align:center; margin-top:10px; min-height:20px; line-height:1.4; }
 
-/* Ripple */
 .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.35); transform:scale(0); animation:ripple-anim 0.55s linear; pointer-events:none; }
 @keyframes ripple-anim { to { transform:scale(4); opacity:0; } }
 
@@ -132,7 +126,6 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
 .shock-stat.accent .val { color:var(--color-primary); }
 .shock-stat .lbl { font-size:11px; color:var(--text-faint); font-weight:600; text-transform:uppercase; letter-spacing:0.06em; }
 
-/* Score */
 .score-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:14px; padding:28px; margin-bottom:28px; text-align:center; }
 .score-label { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px; }
 .score-ring-wrap { display:inline-flex; flex-direction:column; align-items:center; gap:12px; }
@@ -149,7 +142,6 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
 .score-badge.good { background:rgba(34,197,94,0.15);  color:#22C55E; }
 .score-tip { font-size:13px; color:var(--text-muted); margin-top:10px; max-width:340px; line-height:1.55; }
 
-/* Bar */
 .bar-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:14px; padding:24px; margin-bottom:28px; }
 .bar-card h3 { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px; }
 .bar-track { position:relative; background:var(--bg-overlay); border-radius:8px; height:44px; overflow:hidden; }
@@ -161,35 +153,11 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
 .leg { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); }
 .leg-dot { width:8px; height:8px; border-radius:50%; }
 
-/* Plan */
 .plan-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:14px; padding:28px; margin-bottom:28px; }
 .plan-card h3 { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:20px; }
 .plan-loading { display:flex; align-items:center; gap:10px; color:var(--text-muted); font-size:14px; padding:12px 0; }
 .plan-loading i { color:var(--color-primary); font-size:18px; animation:spin 1s linear infinite; }
-.plan-save-eyebrow { margin-bottom:10px; }
-.plan-save-title { font-size:18px; font-weight:900; letter-spacing:-0.03em; margin-bottom:8px; }
-.plan-save-desc { font-size:14px; color:var(--text-muted); margin-bottom:16px; line-height:1.6; }
-.plan-save-row { display:flex; gap:10px; flex-wrap:wrap; }
-.plan-save-input { flex:1; min-width:180px; padding:12px 16px; border-radius:10px; border:1.5px solid var(--border-subtle); font-size:14px; color:var(--text-primary); background:var(--bg-raised); outline:none; transition:border-color 0.2s,background-color 0.2s; }
-.plan-save-input:focus { border-color:var(--color-primary); background:var(--bg-overlay); }
-.plan-save-input::placeholder { color:var(--text-faint); }
-.plan-save-input.error { border-color:var(--color-primary); }
-.plan-save-btn { background:var(--color-primary); color:#fff; border:none; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s; display:flex; align-items:center; gap:6px; white-space:nowrap; position:relative; overflow:hidden; }
-.plan-save-btn:hover { background:var(--color-primary-dark); transform:translateY(-1px); }
-.plan-save-error { font-size:12px; color:var(--color-primary); min-height:18px; margin-top:8px; }
-.plan-save-success { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:#22C55E; padding:14px 18px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:10px; margin-top:4px; }
-.plan-save-success i { font-size:20px; flex-shrink:0; }
-.auth-fields { display:flex; flex-direction:column; gap:10px; }
-.auth-error { font-size:12px; color:var(--color-primary); min-height:18px; margin-top:6px; }
-.auth-switch { font-size:12px; color:var(--text-faint); margin-top:10px; }
-.auth-switch a { color:var(--color-primary); text-decoration:none; font-weight:600; }
-.auth-switch a:hover { text-decoration:underline; }
-.nav-user { display:flex; align-items:center; gap:10px; }
-.nav-user-email { font-size:12px; color:var(--text-muted); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.btn-logout { font-size:11px; font-weight:600; color:var(--text-faint); background:none; border:1px solid var(--border-subtle); padding:4px 10px; border-radius:6px; cursor:pointer; transition:color 0.2s,border-color 0.2s; }
-.btn-logout:hover { color:var(--color-primary); border-color:var(--color-primary-border); }
 @keyframes spin { to { transform:rotate(360deg); } }
-.spin { animation:spin 1s linear infinite; }
 .plan-steps { display:flex; flex-direction:column; gap:12px; }
 .plan-step { background:var(--bg-raised); border:1px solid var(--border-subtle); border-radius:10px; padding:16px 18px; display:flex; gap:14px; align-items:flex-start; transition:border-color 0.2s; opacity:0; transform:translateY(10px); animation:stepIn 0.4s ease forwards; }
 @keyframes stepIn { to { opacity:1; transform:none; } }
@@ -198,96 +166,47 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
 .step-content h4 { font-size:14px; font-weight:600; margin-bottom:3px; }
 .step-content p  { font-size:13px; color:var(--text-muted); line-height:1.55; }
 
+.email-cta { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:16px; padding:40px; text-align:center; }
+.email-cta h3 { font-size:26px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
+.email-cta p  { font-size:14px; color:var(--text-muted); margin-bottom:28px; line-height:1.65; }
+.email-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.email-input { padding:13px 18px; border-radius:10px; border:1.5px solid var(--border-subtle); font-size:14px; width:270px; outline:none; color:var(--text-primary); background:var(--bg-raised); transition:border-color 0.2s; }
+.email-input:focus { border-color:var(--color-primary); }
+.email-input::placeholder { color:var(--text-faint); }
+.btn-email { background:var(--color-primary); color:#fff; border:none; padding:13px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s; display:flex; align-items:center; gap:6px; position:relative; overflow:hidden; }
+.btn-email:hover  { background:var(--color-primary-dark); transform:translateY(-1px); }
+.btn-email:active { transform:scale(0.98); }
+.email-note { font-size:11px; color:var(--text-faint); margin-top:14px; }
 
-/* ── Sim counter ── */
-.sim-counter { display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:20px; font-size:13px; color:var(--text-muted); }
-.sim-counter-num { font-size:15px; font-weight:900; color:var(--color-primary); letter-spacing:-0.03em; display:inline-flex; align-items:center; gap:1px; }
-.sim-counter-dot { width:6px; height:6px; background:#22C55E; border-radius:50%; box-shadow:0 0 6px rgba(34,197,94,0.7); animation:sc-pulse 2s infinite; flex-shrink:0; }
-@keyframes sc-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+/* ── Footer ── */
+footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-top:auto; }
+.footer-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.footer-links { display:flex; gap:24px; flex-wrap:wrap; }
+.footer-link { font-size:13px; color:var(--text-faint); text-decoration:none; transition:color 0.2s; }
+.footer-link:hover { color:var(--text-muted); }
+.footer-copy { font-size:12px; color:var(--text-faint); }
 
-/* ── Social proof cards ── */
-.cta-zone { position:relative; display:inline-block; }
-.sp-card { position:absolute; top:50%; transform:translateY(-50%); width:190px; background:var(--bg-raised); border:1px solid var(--color-primary-border); border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px; opacity:0; transition:opacity 0.5s ease; pointer-events:none; }
-.sp-card.visible { opacity:1; }
-.sp-card--left  { right:calc(100% + 20px); }
-.sp-card--right { left:calc(100% + 20px); }
-.sp-dot { width:7px; height:7px; background:var(--color-primary); border-radius:50%; flex-shrink:0; box-shadow:0 0 8px rgba(226,75,74,0.7); animation:sc-pulse 2s infinite; }
-.sp-body { display:flex; flex-direction:column; gap:1px; }
-.sp-name   { font-size:12px; font-weight:700; color:var(--text-primary); }
-.sp-action { font-size:11px; color:var(--color-primary); font-weight:600; }
-@media(max-width:900px){ .sp-card { display:none; } }
-
-/* ── Témoignages ── */
-.reviews-section { padding:64px 48px; max-width:680px; margin:0 auto; }
-.reviews-placeholder { border:1px dashed var(--border-subtle); border-radius:16px; padding:48px 40px; display:flex; flex-direction:column; align-items:center; gap:20px; }
-.reviews-placeholder p { font-size:15px; color:var(--text-muted); margin:0; text-align:center; }
-.testimonial-form { width:100%; display:flex; flex-direction:column; gap:12px; }
-.testimonial-form input,
-.testimonial-form textarea { width:100%; box-sizing:border-box; background:var(--bg-raised); border:1px solid var(--border-default); border-radius:10px; padding:11px 14px; font-size:14px; color:var(--text-primary); outline:none; transition:border-color 0.2s; resize:vertical; }
-.testimonial-form input:focus,
-.testimonial-form textarea:focus { border-color:var(--color-primary); }
-.testimonial-form textarea { min-height:100px; }
-.btn-testimonial { align-self:flex-end; background:var(--color-primary); color:#fff; border:none; padding:11px 22px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s; }
-.btn-testimonial:hover { background:var(--color-primary-dark); transform:translateY(-1px); }
-.testimonial-thanks { font-size:13px; color:var(--color-primary); display:none; text-align:center; }
-
-/* ── Pricing ── */
-.pricing-section { margin-bottom:28px; }
-.pricing-header { text-align:center; margin-bottom:28px; }
-.pricing-eyebrow { font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--color-primary); text-transform:uppercase; margin-bottom:8px; }
-.pricing-header h3 { font-size:24px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
-.pricing-sub { font-size:14px; color:var(--text-muted); }
-.pricing-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.pricing-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:16px; padding:28px 24px; display:flex; flex-direction:column; gap:20px; position:relative; transition:border-color 0.2s,transform 0.2s; }
-.pricing-card:hover { border-color:var(--border-default); transform:translateY(-2px); }
-.pricing-card--pro { border-color:var(--color-primary-border); background:linear-gradient(135deg,rgba(226,75,74,0.07) 0%,rgba(255,123,53,0.04) 100%); }
-.pricing-card--pro:hover { border-color:var(--color-primary); }
-.plan-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--grad-brand); color:#fff; font-size:10px; font-weight:800; padding:4px 14px; border-radius:100px; letter-spacing:0.08em; white-space:nowrap; }
-.plan-name { font-size:13px; font-weight:700; color:var(--text-faint); letter-spacing:0.06em; text-transform:uppercase; }
-.plan-price { display:flex; align-items:baseline; gap:3px; }
-.price-amount { font-size:36px; font-weight:900; letter-spacing:-0.04em; }
-.price-period { font-size:14px; color:var(--text-muted); }
-.plan-features { list-style:none; display:flex; flex-direction:column; gap:9px; flex:1; }
-.plan-features li { font-size:13px; color:var(--text-muted); display:flex; align-items:flex-start; gap:8px; line-height:1.45; }
-.plan-features li::before { content:''; flex-shrink:0; width:16px; height:16px; border-radius:50%; background:var(--color-primary-subtle); border:1px solid var(--color-primary-border); margin-top:1px; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 8.5L6.8 11L12 5' stroke='%23E24B4A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-size:contain; background-repeat:no-repeat; }
-.btn-pricing { width:100%; padding:13px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:background-color 0.2s,transform 0.2s,filter 0.2s,opacity 0.2s; letter-spacing:0.01em; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:6px; }
-.btn-pricing:hover:not(:disabled) { transform:translateY(-1px); }
-.btn-pricing:active:not(:disabled) { transform:scale(0.98); }
-.btn-pricing:disabled { opacity:0.6; cursor:not-allowed; }
-.btn-pricing--default { background:var(--bg-overlay); color:var(--text-primary); border:1.5px solid var(--border-default); }
-.btn-pricing--default:hover:not(:disabled) { background:var(--bg-raised); }
-.btn-pricing--pro { background:var(--grad-brand); color:#fff; border:none; }
-.btn-pricing--pro:hover:not(:disabled) { filter:brightness(1.08); }
-@media(max-width:640px){
-  .pricing-grid { grid-template-columns:1fr; }
-  .pricing-card { padding:24px 20px; }
-}
-
-/* ── Checkout success banner ── */
-.checkout-success-banner { display:none; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); border-radius:14px; padding:18px 24px; max-width:1100px; margin:20px 48px 0; align-items:center; gap:16px; }
-.checkout-success-banner i { font-size:26px; color:#22C55E; flex-shrink:0; }
-.checkout-success-banner strong { display:block; font-size:15px; font-weight:700; color:#22C55E; margin-bottom:3px; }
-.checkout-success-banner span { font-size:13px; color:var(--text-muted); line-height:1.5; }
-@media(max-width:640px){ .checkout-success-banner { margin:16px 20px 0; } }
-
-/* Confetti */
 #confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
 
 /* ── Responsive ── */
 @media(max-width:640px){
-  nav,
-  .sim-section,
-  .shock        { padding-left:20px; padding-right:20px; }
-  .hero         { padding:56px 20px 48px; }
-  .hero h1      { font-size:38px; letter-spacing:-0.04em; }
-  .hero-sub     { font-size:16px; }
-  .stats-row    { gap:24px; }
+  nav,.sim-section,.shock { padding-left:20px; padding-right:20px; }
+  .hero { padding:56px 20px 48px; }
+  .hero h1 { font-size:38px; letter-spacing:-0.04em; }
+  .hero-sub { font-size:16px; }
+  .stats-row { gap:24px; }
   .stat-item .num { font-size:22px; }
-  .sim-wrap     { padding:24px; }
-  .sim-row      { grid-template-columns:1fr; }
-  .shock-grid   { grid-template-columns:1fr; }
+  .sim-wrap { padding:24px; }
+  .sim-row { grid-template-columns:1fr; }
+  .shock-grid { grid-template-columns:1fr; }
   .shock-banner h2 { font-size:26px; }
-  .reviews-section { padding:40px 20px; }
+  .email-cta { padding:28px 20px; }
+  .email-row { flex-direction:column; align-items:stretch; }
+  .email-input { width:100%; }
+  .btn-email { justify-content:center; }
+  footer { padding:20px; }
+  .footer-inner { flex-direction:column; align-items:flex-start; }
+  .nav-links { gap:8px; }
 }
 </style>
 </head>
@@ -298,7 +217,7 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
 <header>
   <nav aria-label="Navigation principale">
     <div class="nav-inner">
-      <div class="logo-wrap">
+      <a href="/" class="logo-wrap">
         <div class="logo-icon" aria-hidden="true">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
@@ -307,62 +226,24 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
           </svg>
         </div>
         <span class="logo" translate="no">Pre<em>vano</em></span>
-      </div>
-      <div id="nav-user" class="nav-user" style="display:none">
-        <span class="nav-user-email" id="nav-user-email"></span>
-        <button class="btn-logout" id="btn-logout" type="button">Déconnexion</button>
+      </a>
+      <div class="nav-links">
+        <a href="/tarifs.html" class="nav-link">Tarifs</a>
+        <div id="nav-auth" style="display:flex;align-items:center;gap:10px"></div>
       </div>
     </div>
   </nav>
 </header>
 
-
 <main>
-  <div id="checkout-success-banner" class="checkout-success-banner" role="alert" aria-live="polite">
-    <i class="ti ti-circle-check-filled" aria-hidden="true"></i>
-    <div>
-      <strong>Paiement confirmé — bienvenue sur Prevano !</strong>
-      <span>Tu vas recevoir un email de confirmation dans quelques minutes. Ton plan est en cours de préparation.</span>
-    </div>
-  </div>
   <section class="hero reveal" aria-labelledby="hero-title">
-    <div class="hero-eyebrow">
-      <div class="logo-icon" style="width:18px;height:18px;border-radius:5px;flex-shrink:0;" aria-hidden="true">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
-          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="21" cy="4" r="2.4" fill="#fff"/>
-        </svg>
-      </div>
-      Simulateur de retraite
-    </div>
-    <p class="sim-counter">
-      <span class="sim-counter-dot" aria-hidden="true"></span>
-      <span class="sim-counter-num" id="sim-counter-num">0</span>
-      <span>simulations effectuées ces dernières 24h</span>
-    </p>
-    <h1 id="hero-title">Ce que tu toucheras à la retraite <em>va te surprendre.</em></h1>
+    <div class="hero-eyebrow"><span class="hero-dot" aria-hidden="true"></span> Simulateur de retraite</div>
+    <h1 id="hero-title">Ce que tu toucheras à la retraite<br><em>va te surprendre.</em></h1>
     <p class="hero-sub">Calcule en 60 secondes le montant exact de ta pension — et ce que tu dois faire maintenant pour l'améliorer.</p>
     <p class="hero-note">Gratuit · Aucune inscription requise · Résultat immédiat</p>
-    <div class="cta-zone">
-      <div class="sp-card sp-card--left" id="sp-left">
-        <span class="sp-dot" aria-hidden="true"></span>
-        <div class="sp-body">
-          <span class="sp-name" id="sp-left-name"></span>
-          <span class="sp-action" id="sp-left-action"></span>
-        </div>
-      </div>
-      <button id="btn-scroll" class="hero-cta" type="button">
-        Calculer ma retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
-      </button>
-      <div class="sp-card sp-card--right" id="sp-right">
-        <span class="sp-dot" aria-hidden="true"></span>
-        <div class="sp-body">
-          <span class="sp-name" id="sp-right-name"></span>
-          <span class="sp-action" id="sp-right-action"></span>
-        </div>
-      </div>
-    </div>
+    <button id="btn-scroll" class="hero-cta" type="button">
+      Calculer ma retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>
+    </button>
     <div class="stats-row">
       <div class="stat-item"><div class="num"><em>-63%</em></div><div class="lbl">Perte de revenu moyenne</div></div>
       <div class="stat-item"><div class="num">60s</div><div class="lbl">Pour voir ton résultat</div></div>
@@ -402,7 +283,7 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
         </div>
         <div class="field">
           <label for="depart">Âge de départ souhaité</label>
-          <input type="number" id="depart" placeholder="64" min="60" max="70" autocomplete="prevano-depart">
+          <input type="number" id="depart" placeholder="64" min="60" max="70" autocomplete="off">
         </div>
       </div>
       <div class="field field--full">
@@ -480,204 +361,88 @@ select:-webkit-autofill { -webkit-box-shadow:0 0 0px 1000px var(--bg-raised) ins
         <i class="ti ti-loader-2" aria-hidden="true"></i> Génération de ton plan en cours...
       </div>
       <div class="plan-steps" id="plan-steps" style="display:none"></div>
-      <div id="plan-save" style="display:none">
-        <p class="pricing-eyebrow plan-save-eyebrow">Early Access</p>
-        <p class="plan-save-title">Crée ton compte Prevano</p>
-        <p class="plan-save-desc">Ton plan personnalisé t'attend — crée ton compte pour le recevoir dès le lancement et sauvegarder ta simulation.</p>
-
-        <div id="auth-signup">
-          <div class="auth-fields">
-            <input type="email" id="auth-email" class="plan-save-input" placeholder="ton@email.com" autocomplete="email">
-            <input type="password" id="auth-password" class="plan-save-input" placeholder="Mot de passe (min. 8 caractères)" autocomplete="new-password">
-            <button type="button" id="btn-signup" class="plan-save-btn">
-              Créer mon compte <i class="ti ti-arrow-right" aria-hidden="true"></i>
-            </button>
-          </div>
-          <p class="auth-error" id="signup-error" role="alert" aria-live="assertive"></p>
-          <p class="auth-switch">Déjà un compte ? <a href="#" id="link-show-login">Se connecter</a></p>
-        </div>
-
-        <div id="auth-login" style="display:none">
-          <div class="auth-fields">
-            <input type="email" id="login-email" class="plan-save-input" placeholder="ton@email.com" autocomplete="email">
-            <input type="password" id="login-password" class="plan-save-input" placeholder="Mot de passe" autocomplete="current-password">
-            <button type="button" id="btn-login" class="plan-save-btn">
-              Se connecter <i class="ti ti-arrow-right" aria-hidden="true"></i>
-            </button>
-          </div>
-          <p class="auth-error" id="login-error" role="alert" aria-live="assertive"></p>
-          <p class="auth-switch"><a href="#" id="link-show-signup">Créer un compte</a></p>
-        </div>
-
-        <div class="plan-save-success" id="plan-save-success" style="display:none">
-          <i class="ti ti-circle-check-filled" aria-hidden="true"></i>
-          <span id="auth-success-msg">Compte créé — tu recevras ton plan dès le lancement !</span>
-        </div>
-      </div>
     </div>
 
-    <div class="pricing-section">
-      <div class="pricing-header">
-        <p class="pricing-eyebrow">Nos offres</p>
-        <h3>Bientôt disponible</h3>
-        <p class="pricing-sub">Le produit complet arrive prochainement.</p>
+    <div class="email-cta reveal">
+      <h3>Reçois ton plan complet.</h3>
+      <p>Projections détaillées, stratégies d'épargne et alertes personnalisées —<br>rejoins Prevano dès maintenant.</p>
+      <div class="email-row">
+        <input class="email-input" type="email" id="user-email" placeholder="ton@email.com" autocomplete="email">
+        <button id="btn-email" class="btn-email" type="button">
+          M'envoyer le plan <i class="ti ti-send" aria-hidden="true"></i>
+        </button>
       </div>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="plan-name">Starter</div>
-          <div class="plan-price">
-            <span class="price-amount">9,99€</span>
-            <span class="price-period">/mois</span>
-          </div>
-          <ul class="plan-features">
-            <li>Simulations illimitées</li>
-            <li>Plan d'action personnalisé</li>
-            <li>Rapport PDF téléchargeable</li>
-            <li>Suivi mensuel par email</li>
-          </ul>
-          <button class="btn-pricing btn-pricing--default" disabled type="button">
-            Bientôt disponible
-          </button>
-        </div>
-        <div class="pricing-card pricing-card--pro">
-          <div class="plan-badge">LE PLUS POPULAIRE</div>
-          <div class="plan-name">Pro</div>
-          <div class="plan-price">
-            <span class="price-amount">14,99€</span>
-            <span class="price-period">/mois</span>
-          </div>
-          <ul class="plan-features">
-            <li>Tout Starter inclus</li>
-            <li>Analyse patrimoniale complète</li>
-            <li>Scénarios départ anticipé &amp; épargne+</li>
-            <li>Suivi personnalisé mensuel</li>
-            <li>Support prioritaire</li>
-          </ul>
-          <button class="btn-pricing btn-pricing--pro" disabled type="button">
-            Bientôt disponible
-          </button>
-        </div>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- ── Témoignages ── -->
-  <section class="reviews-section reveal" aria-label="Témoignages">
-    <div class="reviews-placeholder">
-      <p>Les premiers témoignages arrivent bientôt.</p>
-      <form class="testimonial-form" id="testimonial-form" novalidate>
-        <input type="text" id="testimonial-name" placeholder="Votre prénom" required maxlength="80">
-        <textarea id="testimonial-text" placeholder="Partagez votre expérience avec Prevano…" required maxlength="1000"></textarea>
-        <button type="submit" class="btn-testimonial">Envoyer</button>
-      </form>
-      <p class="testimonial-thanks" id="testimonial-thanks">Merci pour votre témoignage !</p>
+      <p class="email-note">Sans spam · Uniquement ton plan Prevano.</p>
     </div>
   </section>
-
 </main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/cgv.html"              class="footer-link">CGV</a>
+      <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
+      <a href="/contact.html"          class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2025 Prevano · Tous droits réservés</span>
+  </div>
+</footer>
 
 <script>
 'use strict';
 
-/* ─── Sim counter + social proof cards ─────────────────────────── */
+/* ─── Helpers ───────────────────────────────────────────────────── */
 
-(function() {
-  const NAMES = [
-    'Marie C.','Thomas R.','Julien M.','Sophie L.','Antoine B.',
-    'Claire D.','Nicolas P.','Emma G.','Maxime V.','Laura F.',
-    'Pierre H.','Sarah K.','Romain T.','Inès B.','Alexandre D.',
-    'Charlotte M.','Damien L.','Lucie V.','François A.','Camille R.',
-    'Hugo N.','Amélie J.','Sébastien G.','Pauline C.','Kevin S.',
-    'Manon T.','Baptiste F.','Océane H.','Valentin D.','Léa P.',
-  ];
-  const ACTIONS = [
-    'vient de simuler','a calculé sa pension',
-    'a découvert son score','vient de voir son plan',
-    'a simulé son départ à 62 ans','a reçu ses 3 actions',
-  ];
+const $ = id => document.getElementById(id);
 
-  const SIM_COUNT_BASE   = 847;
-  const SIM_COUNT_JITTER = 40;
-  const BUMP_INTERVAL_MS = 9000;
+function fmt(n) { return Math.round(n).toLocaleString('fr-FR') + '€'; }
 
-  let simCount = SIM_COUNT_BASE + Math.floor(Math.random() * SIM_COUNT_JITTER);
-  let nameIdx  = 0;
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-  /* ── Compteur avec déroulement chiffre par chiffre ── */
-  function animateCounter(el, from, to, duration) {
-    const start = performance.now();
-    function step(now) {
-      const p = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      const val  = Math.round(from + (to - from) * ease);
-      el.textContent = val.toLocaleString('fr-FR');
-      if (p < 1) requestAnimationFrame(step);
+/* ─── Nav auth ──────────────────────────────────────────────────── */
+
+async function initNav() {
+  const navAuth = $('nav-auth');
+  if (!navAuth) return;
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (res.ok) {
+      const { user } = await res.json();
+      navAuth.innerHTML = `
+        <a href="/profil.html" class="nav-link">Bonjour, ${escHtml(user.firstName)}</a>
+        <button id="btn-logout" class="btn-nav">Déconnexion</button>`;
+      $('btn-logout')?.addEventListener('click', async () => {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        location.reload();
+      });
+    } else {
+      showLoginLinks(navAuth);
     }
-    requestAnimationFrame(step);
-  }
+  } catch { showLoginLinks(navAuth); }
+}
 
-  function bumpCounter() {
-    simCount++;
-    const el = document.getElementById('sim-counter-num');
-    if (el) {
-      const prev = simCount - 1;
-      animateCounter(el, prev, simCount, 600);
-    }
-    setTimeout(bumpCounter, BUMP_INTERVAL_MS + Math.random() * BUMP_INTERVAL_MS);
-  }
+function showLoginLinks(el) {
+  el.innerHTML = `
+    <a href="/login.html"  class="nav-link">Connexion</a>
+    <a href="/signup.html" class="btn-nav">Commencer gratuitement</a>`;
+}
 
-  /* ── Cartes sociales gauche/droite ── */
-  function nextName() { return NAMES[nameIdx++ % NAMES.length]; }
-  function nextAction() { return ACTIONS[Math.floor(Math.random() * ACTIONS.length)]; }
-
-  function rotateCard(cardId, nameId, actionId) {
-    const card   = document.getElementById(cardId);
-    const nameEl = document.getElementById(nameId);
-    const actEl  = document.getElementById(actionId);
-    if (!card) return;
-
-    function show() {
-      nameEl.textContent = nextName();
-      actEl.textContent  = nextAction();
-      card.classList.add('visible');
-      setTimeout(() => {
-        card.classList.remove('visible');
-        setTimeout(show, 1200 + Math.random() * 800);
-      }, 3500 + Math.random() * 1500);
-    }
-    show();
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    /* Compteur : animation initiale depuis 0 */
-    const counterEl = document.getElementById('sim-counter-num');
-    if (counterEl) {
-      animateCounter(counterEl, 0, simCount, 1800);
-      setTimeout(bumpCounter, BUMP_INTERVAL_MS + Math.random() * BUMP_INTERVAL_MS);
-    }
-
-    /* Cartes — décalage pour qu'elles n'apparaissent pas en même temps */
-    setTimeout(() => rotateCard('sp-left',  'sp-left-name',  'sp-left-action'),  800);
-    setTimeout(() => rotateCard('sp-right', 'sp-right-name', 'sp-right-action'), 2400);
-  });
-})();
+initNav();
 
 /* ─── Constants ─────────────────────────────────────────────────── */
 
-const SPINNER_HTML = '<i class="ti ti-loader-2 spin" aria-hidden="true"></i>';
-
-/** 2π × r(50) — exact SVG circumference, avoids magic number 314 */
 const SCORE_CIRCUMFERENCE = 2 * Math.PI * 50;
 
-/** Pension replacement-rate parameters per status */
 const RATE_TABLE = {
   prive:         { base: 0.35, extra: 0.15, fullYears: 43   },
   fonctionnaire: { base: 0.55, extra: 0.20, fullYears: 41.5 },
   independant:   { base: 0.25, extra: 0.10, fullYears: 43   },
 };
 
-/** Score weights — must sum to 100 */
 const SCORE_WEIGHTS = {
   replacement: 40,
   savings:     30,
@@ -686,9 +451,9 @@ const SCORE_WEIGHTS = {
 };
 
 const SCORE_TIERS = [
-  { threshold: 35,       color: '#E24B4A', cls: 'bad',  label: 'Situation critique',
+  { threshold: 35, color: '#E24B4A', cls: 'bad',  label: 'Situation critique',
     tip: "Ton niveau d'épargne actuel ne compensera pas le manque à la retraite. Il est urgent d'agir dès maintenant." },
-  { threshold: 65,       color: '#FFB400', cls: 'mid',  label: 'À améliorer',
+  { threshold: 65, color: '#FFB400', cls: 'mid',  label: 'À améliorer',
     tip: "Tu as une base correcte, mais quelques ajustements maintenant feront une grande différence dans 20 ans." },
   { threshold: Infinity, color: '#22C55E', cls: 'good', label: 'Bonne trajectoire',
     tip: "Tu es sur la bonne voie. Continue et optimise ton allocation pour sécuriser encore mieux ton avenir." },
@@ -696,25 +461,6 @@ const SCORE_TIERS = [
 
 const CONFETTI_COLORS = ['#E24B4A','#FF7B6B','#FFB400','#22C55E','#60A5FA','#F5F4F0'];
 const FIELD_IDS       = ['age','salaire','epargne','depart','statut'];
-
-const STATUS_LABELS = {
-  prive:         'salarié du privé',
-  fonctionnaire: 'fonctionnaire',
-  independant:   'indépendant/freelance',
-};
-
-/* ─── Helpers ───────────────────────────────────────────────────── */
-
-const $ = id => document.getElementById(id);
-
-/* ─── Supabase state (déclaré tôt — utilisé dans simulate() et les handlers auth) ── */
-let _sb      = null;
-let _simData = null;
-let _sbReady = null;
-
-function fmt(n) {
-  return Math.round(n).toLocaleString('fr-FR') + '€';
-}
 
 /* ─── Scroll reveal ─────────────────────────────────────────────── */
 
@@ -726,24 +472,19 @@ const revealObserver = new IntersectionObserver(entries => {
 
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-/* ─── Ripple (event delegation — works on all present & future buttons) ── */
+/* ─── Ripple ────────────────────────────────────────────────────── */
 
 document.addEventListener('click', e => {
-  const btn = e.target.closest('.btn-primary:not(:disabled),.btn-email,.hero-cta,.btn-pricing:not(:disabled)');
+  const btn = e.target.closest('.btn-primary:not(:disabled),.btn-email,.hero-cta');
   if (!btn) return;
   const { left, top, width, height } = btn.getBoundingClientRect();
   const size = Math.max(width, height);
   const rip  = document.createElement('span');
-  rip.className  = 'ripple';
+  rip.className = 'ripple';
   rip.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - left - size / 2}px;top:${e.clientY - top - size / 2}px`;
   btn.appendChild(rip);
   rip.addEventListener('animationend', () => rip.remove(), { once: true });
 });
-
-/* Réinitialise après l'autofill navigateur (qui se déclenche ~100ms après le chargement) */
-function clearFields() { FIELD_IDS.forEach(id => { const el = $(id); if (el) el.value = ''; }); }
-clearFields();
-setTimeout(clearFields, 200);
 
 /* ─── Progress bar ──────────────────────────────────────────────── */
 
@@ -752,7 +493,7 @@ const progressCount = $('progress-count');
 const progressTrack = progressFill.closest('[role="progressbar"]');
 
 function updateProgress() {
-  const filled = FIELD_IDS.reduce((n, id) => n + ($(id)?.value ? 1 : 0), 0);
+  const filled = FIELD_IDS.reduce((n, id) => n + ($( id)?.value ? 1 : 0), 0);
   progressFill.style.transform = `scaleX(${filled / FIELD_IDS.length})`;
   progressCount.textContent    = `${filled} / ${FIELD_IDS.length}`;
   progressTrack.setAttribute('aria-valuenow', filled);
@@ -829,20 +570,18 @@ function computeScore(sal, pension, ep, annees, statut) {
 }
 
 function renderScore(score) {
-  const tier  = SCORE_TIERS.find(t => score < t.threshold);
-  const fill  = $('score-ring-fill');
-  const num   = $('score-num');
+  const tier = SCORE_TIERS.find(t => score < t.threshold);
+  const fill = $('score-ring-fill');
+  const num  = $('score-num');
 
-  // Set exact circumference via JS (avoids the magic-number 314 in HTML)
   fill.setAttribute('stroke-dasharray', SCORE_CIRCUMFERENCE.toFixed(3));
-  fill.style.stroke          = tier.color;
+  fill.style.stroke           = tier.color;
   fill.style.strokeDashoffset = (SCORE_CIRCUMFERENCE - (score / 100) * SCORE_CIRCUMFERENCE).toFixed(3);
 
   $('score-badge').className   = `score-badge ${tier.cls}`;
   $('score-badge').textContent = tier.label;
   $('score-tip').textContent   = tier.tip;
 
-  // RAF counter with cubic-ease-out — smoother than setInterval
   const start    = performance.now();
   const duration = 900;
   (function tick(now) {
@@ -890,15 +629,11 @@ function simulate() {
   const gap     = sal - pension;
   const pctGap  = Math.round((1 - pension / sal) * 100);
   const barW    = Math.max(Math.round((pension / sal) * 100), 5);
-  const score = computeScore(sal, pension, ep, annees, statut);
-  _simData    = { age, salaire: sal, epargne: ep, depart: dep, statut, pension, gap, score };
 
-  // Loading state
   const btn = $('btn-simulate');
   btn.disabled  = true;
-  btn.innerHTML = SPINNER_HTML + ' Calcul en cours…';
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Calcul en cours...';
 
-  // Populate headline with DOM methods — no innerHTML on dynamic data
   const headline = $('shock-headline');
   headline.textContent = '';
   const em = document.createElement('em');
@@ -920,199 +655,75 @@ function simulate() {
     revealObserver.observe(el);
   });
 
-  // Double-rAF: guarantees layout is computed before scroll fires
   requestAnimationFrame(() => requestAnimationFrame(() => {
     shock.scrollIntoView({ behavior: 'smooth', block: 'start' });
     launchConfetti();
-    renderScore(score);
+    renderScore(computeScore(sal, pension, ep, annees, statut));
     btn.disabled  = false;
     btn.innerHTML = 'Voir ma projection retraite <i class="ti ti-arrow-right" aria-hidden="true"></i>';
   }));
 
-  generatePlan();
+  generatePlan(age, sal, pension, gap, ep, annees, statut);
 }
 
-/* ─── Generate plan ─────────────────────────────────────────────── */
+/* ─── Generate plan (via proxy sécurisé) ───────────────────────── */
 
-function generatePlan() {
-  $('plan-loading').style.display = 'none';
-  $('plan-save').style.display    = 'block';
-}
+async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
+  const loading   = $('plan-loading');
+  const container = $('plan-steps');
+  loading.style.display   = 'flex';
+  container.style.display = 'none';
 
-/* ─── Supabase Auth ─────────────────────────────────────────────── */
-
-async function initSupabase() {
-  const resp = await fetch('/.netlify/functions/get-config');
-  if (!resp.ok) throw new Error(`get-config HTTP ${resp.status}`);
-
-  const { supabaseUrl, supabaseAnonKey } = await resp.json();
-  if (!supabaseUrl || !supabaseAnonKey) throw new Error('Variables Supabase manquantes dans Netlify');
-
-  _sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-
-  const { data: { session } } = await _sb.auth.getSession();
-  if (session) showNavUser(session.user);
-
-  _sb.auth.onAuthStateChange((_event, session) => {
-    if (session) showNavUser(session.user);
-    else hideNavUser();
-  });
-
-  return _sb;
-}
-
-_sbReady = initSupabase().catch(err => {
-  console.error('[supabase init]', err.message);
-  return null;
-});
-
-function showNavUser(user) {
-  $('nav-user-email').textContent = user.email;
-  $('nav-user').style.display     = 'flex';
-}
-
-function hideNavUser() {
-  $('nav-user').style.display = 'none';
-}
-
-async function saveSimulation(userId) {
-  if (!_sb || !_simData || !userId) return;
   try {
-    await _sb.from('simulations').insert({ user_id: userId, ..._simData });
+    const resp = await fetch('/api/plan', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify({ age, sal, pension, gap, ep, annees, statut }),
+    });
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+    const { steps } = await resp.json();
+
+    if (!Array.isArray(steps) || steps.length !== 3) throw new Error('Format inattendu');
+
+    container.innerHTML = '';
+    steps.forEach((step, i) => {
+      const div   = document.createElement('div');  div.className = 'plan-step'; div.style.animationDelay = `${i * 0.12}s`;
+      const badge = document.createElement('div');  badge.className = 'step-num'; badge.textContent = i + 1;
+      const body  = document.createElement('div');  body.className = 'step-content';
+      const h4    = document.createElement('h4');   h4.textContent = step.title;
+      const p     = document.createElement('p');    p.textContent  = step.desc;
+      body.append(h4, p);
+      div.append(badge, body);
+      container.appendChild(div);
+    });
+
+    loading.style.display   = 'none';
+    container.style.display = 'flex';
   } catch (err) {
-    console.error('[saveSimulation]', err);
+    console.error('[generatePlan]', err);
+    loading.innerHTML = '<span style="color:var(--text-muted);font-size:13px">Plan disponible une fois connecté à Prevano.</span>';
   }
 }
 
-function showAuthSuccess(msg) {
-  $('auth-signup').style.display      = 'none';
-  $('auth-login').style.display       = 'none';
-  $('auth-success-msg').textContent   = msg;
-  $('plan-save-success').style.display = 'flex';
+/* ─── Submit email ──────────────────────────────────────────────── */
+
+function submitEmail() {
+  const input = $('user-email');
+  if (!input.validity.valid) { input.focus(); return; }
+  window.open(
+    'https://e1966e2e.sibforms.com/serve/MUIFAOKeyQAhd7aThpwc95y3ddkMyDgzYfLi_BZwCued7LJpHkCH2Io9vTXExUxgZO0qv8f-g4ho7h9GqgsvY9IQ7X7Fxzt0rUNsvW7hHkVp2e7uOnz1jm92tPscAG1Wirbw_o5NMVxC7OEK4sCSA8E-y2-GisBN3qoiMhPcfmizSh6UHTdIukQ2mue3RuoxBUgbFFUj7Y1nviUWLw==',
+    '_blank', 'noopener,noreferrer'
+  );
 }
 
-/* Signup */
-$('btn-signup').addEventListener('click', async () => {
-  const email    = $('auth-email').value.trim();
-  const password = $('auth-password').value;
-  const errorEl  = $('signup-error');
-  const btn      = $('btn-signup');
+/* ─── Events ────────────────────────────────────────────────────── */
 
-  errorEl.textContent = '';
-
-  if (!email || !$('auth-email').validity.valid) {
-    errorEl.textContent = 'Saisis une adresse email valide.'; return;
-  }
-  if (password.length < 8) {
-    errorEl.textContent = 'Mot de passe trop court (min. 8 caractères).'; return;
-  }
-  btn.disabled = true; btn.innerHTML = SPINNER_HTML + ' Création…';
-
-  const sb = await _sbReady;
-  if (!sb) {
-    errorEl.textContent = 'Service indisponible — recharge la page.';
-    btn.disabled = false;
-    btn.innerHTML = 'Créer mon compte <i class="ti ti-arrow-right" aria-hidden="true"></i>';
-    return;
-  }
-
-  const { data, error } = await sb.auth.signUp({ email, password });
-
-  if (error) {
-    errorEl.textContent = error.message === 'User already registered'
-      ? 'Email déjà utilisé — connecte-toi plutôt.'
-      : error.message;
-    btn.disabled = false;
-    btn.innerHTML = 'Créer mon compte <i class="ti ti-arrow-right" aria-hidden="true"></i>';
-    return;
-  }
-
-  await saveSimulation(data.user?.id);
-  showAuthSuccess('Compte créé — tu recevras ton plan dès le lancement !');
-});
-
-/* Login */
-$('btn-login').addEventListener('click', async () => {
-  const email    = $('login-email').value.trim();
-  const password = $('login-password').value;
-  const errorEl  = $('login-error');
-  const btn      = $('btn-login');
-
-  errorEl.textContent = '';
-
-  if (!email || password.length < 1) {
-    errorEl.textContent = 'Remplis les deux champs.'; return;
-  }
-
-  btn.disabled = true; btn.innerHTML = SPINNER_HTML + ' Connexion…';
-
-  const sb = await _sbReady;
-  if (!sb) {
-    errorEl.textContent = 'Service indisponible — recharge la page.';
-    btn.disabled = false;
-    btn.innerHTML = 'Se connecter <i class="ti ti-arrow-right" aria-hidden="true"></i>';
-    return;
-  }
-
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-  if (error) {
-    errorEl.textContent = 'Email ou mot de passe incorrect.';
-    btn.disabled = false;
-    btn.innerHTML = 'Se connecter <i class="ti ti-arrow-right" aria-hidden="true"></i>';
-    return;
-  }
-
-  await saveSimulation(data.user?.id);
-  showAuthSuccess('Connecté ! Ton espace Prevano est prêt.');
-});
-
-/* Toggle signup ↔ login */
-$('link-show-login').addEventListener('click', e => {
-  e.preventDefault();
-  $('auth-signup').style.display = 'none';
-  $('auth-login').style.display  = 'block';
-});
-$('link-show-signup').addEventListener('click', e => {
-  e.preventDefault();
-  $('auth-login').style.display  = 'none';
-  $('auth-signup').style.display = 'block';
-});
-
-/* Logout */
-$('btn-logout').addEventListener('click', async () => {
-  if (_sb) await _sb.auth.signOut();
-});
-
-/* ─── Checkout success detection ────────────────────────────────── */
-
-(function () {
-  if (new URLSearchParams(window.location.search).get('checkout') !== 'success') return;
-  history.replaceState(null, '', window.location.pathname);
-  const banner = $('checkout-success-banner');
-  if (!banner) return;
-  banner.style.display = 'flex';
-  requestAnimationFrame(() => banner.scrollIntoView({ behavior: 'smooth', block: 'center' }));
-})();
-
-/* ─── Wire up events (zero inline onclick) ──────────────────────── */
-
-$('btn-scroll').addEventListener('click',    () => $('simulator').scrollIntoView({ behavior: 'smooth' }));
-$('btn-simulate').addEventListener('click',  simulate);
-
-/* ─── Testimonial form ──────────────────────────────────────────── */
-
-document.getElementById('testimonial-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const name = document.getElementById('testimonial-name').value.trim();
-  const text = document.getElementById('testimonial-text').value.trim();
-  if (!name || !text) return;
-  const subject = encodeURIComponent('Témoignage Prevano — ' + name);
-  const body    = encodeURIComponent(name + ' écrit :\n\n' + text);
-  window.location.href = 'mailto:prevano.app@outlook.fr?subject=' + subject + '&body=' + body;
-  this.style.display = 'none';
-  document.getElementById('testimonial-thanks').style.display = 'block';
-});
+$('btn-scroll').addEventListener('click',   () => $('simulator').scrollIntoView({ behavior: 'smooth' }));
+$('btn-simulate').addEventListener('click', simulate);
+$('btn-email').addEventListener('click',    submitEmail);
 </script>
 </body>
 </html>

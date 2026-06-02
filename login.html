@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — Prevano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input,button{font-family:inherit;font-size:inherit;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+/* Nav */
+nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);}
+.nav-inner{max-width:1100px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--grad-brand);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo em{font-style:normal;}
+/* Auth card */
+.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 20px;}
+.auth-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:20px;padding:40px;width:100%;max-width:440px;}
+.auth-title{font-size:24px;font-weight:900;letter-spacing:-0.04em;margin-bottom:6px;}
+.auth-sub{font-size:14px;color:var(--text-muted);margin-bottom:32px;}
+.auth-sub a{color:var(--color-primary);text-decoration:none;}
+.field{margin-bottom:18px;}
+.field label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px;display:block;}
+.field input{width:100%;padding:13px 16px;border-radius:10px;border:1.5px solid var(--border-subtle);color:var(--text-primary);background:var(--bg-raised);outline:none;transition:border-color 0.2s;}
+.field input:focus{border-color:var(--color-primary);}
+.field input::placeholder{color:var(--text-faint);}
+.forgot{display:block;text-align:right;font-size:12px;color:var(--text-faint);text-decoration:none;margin-top:6px;transition:color 0.2s;}
+.forgot:hover{color:var(--text-muted);}
+.btn-submit{width:100%;padding:14px;background:var(--color-primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:background-color 0.2s,transform 0.2s,opacity 0.2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-submit:hover:not(:disabled){background:var(--color-primary-dark);transform:translateY(-1px);}
+.btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
+.auth-error{font-size:13px;color:var(--color-primary);text-align:center;margin-top:12px;min-height:18px;}
+.auth-divider{text-align:center;font-size:13px;color:var(--text-faint);margin:24px 0;}
+.auth-footer{text-align:center;font-size:13px;color:var(--text-muted);}
+.auth-footer a{color:var(--color-primary);text-decoration:none;font-weight:600;}
+/* Footer */
+footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-size:12px;color:var(--text-faint);text-decoration:none;}
+.footer-link:hover{color:var(--text-muted);}
+.footer-copy{font-size:12px;color:var(--text-faint);}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo-wrap">
+        <div class="logo-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="logo" translate="no">Pre<em>vano</em></span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main class="auth-wrap">
+  <div class="auth-card">
+    <h1 class="auth-title">Connexion</h1>
+    <p class="auth-sub">Pas encore de compte ? <a href="/signup.html">Créer un compte gratuitement</a></p>
+
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label for="email">Adresse email</label>
+        <input type="email" id="email" placeholder="ton@email.com" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+        <a href="/forgot-password.html" class="forgot">Mot de passe oublié ?</a>
+      </div>
+      <button type="submit" class="btn-submit" id="btn-submit">
+        <i class="ti ti-login" aria-hidden="true"></i> Se connecter
+      </button>
+      <p class="auth-error" id="auth-error" role="alert" aria-live="assertive"></p>
+    </form>
+
+    <p class="auth-footer" style="margin-top:28px">
+      Pas encore de compte ? <a href="/signup.html">Créer un compte</a>
+    </p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/cgv.html"              class="footer-link">CGV</a>
+      <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
+      <a href="/contact.html"          class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2025 Prevano</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+// Rediriger si déjà connecté
+fetch('/api/auth/me', { credentials: 'include' })
+  .then(r => { if (r.ok) location.replace('/profil.html'); })
+  .catch(() => {});
+
+const form    = document.getElementById('login-form');
+const btnSub  = document.getElementById('btn-submit');
+const errEl   = document.getElementById('auth-error');
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  errEl.textContent = '';
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  if (!email || !password) { errEl.textContent = 'Merci de remplir tous les champs.'; return; }
+
+  btnSub.disabled = true;
+  btnSub.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Connexion…';
+
+  try {
+    const res  = await fetch('/api/auth/login', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) { errEl.textContent = data.error ?? 'Erreur de connexion.'; return; }
+
+    const next = new URLSearchParams(location.search).get('next') ?? '/profil.html';
+    location.replace(next.startsWith('/') ? next : '/profil.html');
+  } catch {
+    errEl.textContent = 'Erreur réseau. Réessaie dans un moment.';
+  } finally {
+    btnSub.disabled = false;
+    btnSub.innerHTML = '<i class="ti ti-login" aria-hidden="true"></i> Se connecter';
+  }
+});
+</script>
+</body>
+</html>

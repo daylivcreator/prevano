@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarifs — Prevano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input,button{font-family:inherit;font-size:inherit;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --grad-text:linear-gradient(135deg,#E24B4A 0%,#FF8C72 55%,#FFB347 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-inner{max-width:1100px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--grad-brand);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo em{font-style:normal;}
+.nav-links{display:flex;align-items:center;gap:14px;}
+.nav-link{font-size:14px;color:var(--text-muted);text-decoration:none;transition:color 0.2s;}
+.nav-link:hover{color:var(--text-primary);}
+.btn-nav{background:var(--color-primary);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:background-color 0.2s;display:inline-flex;align-items:center;}
+.btn-nav:hover{background:var(--color-primary-dark);}
+/* Hero */
+.pricing-hero{padding:64px 48px 48px;text-align:center;max-width:1100px;margin:0 auto;}
+.pricing-hero h1{font-size:48px;font-weight:900;letter-spacing:-0.045em;margin-bottom:16px;line-height:1.1;}
+.pricing-hero h1 em{font-style:normal;background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.pricing-hero p{font-size:17px;color:var(--text-muted);max-width:480px;margin:0 auto 40px;}
+/* Plans grid */
+.plans-section{padding:0 48px 80px;max-width:1100px;margin:0 auto;}
+.plans-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:start;}
+.plan-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:0;position:relative;transition:border-color 0.2s,transform 0.2s;}
+.plan-card:hover{transform:translateY(-2px);}
+.plan-card.featured{border-color:var(--color-primary-border);box-shadow:0 0 40px rgba(226,75,74,0.12);}
+.featured-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--grad-brand);color:#fff;font-size:11px;font-weight:800;padding:5px 16px;border-radius:100px;letter-spacing:0.06em;white-space:nowrap;}
+.plan-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-faint);margin-bottom:12px;}
+.plan-price{font-size:40px;font-weight:900;letter-spacing:-0.04em;margin-bottom:4px;line-height:1;}
+.plan-price span{font-size:15px;font-weight:500;color:var(--text-muted);}
+.plan-desc{font-size:13px;color:var(--text-muted);margin-bottom:28px;line-height:1.6;min-height:40px;}
+.plan-features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;flex:1;}
+.feature{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text-muted);}
+.feature i{color:var(--color-primary);font-size:16px;flex-shrink:0;margin-top:2px;}
+.feature.muted i{color:var(--text-faint);}
+.feature.muted{color:var(--text-faint);}
+.plan-divider{border:none;border-top:1px solid var(--border-subtle);margin:0 0 20px;}
+.feature-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-faint);margin-bottom:10px;}
+/* CTA buttons */
+.btn-plan{width:100%;padding:14px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;}
+.btn-plan-primary{background:var(--color-primary);color:#fff;}
+.btn-plan-primary:hover{background:var(--color-primary-dark);transform:translateY(-1px);}
+.btn-plan-secondary{background:var(--bg-raised);color:var(--text-primary);border:1px solid var(--border-default);}
+.btn-plan-secondary:hover{border-color:var(--color-primary);color:var(--color-primary);}
+.btn-plan:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+/* Guarantee */
+.guarantee{text-align:center;padding:40px 48px;max-width:1100px;margin:0 auto;}
+.guarantee p{font-size:13px;color:var(--text-faint);}
+.guarantee p i{color:var(--text-muted);vertical-align:-2px;}
+/* Cancel banner */
+.cancel-banner{background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3);border-radius:12px;padding:14px 20px;text-align:center;font-size:13px;color:#FFB400;margin-bottom:24px;max-width:680px;margin-left:auto;margin-right:auto;}
+/* Footer */
+footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:auto;}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-size:12px;color:var(--text-faint);text-decoration:none;}
+.footer-link:hover{color:var(--text-muted);}
+.footer-copy{font-size:12px;color:var(--text-faint);}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media(max-width:900px){.plans-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto;}.plan-card.featured{border-color:var(--color-primary-border);}}
+@media(max-width:640px){
+  nav,.pricing-hero,.plans-section,.guarantee{padding-left:20px;padding-right:20px;}
+  .pricing-hero h1{font-size:32px;}
+  footer{padding:16px 20px;}
+}
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo-wrap">
+        <div class="logo-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="logo" translate="no">Pre<em>vano</em></span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/" class="nav-link">Simulateur</a>
+        <div id="nav-auth" style="display:flex;align-items:center;gap:10px"></div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="pricing-hero">
+    <h1>Construis ta retraite<br><em>sans mauvaises surprises.</em></h1>
+    <p>Choisis l'offre adaptée à ta situation et commence à sécuriser ton avenir dès aujourd'hui.</p>
+  </section>
+
+  <div id="cancel-msg" style="display:none" class="cancel-banner">
+    <i class="ti ti-info-circle" aria-hidden="true"></i> Le paiement a été annulé. Ton compte reste actif.
+  </div>
+
+  <section class="plans-section">
+    <div class="plans-grid">
+
+      <!-- Starter -->
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">9,99€<span>/mois</span></div>
+        <p class="plan-desc">L'essentiel pour comprendre ta situation et passer à l'action.</p>
+        <div class="plan-features">
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Simulations illimitées</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Plan d'action IA personnalisé</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Export PDF de tes résultats</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Historique 30 jours</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Support par email (72h)</div>
+        </div>
+        <button class="btn-plan btn-plan-secondary" data-plan="starter" id="btn-starter">
+          Choisir Starter <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- Pro (featured) -->
+      <div class="plan-card featured">
+        <div class="featured-badge">⚡ LE PLUS POPULAIRE</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">14,99€<span>/mois</span></div>
+        <p class="plan-desc">Pour ceux qui veulent aller plus loin et optimiser chaque euro épargné.</p>
+        <div class="plan-features">
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i><strong>Tout Starter inclus</strong></div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Jusqu'à 3 profils (conjoint, enfants)</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Alertes email personnalisées</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Comparateur de stratégies d'épargne</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Simulation de scénarios multiples</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Support prioritaire (48h)</div>
+        </div>
+        <button class="btn-plan btn-plan-primary" data-plan="pro" id="btn-pro">
+          Choisir Pro <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- Premium -->
+      <div class="plan-card">
+        <div class="plan-name">Premium</div>
+        <div class="plan-price">39,99€<span>/mois</span></div>
+        <p class="plan-desc">Accompagnement complet avec un expert pour sécuriser ta retraite à vie.</p>
+        <div class="plan-features">
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i><strong>Tout Pro inclus</strong></div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Audit retraite complet par un expert</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Suivi mensuel personnalisé</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Tableau de bord famille complet</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Simulation succession & transmission</div>
+          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Support VIP — appel vidéo mensuel</div>
+        </div>
+        <button class="btn-plan btn-plan-secondary" data-plan="premium" id="btn-premium">
+          Choisir Premium <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="guarantee">
+    <p><i class="ti ti-shield-check" aria-hidden="true"></i> Paiement sécurisé par Stripe · Annulation à tout moment · Sans engagement</p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/cgv.html"              class="footer-link">CGV</a>
+      <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
+      <a href="/contact.html"          class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2025 Prevano · Tous droits réservés</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+// Price IDs chargés dynamiquement depuis /api/config (env vars Vercel côté serveur)
+const PRICE_IDS = { starter: null, pro: null, premium: null };
+
+fetch('/api/config')
+  .then(r => r.ok ? r.json() : null)
+  .then(data => { if (data?.stripe) Object.assign(PRICE_IDS, data.stripe); })
+  .catch(() => {});
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* Nav auth */
+async function initNav() {
+  const navAuth = document.getElementById('nav-auth');
+  if (!navAuth) return;
+  try {
+    const res = await fetch('/api/auth/me', { credentials:'include' });
+    if (res.ok) {
+      const { user } = await res.json();
+      navAuth.innerHTML = `
+        <a href="/profil.html" class="nav-link">Bonjour, ${escHtml(user.firstName)}</a>
+        <button id="btn-logout" class="btn-nav" style="background:transparent;border:1px solid var(--border-default);color:var(--text-muted)">Déconnexion</button>`;
+      document.getElementById('btn-logout')?.addEventListener('click', async () => {
+        await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+        location.reload();
+      });
+    } else {
+      navAuth.innerHTML = `
+        <a href="/login.html"  class="nav-link">Connexion</a>
+        <a href="/signup.html" class="btn-nav">Commencer gratuitement</a>`;
+    }
+  } catch {
+    navAuth.innerHTML = `
+      <a href="/login.html"  class="nav-link">Connexion</a>
+      <a href="/signup.html" class="btn-nav">Commencer gratuitement</a>`;
+  }
+}
+
+/* Checkout */
+async function startCheckout(plan) {
+  const priceId = PRICE_IDS[plan];
+  const btn = document.getElementById(`btn-${plan}`);
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Chargement…';
+
+  try {
+    // Vérifier si connecté
+    const meRes = await fetch('/api/auth/me', { credentials:'include' });
+    if (!meRes.ok) {
+      location.href = `/login.html?next=/tarifs.html`;
+      return;
+    }
+
+    if (!priceId) {
+      alert('Configuration Stripe manquante. Configure les variables STRIPE_*_PRICE_ID dans Vercel.');
+      return;
+    }
+
+    const res  = await fetch('/api/stripe/checkout', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify({ priceId }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error ?? 'Erreur');
+    location.href = data.url;
+  } catch (err) {
+    alert(err.message ?? 'Impossible de démarrer le paiement.');
+    btn.disabled = false;
+    btn.innerHTML = `Choisir ${plan.charAt(0).toUpperCase() + plan.slice(1)} <i class="ti ti-arrow-right" aria-hidden="true"></i>`;
+  }
+}
+
+/* Afficher le banner d'annulation */
+if (new URLSearchParams(location.search).get('canceled') === '1') {
+  document.getElementById('cancel-msg').style.display = 'block';
+  history.replaceState({}, '', '/tarifs.html');
+}
+
+/* Events */
+['starter','pro','premium'].forEach(plan => {
+  document.getElementById(`btn-${plan}`)?.addEventListener('click', () => startCheckout(plan));
+});
+
+initNav();
+</script>
+</body>
+</html>
