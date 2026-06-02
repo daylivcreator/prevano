@@ -2,6 +2,15 @@
 const { requireSession } = require('./_lib/auth');
 const { sql }            = require('./_lib/db');
 
+// Migration automatique : idempotente, s'exécute au cold start Lambda
+sql`
+  CREATE TABLE IF NOT EXISTS user_simulations (
+    user_id    UUID        PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    data       JSONB       NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )
+`.catch(e => console.error('[migrate] user_simulations:', e.message));
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Méthode non autorisée.' });
 
