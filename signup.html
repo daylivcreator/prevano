@@ -127,6 +127,13 @@ fetch('/api/auth/me', { credentials: 'include' })
   .then(r => { if (r.ok) location.replace('/profil.html'); })
   .catch(() => {});
 
+// Pré-remplir l'email depuis ?email=xxx (venant du CTA simulateur)
+const preEmail = new URLSearchParams(location.search).get('email');
+if (preEmail) {
+  const emailField = document.getElementById('email');
+  if (emailField) emailField.value = decodeURIComponent(preEmail);
+}
+
 const form   = document.getElementById('signup-form');
 const btnSub = document.getElementById('btn-submit');
 const errEl  = document.getElementById('auth-error');

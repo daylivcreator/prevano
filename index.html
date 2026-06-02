@@ -401,17 +401,17 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
     </div>
 
     <div class="email-cta reveal" id="cta-account">
-      <h3>Sauvegarde ton plan.</h3>
-      <p>Crée ton compte gratuitement pour retrouver tes résultats,<br>suivre ta progression et accéder aux stratégies avancées.</p>
-      <div class="email-row" id="cta-buttons">
-        <a href="/signup.html" class="btn-email">
-          Créer mon compte <i class="ti ti-arrow-right" aria-hidden="true"></i>
-        </a>
-        <a href="/login.html" class="btn-email" style="background:var(--bg-raised);border:1px solid var(--border-default);color:var(--text-primary)">
-          Se connecter
-        </a>
+      <h3 id="cta-title">Reçois ton plan complet.</h3>
+      <p id="cta-desc">Entre ton email — on t'envoie les mises à jour Prevano et on t'aide à créer ton compte gratuitement.</p>
+      <div id="cta-content">
+        <div class="email-row">
+          <input class="email-input" type="email" id="cta-email" placeholder="ton@email.com" autocomplete="email">
+          <button id="cta-submit" class="btn-email" type="button">
+            Recevoir mon plan <i class="ti ti-send" aria-hidden="true"></i>
+          </button>
+        </div>
+        <p class="email-note" id="cta-note">Newsletter Prevano · Sans spam · Désabonnement en 1 clic</p>
       </div>
-      <p class="email-note">Gratuit · Aucune CB requise</p>
     </div>
   </section>
 </main>
@@ -819,23 +819,60 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
   }
 }
 
-/* ─── CTA dynamique selon connexion ────────────────────────────── */
+/* ─── CTA email capture + newsletter Brevo ──────────────────────── */
 
 async function updateCta() {
-  const ctaButtons = $('cta-buttons');
-  if (!ctaButtons) return;
   try {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (res.ok) {
       const { user } = await res.json();
-      ctaButtons.innerHTML = `
-        <a href="/profil.html" class="btn-email">
-          Mon espace Prevano <i class="ti ti-arrow-right" aria-hidden="true"></i>
-        </a>`;
-      const note = ctaButtons.closest('.email-cta')?.querySelector('.email-note');
-      if (note) note.textContent = `Connecté en tant que ${escHtml(user.firstName)}`;
+      // Utilisateur connecté → afficher son espace
+      $('cta-title').textContent = `Bonjour, ${escHtml(user.firstName)} !`;
+      $('cta-desc').textContent  = 'Retrouve ton plan complet et suis ta progression dans ton espace.';
+      $('cta-content').innerHTML = `
+        <div class="email-row">
+          <a href="/profil.html" class="btn-email">
+            Mon espace Prevano <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+        <p class="email-note">Plan ${escHtml(user.plan)} actif</p>`;
+      return;
     }
-  } catch { /* non connecté — on garde les boutons par défaut */ }
+  } catch { /* non connecté */ }
+
+  // Non connecté → activer le formulaire email
+  $('cta-submit')?.addEventListener('click', submitEmailCapture);
+  $('cta-email')?.addEventListener('keydown', e => { if (e.key === 'Enter') submitEmailCapture(); });
+}
+
+async function submitEmailCapture() {
+  const input = $('cta-email');
+  const btn   = $('cta-submit');
+  const note  = $('cta-note');
+  const email = input?.value?.trim();
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    input?.focus();
+    return;
+  }
+
+  btn.disabled   = true;
+  btn.innerHTML  = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i>';
+
+  // Souscription newsletter Brevo (fire & forget)
+  fetch('/api/subscribe', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ email }),
+  }).catch(() => {});
+
+  note.textContent  = '✓ Inscription confirmée ! Redirection vers ton compte...';
+  note.style.color  = '#22C55E';
+
+  // Redirection vers signup avec email pré-rempli
+  setTimeout(() => {
+    window.location.href = `/signup.html?email=${encodeURIComponent(email)}`;
+  }, 800);
 }
 
 /* ─── Events ────────────────────────────────────────────────────── */
