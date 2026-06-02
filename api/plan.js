@@ -3,15 +3,6 @@ const { rateLimit, tooManyRequests } = require('./_lib/rate-limit');
 const { getSession }                  = require('./_lib/auth');
 const { sql }                         = require('./_lib/db');
 
-// Migration automatique : idempotente, s'exécute au cold start Lambda
-sql`
-  CREATE TABLE IF NOT EXISTS user_simulations (
-    user_id    UUID        PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    data       JSONB       NOT NULL,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-  )
-`.catch(e => console.error('[migrate] user_simulations:', e.message));
-
 const ALLOWED_STATUTS = ['prive', 'fonctionnaire', 'independant'];
 const API_MODEL       = 'claude-sonnet-4-6';
 
