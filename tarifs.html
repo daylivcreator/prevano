@@ -311,18 +311,21 @@ async function initNav() {
 
 /* Checkout */
 async function startCheckout(plan) {
+  const PLAN_LABELS = { starter: 'Starter', pro: 'Coach Pro', premium: 'Daily Finance' };
+  window.plausible?.('Voir Offre', { props: { plan: PLAN_LABELS[plan] ?? plan } });
+
   const priceId = PRICE_IDS[plan];
   const btn = document.getElementById(`btn-${plan}`);
   btn.disabled = true;
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Chargement…';
 
   try {
-    // Vérifier si connecté
     const meRes = await fetch('/api/auth/me', { credentials:'include' });
     if (!meRes.ok) {
       location.href = `/login.html?next=/tarifs.html`;
       return;
     }
+    window.plausible?.('Checkout Démarré', { props: { plan: PLAN_LABELS[plan] ?? plan } });
 
     if (!priceId) {
       alert('Configuration Stripe manquante. Configure les variables STRIPE_*_PRICE_ID dans Vercel.');

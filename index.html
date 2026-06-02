@@ -775,6 +775,8 @@ function simulate() {
   $('sim-error').textContent = errorMsg ?? '';
   if (errorMsg) return;
 
+  window.plausible?.('Simuler', { props: { statut } });
+
   const annees  = dep - age;
   const pension = calcPension(sal, annees, statut);
   const gap     = sal - pension;
@@ -978,6 +980,7 @@ async function submitEmailCapture() {
     body:    JSON.stringify({ email }),
   }).catch(() => {});
 
+  window.plausible?.('Email Capture');
   note.textContent  = '✓ Inscription confirmée ! Redirection vers ton compte...';
   note.style.color  = '#22C55E';
 
@@ -1077,7 +1080,10 @@ const ACTIVITY_POPUP_ENABLED = true;
 
 /* ─── Events ────────────────────────────────────────────────────── */
 
-$('btn-scroll').addEventListener('click',   () => $('simulator').scrollIntoView({ behavior: 'smooth' }));
+$('btn-scroll').addEventListener('click', () => {
+  $('simulator').scrollIntoView({ behavior: 'smooth' });
+  window.plausible?.('CTA Hero');
+});
 $('btn-simulate').addEventListener('click', simulate);
 updateCta();
 </script>
