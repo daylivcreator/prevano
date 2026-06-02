@@ -75,6 +75,17 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
 .footer-link:hover{color:var(--text-muted);}
 .footer-copy{font-size:12px;color:var(--text-faint);}
 @keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+.activity-popup{position:fixed;bottom:24px;left:24px;z-index:9000;max-width:290px;background:var(--bg-surface);border:1px solid var(--border-default);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:translateX(calc(-100% - 32px));transition:transform 0.45s cubic-bezier(.25,.8,.25,1);pointer-events:none;}
+.activity-popup.show{transform:translateX(0);pointer-events:auto;}
+.activity-popup-dot{width:8px;height:8px;background:var(--color-primary);border-radius:50%;flex-shrink:0;margin-top:5px;animation:pulse 2s infinite;}
+.activity-popup-body{flex:1;min-width:0;}
+.activity-popup-text{font-size:13px;color:var(--text-muted);line-height:1.5;}
+.activity-popup-text strong{color:var(--text-primary);}
+.activity-popup-time{font-size:11px;color:var(--text-faint);margin-top:3px;}
+.activity-popup-close{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:20px;padding:0;line-height:1;flex-shrink:0;transition:color 0.2s;margin-top:-2px;}
+.activity-popup-close:hover{color:var(--text-primary);}
+@media(max-width:640px){.activity-popup{max-width:calc(100vw - 48px);}}
 @media(max-width:900px){.plans-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto;}.plan-card.featured{border-color:var(--color-primary-border);}}
 @media(max-width:640px){
   nav,.pricing-hero,.plans-section,.guarantee{padding-left:20px;padding-right:20px;}
@@ -189,6 +200,16 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
   </div>
 </footer>
 
+<!-- Popup activité — désactivé par défaut (ACTIVITY_POPUP_ENABLED = false) -->
+<div id="activity-popup" class="activity-popup" role="status" aria-live="polite" aria-atomic="true" aria-hidden="true">
+  <span class="activity-popup-dot" aria-hidden="true"></span>
+  <div class="activity-popup-body">
+    <div class="activity-popup-text" id="activity-popup-text"></div>
+    <div class="activity-popup-time" id="activity-popup-time"></div>
+  </div>
+  <button class="activity-popup-close" id="activity-popup-close" aria-label="Fermer la notification">×</button>
+</div>
+
 <script>
 'use strict';
 
@@ -281,6 +302,51 @@ if (new URLSearchParams(location.search).get('canceled') === '1') {
 });
 
 initNav();
+
+/* ─── Popup activité ─────────────────────────────────────── */
+const ACTIVITY_POPUP_ENABLED = false;
+
+(function initActivityPopup() {
+  if (!ACTIVITY_POPUP_ENABLED) return;
+
+  const MESSAGES = [
+    { text: '<strong>Lucas M.</strong> vient de souscrire à Coach Pro',         time: 'À l\'instant' },
+    { text: '<strong>Marie L.</strong> vient de calculer sa retraite',          time: 'Il y a 2 min'  },
+    { text: '<strong>Antoine D.</strong> a rejoint Daily Finance',              time: 'Il y a 5 min'  },
+    { text: '<strong>Céline F.</strong> a simulé sa retraite',                  time: 'Il y a 8 min'  },
+    { text: '<strong>Thomas R.</strong> a ouvert un PER grâce au plan IA',      time: 'Il y a 11 min' },
+    { text: '<strong>Sophie M.</strong> est passée de 28 à 61 de score',        time: 'Il y a 15 min' },
+    { text: '<strong>Julien B.</strong> économise 340€/mois supplémentaires',   time: 'Il y a 18 min' },
+    { text: '<strong>Nadia K.</strong> vient de souscrire à Starter',           time: 'Il y a 21 min' },
+    { text: '<strong>Paul M.</strong> a découvert qu\'il lui manque 890€/mois', time: 'Il y a 24 min' },
+  ];
+
+  let idx = 0;
+  const popup     = document.getElementById('activity-popup');
+  const popupText = document.getElementById('activity-popup-text');
+  const popupTime = document.getElementById('activity-popup-time');
+
+  function show() {
+    const msg = MESSAGES[idx % MESSAGES.length];
+    popupText.innerHTML   = msg.text;
+    popupTime.textContent = msg.time;
+    popup.classList.add('show');
+    popup.removeAttribute('aria-hidden');
+    idx++;
+    setTimeout(() => { popup.classList.remove('show'); popup.setAttribute('aria-hidden', 'true'); }, 5000);
+  }
+
+  document.getElementById('activity-popup-close')?.addEventListener('click', () => {
+    popup.classList.remove('show');
+    popup.setAttribute('aria-hidden', 'true');
+  });
+
+  function schedule() {
+    setTimeout(() => { show(); schedule(); }, 30000 + Math.random() * 30000);
+  }
+
+  setTimeout(() => { show(); schedule(); }, 8000 + Math.random() * 4000);
+})();
 </script>
 </body>
 </html>
