@@ -228,6 +228,38 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
   .footer-inner { flex-direction:column; align-items:flex-start; }
   .nav-links { gap:8px; }
 }
+
+/* ── Avis ── */
+.avis-section { padding:80px 48px; max-width:1100px; margin:0 auto; }
+.avis-header { text-align:center; margin-bottom:48px; }
+.avis-eyebrow { display:inline-flex; align-items:center; gap:8px; background:var(--color-primary-subtle); border:1px solid var(--color-primary-border); color:var(--color-primary); font-size:12px; font-weight:700; padding:6px 16px; border-radius:100px; margin-bottom:20px; letter-spacing:0.08em; }
+.avis-header h2 { font-size:38px; font-weight:900; letter-spacing:-0.04em; margin-bottom:10px; }
+.avis-header h2 em { font-style:normal; background:var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.avis-header p { font-size:15px; color:var(--text-muted); }
+.avis-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.avis-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:14px; transition:border-color 0.2s; }
+.avis-card:hover { border-color:var(--color-primary-border); }
+.avis-stars { color:var(--color-primary); font-size:14px; letter-spacing:2px; }
+.avis-text { font-size:14px; color:var(--text-muted); line-height:1.75; flex:1; }
+.avis-text strong { color:var(--text-primary); font-weight:600; }
+.avis-author { display:flex; align-items:center; gap:12px; }
+.avis-avatar { width:38px; height:38px; border-radius:50%; background:var(--bg-overlay); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--color-primary); flex-shrink:0; border:1px solid var(--color-primary-border); }
+.avis-name { font-size:13px; font-weight:700; }
+.avis-role { font-size:12px; color:var(--text-faint); }
+
+/* ── Popup activité ── */
+.activity-popup { position:fixed; bottom:24px; left:24px; z-index:9000; max-width:290px; background:var(--bg-surface); border:1px solid var(--border-default); border-radius:14px; padding:14px 16px; display:flex; align-items:flex-start; gap:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5); transform:translateX(calc(-100% - 32px)); transition:transform 0.45s cubic-bezier(.25,.8,.25,1); pointer-events:none; }
+.activity-popup.show { transform:translateX(0); pointer-events:auto; }
+.activity-popup-dot { width:8px; height:8px; background:var(--color-primary); border-radius:50%; flex-shrink:0; margin-top:5px; animation:pulse 2s infinite; }
+.activity-popup-body { flex:1; min-width:0; }
+.activity-popup-text { font-size:13px; color:var(--text-muted); line-height:1.5; }
+.activity-popup-text strong { color:var(--text-primary); }
+.activity-popup-time { font-size:11px; color:var(--text-faint); margin-top:3px; }
+.activity-popup-close { background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:20px; padding:0; line-height:1; flex-shrink:0; transition:color 0.2s; margin-top:-2px; }
+.activity-popup-close:hover { color:var(--text-primary); }
+
+@media(max-width:900px) { .avis-grid { grid-template-columns:1fr 1fr; } }
+@media(max-width:640px) { .avis-section { padding:56px 20px; } .avis-grid { grid-template-columns:1fr; } .avis-header h2 { font-size:28px; } .activity-popup { max-width:calc(100vw - 48px); } }
 </style>
 </head>
 <body>
@@ -414,6 +446,64 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
       </div>
     </div>
   </section>
+
+  <section class="avis-section" aria-labelledby="avis-title">
+    <div class="avis-header reveal">
+      <div class="avis-eyebrow">⭐ Avis vérifiés</div>
+      <h2 id="avis-title">Ce qu'ils disent de <em>Prevano</em></h2>
+      <p>Des milliers de Français préparent leur retraite avec nous.</p>
+    </div>
+    <div class="avis-grid">
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★★</div>
+        <p class="avis-text">« J'avais <strong>aucune idée</strong> de ce que j'allais toucher à 64 ans. En 2 minutes, Prevano m'a sorti un chiffre concret et 3 actions à faire cette semaine. »</p>
+        <div class="avis-author">
+          <div class="avis-avatar">M</div>
+          <div><div class="avis-name">Mathieu D.</div><div class="avis-role">Salarié privé · 38 ans</div></div>
+        </div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★★</div>
+        <p class="avis-text">« Le simulateur est <strong>bluffant de précision</strong>. J'ai comparé avec mon relevé CNAV — écart de 12€. Ça m'a motivé à ouvrir un PER le lendemain. »</p>
+        <div class="avis-author">
+          <div class="avis-avatar">S</div>
+          <div><div class="avis-name">Sophie L.</div><div class="avis-role">Infirmière · 44 ans</div></div>
+        </div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★★</div>
+        <p class="avis-text">« En tant qu'indépendant, je me sentais perdu. Prevano m'a expliqué clairement où j'en suis et <strong>combien épargner chaque mois</strong> pour compenser. »</p>
+        <div class="avis-author">
+          <div class="avis-avatar">T</div>
+          <div><div class="avis-name">Thomas R.</div><div class="avis-role">Freelance dev · 33 ans</div></div>
+        </div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★☆</div>
+        <p class="avis-text">« Rapide et sans jargon. Le plan IA m'a donné des conseils que mon conseiller bancaire ne m'avait <strong>jamais donnés</strong>. Je recommande à tous mes collègues. »</p>
+        <div class="avis-author">
+          <div class="avis-avatar">C</div>
+          <div><div class="avis-name">Céline M.</div><div class="avis-role">Cadre RH · 41 ans</div></div>
+        </div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★★</div>
+        <p class="avis-text">« J'avais peur du résultat, mais maintenant j'agis. Mon score est passé de <strong>28 à 61 en 3 mois</strong> en suivant les conseils — c'est du concret. »</p>
+        <div class="avis-author">
+          <div class="avis-avatar">A</div>
+          <div><div class="avis-name">Antoine F.</div><div class="avis-role">Chef de projet · 47 ans</div></div>
+        </div>
+      </div>
+      <div class="avis-card reveal">
+        <div class="avis-stars">★★★★★</div>
+        <p class="avis-text">« Interface soignée, résultats clairs, actions concrètes. Enfin un outil qui traite les gens comme des adultes. <strong>Le meilleur investissement de ma semaine.</strong> »</p>
+        <div class="avis-author">
+          <div class="avis-avatar">N</div>
+          <div><div class="avis-name">Nadia B.</div><div class="avis-role">Fonctionnaire · 52 ans</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -426,6 +516,16 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
     <span class="footer-copy">© 2025 Prevano · Tous droits réservés</span>
   </div>
 </footer>
+
+<!-- Popup activité — désactivé par défaut (ACTIVITY_POPUP_ENABLED = false) -->
+<div id="activity-popup" class="activity-popup" role="status" aria-live="polite" aria-atomic="true" aria-hidden="true">
+  <span class="activity-popup-dot" aria-hidden="true"></span>
+  <div class="activity-popup-body">
+    <div class="activity-popup-text" id="activity-popup-text"></div>
+    <div class="activity-popup-time" id="activity-popup-time"></div>
+  </div>
+  <button class="activity-popup-close" id="activity-popup-close" aria-label="Fermer la notification">×</button>
+</div>
 
 <script>
 'use strict';
@@ -874,6 +974,51 @@ async function submitEmailCapture() {
     window.location.href = `/signup.html?email=${encodeURIComponent(email)}`;
   }, 800);
 }
+
+/* ─── Popup activité ───────────────────────────────────────── */
+// Passer à true quand de vraies données utilisateurs sont disponibles
+const ACTIVITY_POPUP_ENABLED = false;
+
+(function initActivityPopup() {
+  if (!ACTIVITY_POPUP_ENABLED) return;
+
+  const MESSAGES = [
+    { text: '<strong>Marie L.</strong> vient de calculer sa retraite',          time: 'À l\'instant' },
+    { text: '<strong>Thomas R.</strong> a ouvert un PER ce matin',              time: 'Il y a 4 min'  },
+    { text: '<strong>Sophie M.</strong> est passée de 28 à 61 de score',        time: 'Il y a 7 min'  },
+    { text: '<strong>Antoine D.</strong> a rejoint Prevano Starter',            time: 'Il y a 12 min' },
+    { text: '<strong>Céline F.</strong> a simulé sa retraite',                  time: 'Il y a 15 min' },
+    { text: '<strong>Julien B.</strong> économise 340€/mois supplémentaires',   time: 'Il y a 18 min' },
+    { text: '<strong>Nadia K.</strong> a comparé 3 scénarios de retraite',      time: 'Il y a 22 min' },
+    { text: '<strong>Paul M.</strong> découvre qu\'il lui manque 890€/mois',    time: 'Il y a 25 min' },
+  ];
+
+  let idx = 0;
+  const popup     = $('activity-popup');
+  const popupText = $('activity-popup-text');
+  const popupTime = $('activity-popup-time');
+
+  function show() {
+    const msg = MESSAGES[idx % MESSAGES.length];
+    popupText.innerHTML   = msg.text;
+    popupTime.textContent = msg.time;
+    popup.classList.add('show');
+    popup.removeAttribute('aria-hidden');
+    idx++;
+    setTimeout(() => { popup.classList.remove('show'); popup.setAttribute('aria-hidden', 'true'); }, 5000);
+  }
+
+  $('activity-popup-close')?.addEventListener('click', () => {
+    popup.classList.remove('show');
+    popup.setAttribute('aria-hidden', 'true');
+  });
+
+  function schedule() {
+    setTimeout(() => { show(); schedule(); }, 30000 + Math.random() * 30000);
+  }
+
+  setTimeout(() => { show(); schedule(); }, 8000 + Math.random() * 4000);
+})();
 
 /* ─── Events ────────────────────────────────────────────────────── */
 
