@@ -976,35 +976,58 @@ async function submitEmailCapture() {
 }
 
 /* ─── Popup activité ───────────────────────────────────────── */
-// Passer à true quand de vraies données utilisateurs sont disponibles
 const ACTIVITY_POPUP_ENABLED = true;
 
 (function initActivityPopup() {
   if (!ACTIVITY_POPUP_ENABLED) return;
+  if (window.innerWidth < 380) return;
+
+  const PAGE_LOAD = Date.now();
+  const MAX_SHOWS = 4;
 
   const MESSAGES = [
-    { text: '<strong>Marie L.</strong> vient de calculer sa retraite',          time: 'À l\'instant' },
-    { text: '<strong>Thomas R.</strong> a ouvert un PER ce matin',              time: 'Il y a 4 min'  },
-    { text: '<strong>Sophie M.</strong> est passée de 28 à 61 de score',        time: 'Il y a 7 min'  },
-    { text: '<strong>Antoine D.</strong> a rejoint Prevano Starter',            time: 'Il y a 12 min' },
-    { text: '<strong>Céline F.</strong> a simulé sa retraite',                  time: 'Il y a 15 min' },
-    { text: '<strong>Julien B.</strong> économise 340€/mois supplémentaires',   time: 'Il y a 18 min' },
-    { text: '<strong>Nadia K.</strong> a comparé 3 scénarios de retraite',      time: 'Il y a 22 min' },
-    { text: '<strong>Paul M.</strong> découvre qu\'il lui manque 890€/mois',    time: 'Il y a 25 min' },
+    { text: '<strong>Marie L.</strong> vient de calculer sa retraite',          delay: 0  },
+    { text: '<strong>Thomas R.</strong> a ouvert un PER ce matin',              delay: 4  },
+    { text: '<strong>Sophie M.</strong> est passée de 28 à 61 de score',        delay: 7  },
+    { text: '<strong>Antoine D.</strong> a rejoint Prevano Starter',            delay: 12 },
+    { text: '<strong>Céline F.</strong> a simulé sa retraite',                  delay: 15 },
+    { text: '<strong>Julien B.</strong> économise 340€/mois supplémentaires',   delay: 18 },
+    { text: '<strong>Nadia K.</strong> a comparé 3 scénarios de retraite',      delay: 22 },
+    { text: '<strong>Paul M.</strong> découvre qu\'il lui manque 890€/mois',    delay: 25 },
   ];
 
-  let idx = 0;
+  function fmtTime(delay) {
+    const mins = delay + Math.floor((Date.now() - PAGE_LOAD) / 60000);
+    if (mins === 0) return 'À l\'instant';
+    if (mins === 1) return 'Il y a 1 min';
+    return 'Il y a ' + mins + ' min';
+  }
+
+  let showCount = 0;
+  let lastIdx   = -1;
+  let cursor    = 0;
+
   const popup     = $('activity-popup');
   const popupText = $('activity-popup-text');
   const popupTime = $('activity-popup-time');
 
-  function show() {
-    const msg = MESSAGES[idx % MESSAGES.length];
+  function show(override) {
+    if (showCount >= MAX_SHOWS) return;
+    let msg;
+    if (override) {
+      msg = override;
+    } else {
+      let idx = cursor % MESSAGES.length;
+      if (idx === lastIdx) idx = (idx + 1) % MESSAGES.length;
+      lastIdx = idx;
+      cursor  = idx + 1;
+      msg     = MESSAGES[idx];
+    }
     popupText.innerHTML   = msg.text;
-    popupTime.textContent = msg.time;
+    popupTime.textContent = fmtTime(msg.delay);
     popup.classList.add('show');
     popup.removeAttribute('aria-hidden');
-    idx++;
+    showCount++;
     setTimeout(() => { popup.classList.remove('show'); popup.setAttribute('aria-hidden', 'true'); }, 5000);
   }
 
@@ -1014,10 +1037,24 @@ const ACTIVITY_POPUP_ENABLED = true;
   });
 
   function schedule() {
-    setTimeout(() => { show(); schedule(); }, 30000 + Math.random() * 30000);
+    if (showCount >= MAX_SHOWS) return;
+    setTimeout(() => { show(); schedule(); }, 60000 + Math.random() * 30000);
   }
 
+  // Déclencheur initial 8-12s
   setTimeout(() => { show(); schedule(); }, 8000 + Math.random() * 4000);
+
+  // Déclencheur intelligent : 12s après que l'utilisateur voit ses résultats
+  const shockEl = $('shock-section');
+  if (shockEl) {
+    const obs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        obs.disconnect();
+        setTimeout(() => show({ text: '<strong>Sophie M.</strong> vient de découvrir sa pension estimée', delay: 0 }), 12000);
+      }
+    }, { threshold: 0.3 });
+    obs.observe(shockEl);
+  }
 })();
 
 /* ─── Events ────────────────────────────────────────────────────── */
