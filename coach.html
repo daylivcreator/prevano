@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach IA — Prevano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input,button,textarea{font-family:inherit;font-size:inherit;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+}
+html,body{height:100%;}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;display:flex;flex-direction:column;}
+/* Nav */
+nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;flex-shrink:0;}
+.nav-inner{max-width:1200px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--grad-brand);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo em{font-style:normal;}
+.nav-links{display:flex;align-items:center;gap:14px;}
+.nav-link{font-size:14px;color:var(--text-muted);text-decoration:none;transition:color .2s;}
+.nav-link:hover{color:var(--text-primary);}
+.btn-nav-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border-default);padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-nav-ghost:hover{border-color:var(--color-primary);color:var(--color-primary);}
+/* Chat shell */
+.chat-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;max-width:800px;margin:0 auto;width:100%;padding:0 24px;}
+/* Chat header */
+.chat-header{padding:20px 0 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;}
+.coach-avatar{width:44px;height:44px;background:var(--grad-brand);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:-0.02em;}
+.coach-info .coach-name{font-size:15px;font-weight:700;}
+.coach-info .coach-status{font-size:12px;color:#22C55E;display:flex;align-items:center;gap:5px;}
+.coach-status-dot{width:6px;height:6px;background:#22C55E;border-radius:50%;flex-shrink:0;}
+.chat-header-actions{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.btn-clear{background:transparent;border:1px solid var(--border-subtle);color:var(--text-faint);padding:6px 12px;border-radius:7px;font-size:12px;cursor:pointer;transition:all .2s;}
+.btn-clear:hover{border-color:var(--border-default);color:var(--text-muted);}
+.btn-refresh-plan{background:var(--color-primary-subtle);border:1px solid var(--color-primary-border);color:var(--color-primary);padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.btn-refresh-plan:hover:not(:disabled){background:var(--color-primary);color:#fff;}
+.btn-refresh-plan:disabled{opacity:.5;cursor:not-allowed;}
+/* Messages */
+.messages-wrap{flex:1;overflow-y:auto;padding:20px 0;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth;}
+.messages-wrap::-webkit-scrollbar{width:4px;}
+.messages-wrap::-webkit-scrollbar-track{background:transparent;}
+.messages-wrap::-webkit-scrollbar-thumb{background:var(--border-subtle);border-radius:2px;}
+/* Empty state */
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 0;}
+.empty-icon{width:56px;height:56px;background:var(--color-primary-subtle);border:1px solid var(--color-primary-border);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.empty-icon i{font-size:24px;color:var(--color-primary);}
+.empty-title{font-size:18px;font-weight:700;margin-bottom:8px;}
+.empty-sub{font-size:13px;color:var(--text-muted);max-width:320px;line-height:1.6;margin-bottom:24px;}
+.suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:480px;}
+.suggestion{background:var(--bg-raised);border:1px solid var(--border-default);color:var(--text-muted);padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;text-align:left;line-height:1.4;}
+.suggestion:hover{border-color:var(--color-primary-border);color:var(--text-primary);background:var(--color-primary-subtle);}
+/* Message bubbles */
+.msg{display:flex;gap:10px;align-items:flex-end;max-width:88%;}
+.msg.user{align-self:flex-end;flex-direction:row-reverse;}
+.msg.assistant{align-self:flex-start;}
+.msg-avatar{width:32px;height:32px;background:var(--grad-brand);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;margin-bottom:2px;}
+.msg-bubble{padding:12px 16px;border-radius:14px;font-size:13px;line-height:1.65;word-break:break-word;}
+.msg.user .msg-bubble{background:var(--color-primary);color:#fff;border-bottom-right-radius:4px;}
+.msg.assistant .msg-bubble{background:var(--bg-raised);border:1px solid var(--border-subtle);color:var(--text-primary);border-bottom-left-radius:4px;}
+.msg-time{font-size:10px;color:var(--text-faint);margin-top:4px;padding:0 4px;}
+.msg-wrap{display:flex;flex-direction:column;}
+.msg.user .msg-wrap{align-items:flex-end;}
+.msg.assistant .msg-wrap{align-items:flex-start;}
+/* Typing indicator */
+.typing-bubble{background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:14px;border-bottom-left-radius:4px;padding:12px 16px;display:flex;align-items:center;gap:4px;}
+.typing-dot{width:6px;height:6px;background:var(--text-faint);border-radius:50%;animation:typingBounce 1.2s ease-in-out infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+/* Input area */
+.input-area{padding:16px 0 24px;border-top:1px solid var(--border-subtle);flex-shrink:0;}
+.input-row{display:flex;gap:10px;align-items:flex-end;}
+.msg-input{flex:1;padding:12px 16px;border-radius:12px;border:1.5px solid var(--border-subtle);background:var(--bg-raised);color:var(--text-primary);outline:none;resize:none;min-height:44px;max-height:140px;font-size:13px;line-height:1.6;transition:border-color .2s,background .2s;overflow-y:auto;}
+.msg-input:focus{border-color:var(--color-primary);background:var(--bg-overlay);}
+.msg-input::placeholder{color:var(--text-faint);}
+.btn-send{width:44px;height:44px;background:var(--color-primary);color:#fff;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background .2s,transform .2s;flex-shrink:0;}
+.btn-send:hover:not(:disabled){background:var(--color-primary-dark);transform:translateY(-1px);}
+.btn-send:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.input-hint{font-size:11px;color:var(--text-faint);margin-top:8px;text-align:center;}
+/* Rate limit warning */
+.rate-warn{font-size:12px;color:#FFB400;text-align:center;margin-top:6px;display:none;}
+/* Plan guard */
+.plan-guard{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;}
+.guard-icon{width:64px;height:64px;background:var(--bg-raised);border:1px solid var(--border-default);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+.guard-title{font-size:24px;font-weight:900;letter-spacing:-0.04em;margin-bottom:8px;}
+.guard-sub{font-size:14px;color:var(--text-muted);margin-bottom:28px;max-width:420px;line-height:1.65;}
+.btn-upgrade{background:var(--color-primary);color:#fff;border:none;padding:13px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .2s;}
+.btn-upgrade:hover{background:var(--color-primary-dark);transform:translateY(-1px);}
+/* Page loading */
+#page-loading{flex:1;display:flex;align-items:center;justify-content:center;}
+.skeleton{background:linear-gradient(90deg,var(--bg-raised) 25%,var(--bg-overlay) 50%,var(--bg-raised) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media(max-width:640px){
+  nav{padding:0 16px;}
+  .chat-shell{padding:0 16px;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo-wrap">
+      <div class="logo-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+          <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+        </svg>
+      </div>
+      <span class="logo" translate="no">Pre<em>vano</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="/"            class="nav-link">Simulateur</a>
+      <a href="/profil.html" class="nav-link">Mon profil</a>
+      <button id="btn-logout" class="btn-nav-ghost">Déconnexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Loading -->
+<div id="page-loading">
+  <div class="skeleton" style="width:200px;height:18px;"></div>
+</div>
+
+<!-- Plan guard -->
+<div id="plan-guard" style="display:none" class="plan-guard">
+  <div class="guard-icon"><i class="ti ti-message-chatbot" style="color:var(--color-primary);font-size:28px"></i></div>
+  <h1 class="guard-title">Coach IA Prevano</h1>
+  <p class="guard-sub">Pose toutes tes questions à ton coach financier spécialisé retraite, investissement et fiscalité — disponible 24h/24. Disponible dès l'offre Coach Pro.</p>
+  <a href="/tarifs.html" class="btn-upgrade">
+    <i class="ti ti-bolt" aria-hidden="true"></i> Passer à Coach Pro — 19,99€/mois
+  </a>
+</div>
+
+<!-- Chat -->
+<div id="chat-shell" class="chat-shell" style="display:none">
+  <div class="chat-header">
+    <div class="coach-avatar">PC</div>
+    <div class="coach-info">
+      <div class="coach-name">Prevano Coach</div>
+      <div class="coach-status"><span class="coach-status-dot"></span>En ligne</div>
+    </div>
+    <div class="chat-header-actions">
+      <button class="btn-refresh-plan" id="btn-refresh-plan" title="Régénère ton plan retraite depuis ta dernière simulation">
+        <i class="ti ti-refresh" aria-hidden="true"></i> Mettre à jour le plan
+      </button>
+      <button class="btn-clear" id="btn-clear" title="Effacer la conversation">
+        <i class="ti ti-trash" aria-hidden="true"></i> Effacer
+      </button>
+    </div>
+  </div>
+
+  <div class="messages-wrap" id="messages-wrap" role="log" aria-live="polite" aria-label="Conversation avec Prevano Coach">
+    <!-- Empty state shown by default, replaced by messages -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon"><i class="ti ti-message-dots"></i></div>
+      <div class="empty-title">Bonjour <span id="user-firstname"></span> 👋</div>
+      <p class="empty-sub">Pose-moi toutes tes questions sur la retraite, l'investissement et l'optimisation fiscale.</p>
+      <div class="suggestions" id="suggestions">
+        <button class="suggestion" data-q="Dois-je ouvrir un PEA maintenant ?">Dois-je ouvrir un PEA maintenant ?</button>
+        <button class="suggestion" data-q="Comment optimiser mon assurance-vie ?">Comment optimiser mon assurance-vie ?</button>
+        <button class="suggestion" data-q="Est-ce le bon moment pour investir dans l'immobilier ?">Est-ce le bon moment pour investir dans l'immobilier ?</button>
+        <button class="suggestion" data-q="Quelle différence entre PEA et compte-titres ?">PEA vs compte-titres : quelle différence ?</button>
+        <button class="suggestion" data-q="Combien dois-je épargner chaque mois pour ma retraite ?">Combien épargner/mois pour ma retraite ?</button>
+        <button class="suggestion" data-q="Comment fonctionne le PER et est-ce fait pour moi ?">Le PER, c'est fait pour moi ?</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <p class="rate-warn" id="rate-warn">Limite de 20 messages/heure atteinte. Reviens plus tard.</p>
+    <div class="input-row">
+      <textarea
+        id="msg-input"
+        class="msg-input"
+        placeholder="Pose ta question à ton coach…"
+        rows="1"
+        maxlength="2000"
+        aria-label="Message au coach"
+      ></textarea>
+      <button id="btn-send" class="btn-send" aria-label="Envoyer" disabled>
+        <i class="ti ti-send-2" aria-hidden="true"></i>
+      </button>
+    </div>
+    <p class="input-hint">Coach IA · Finance personnelle France · Ne remplace pas un conseiller en gestion de patrimoine</p>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function nl2br(s) {
+  return escHtml(s).replace(/\n/g, '<br>');
+}
+
+function fmtTime(d) {
+  return d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+}
+
+const history = [];   // { role, content }
+let sending   = false;
+
+const messagesWrap = document.getElementById('messages-wrap');
+const emptyState   = document.getElementById('empty-state');
+const input        = document.getElementById('msg-input');
+const btnSend      = document.getElementById('btn-send');
+const rateWarn     = document.getElementById('rate-warn');
+
+function scrollBottom() {
+  messagesWrap.scrollTop = messagesWrap.scrollHeight;
+}
+
+function appendMessage(role, content) {
+  emptyState.style.display = 'none';
+
+  const now   = new Date();
+  const isUser = role === 'user';
+
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = `
+    ${!isUser ? '<div class="msg-avatar" aria-hidden="true">PC</div>' : ''}
+    <div class="msg-wrap">
+      <div class="msg-bubble">${nl2br(content)}</div>
+      <span class="msg-time">${fmtTime(now)}</span>
+    </div>
+  `;
+  messagesWrap.appendChild(div);
+  scrollBottom();
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.id        = 'typing-indicator';
+  div.innerHTML = `
+    <div class="msg-avatar" aria-hidden="true">PC</div>
+    <div class="typing-bubble" role="status" aria-label="Le coach rédige une réponse">
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+    </div>
+  `;
+  messagesWrap.appendChild(div);
+  scrollBottom();
+}
+
+function removeTyping() {
+  document.getElementById('typing-indicator')?.remove();
+}
+
+async function sendMessage(text) {
+  text = text.trim();
+  if (!text || sending) return;
+
+  sending = true;
+  btnSend.disabled = true;
+  input.value      = '';
+  input.style.height = '';
+  rateWarn.style.display = 'none';
+
+  appendMessage('user', text);
+  history.push({ role:'user', content:text });
+  showTyping();
+
+  try {
+    const res = await fetch('/api/coach', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify({ message: text, history: history.slice(-20) }),
+    });
+    const data = await res.json();
+    removeTyping();
+
+    if (res.status === 429) {
+      rateWarn.style.display = 'block';
+      history.pop();
+      return;
+    }
+
+    if (!res.ok) {
+      appendMessage('assistant', data.error ?? 'Une erreur est survenue. Réessaie.');
+      history.pop();
+      return;
+    }
+
+    const reply = data.reply ?? '';
+    appendMessage('assistant', reply);
+    history.push({ role:'assistant', content:reply });
+  } catch {
+    removeTyping();
+    appendMessage('assistant', 'Erreur de connexion. Vérifie ta connexion et réessaie.');
+    history.pop();
+  } finally {
+    sending = false;
+    updateSendBtn();
+  }
+}
+
+function updateSendBtn() {
+  btnSend.disabled = sending || input.value.trim().length === 0;
+}
+
+// Auto-resize textarea
+input.addEventListener('input', () => {
+  input.style.height = '';
+  input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  updateSendBtn();
+});
+
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (!btnSend.disabled) sendMessage(input.value);
+  }
+});
+
+btnSend.addEventListener('click', () => sendMessage(input.value));
+
+// Quick suggestions
+document.getElementById('suggestions').addEventListener('click', (e) => {
+  const btn = e.target.closest('.suggestion');
+  if (btn) sendMessage(btn.dataset.q);
+});
+
+// Mettre à jour le plan retraite
+function formatPlanForChat(data) {
+  const PLAN_LABELS = { starter:'Starter', pro:'Coach Pro', premium:'Daily Finance' };
+  const lines = [];
+  lines.push(`Plan retraite mis à jour — ${PLAN_LABELS[data.plan] ?? data.plan}\n`);
+
+  if (Array.isArray(data.steps) && data.steps.length) {
+    lines.push('Actions prioritaires :');
+    data.steps.forEach((s, i) => {
+      lines.push(`${i + 1}. ${s.title}\n   ${s.desc}`);
+    });
+  }
+
+  if (Array.isArray(data.scenarios) && data.scenarios.length) {
+    lines.push('\nScénarios :');
+    data.scenarios.forEach(s => {
+      lines.push(`• ${s.label} — Pension : ${s.pension_estimee}€/mois | Épargne cible : ${s.epargne_mensuelle_cible}€/mois\n  ${s.commentaire}`);
+    });
+  }
+
+  if (Array.isArray(data.enveloppes) && data.enveloppes.length) {
+    lines.push('\nEnveloppes recommandées :');
+    data.enveloppes.forEach(e => {
+      const economie = e.economie_impot_annuelle ? ` | Économie fiscale : ${e.economie_impot_annuelle}€/an` : '';
+      lines.push(`• ${e.nom} : ${e.montant_mensuel_recommande}€/mois${economie}\n  ${e.avantage}`);
+    });
+  }
+
+  if (data.resume_fiscal) {
+    lines.push(`\nOptimisation fiscale : ${data.resume_fiscal}`);
+  }
+
+  return lines.join('\n');
+}
+
+document.getElementById('btn-refresh-plan').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-refresh-plan');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Chargement…';
+
+  try {
+    const simRes = await fetch('/api/simulation', { credentials:'include' });
+    const simData = await simRes.json();
+
+    if (!simRes.ok || !simData.simulation) {
+      const noSimMsg = 'Je n\'ai pas encore de données de simulation. Rends-toi sur la page d\'accueil, lance une simulation, puis reviens ici pour mettre à jour ton plan.';
+      appendMessage('assistant', noSimMsg);
+      history.push({ role:'assistant', content: noSimMsg });
+      return;
+    }
+
+    appendMessage('assistant', 'Je régénère ton plan retraite à partir de ta dernière simulation…');
+    showTyping();
+
+    const sim = simData.simulation;
+    const planRes = await fetch('/api/plan', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify({
+        age:    sim.age,
+        sal:    sim.sal,
+        pension:sim.pension,
+        gap:    sim.gap,
+        ep:     sim.ep,
+        annees: sim.annees,
+        statut: sim.statut,
+      }),
+    });
+    const planData = await planRes.json();
+    removeTyping();
+
+    if (!planRes.ok) {
+      appendMessage('assistant', planData.error ?? 'Impossible de régénérer le plan pour le moment.');
+      return;
+    }
+
+    const msg = formatPlanForChat(planData);
+    appendMessage('assistant', msg);
+    history.push({ role:'assistant', content: msg });
+  } catch {
+    removeTyping();
+    appendMessage('assistant', 'Erreur de connexion. Réessaie dans un instant.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-refresh" aria-hidden="true"></i> Mettre à jour le plan';
+  }
+});
+
+// Clear conversation
+document.getElementById('btn-clear').addEventListener('click', () => {
+  history.length = 0;
+  messagesWrap.querySelectorAll('.msg').forEach(m => m.remove());
+  emptyState.style.display = 'flex';
+  rateWarn.style.display   = 'none';
+});
+
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+  location.replace('/');
+});
+
+async function init() {
+  try {
+    const meRes = await fetch('/api/auth/me', { credentials:'include' });
+    if (!meRes.ok) { location.replace('/login.html?next=/coach.html'); return; }
+    const { user } = await meRes.json();
+
+    document.getElementById('page-loading').style.display = 'none';
+
+    const PRO = new Set(['pro', 'premium']);
+    if (!PRO.has(user.plan)) {
+      document.getElementById('plan-guard').style.display = 'flex';
+      return;
+    }
+
+    document.getElementById('user-firstname').textContent = user.firstName ?? '';
+    document.getElementById('chat-shell').style.display = 'flex';
+    input.focus();
+  } catch {
+    location.replace('/login.html?next=/coach.html');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
