@@ -102,6 +102,13 @@ module.exports = async function handler(req, res) {
     try {
       const r = await sql`SELECT plan FROM users WHERE id = ${session.userId}`;
       userPlan = r.rows[0]?.plan ?? 'free';
+      // Persiste les paramètres de simulation (non-bloquant)
+      const simData = JSON.stringify({ age, sal, pension, gap, ep, annees, statut });
+      sql`
+        INSERT INTO user_simulations (user_id, data, updated_at)
+        VALUES (${session.userId}, ${simData}, NOW())
+        ON CONFLICT (user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()
+      `.catch(() => {});
     } catch { /* DB indisponible → on traite comme free */ }
   }
 

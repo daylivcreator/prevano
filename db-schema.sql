@@ -64,3 +64,12 @@ CREATE TABLE IF NOT EXISTS daily_progress (
   UNIQUE(user_id, lesson_date)
 );
 CREATE INDEX IF NOT EXISTS daily_progress_user_idx ON daily_progress (user_id, lesson_date DESC);
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Coach Pro : dernière simulation retraite par utilisateur
+-- ──────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS user_simulations (
+  user_id    UUID        PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  data       JSONB       NOT NULL,  -- {age, sal, pension, gap, ep, annees, statut}
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
