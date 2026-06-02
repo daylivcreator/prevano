@@ -2,7 +2,7 @@
 const { rateLimit, tooManyRequests } = require('./_lib/rate-limit');
 
 const ALLOWED_STATUTS = ['prive', 'fonctionnaire', 'independant'];
-const API_MODEL = 'claude-sonnet-4-20250514';
+const API_MODEL = 'claude-sonnet-4-6';
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée.' });
