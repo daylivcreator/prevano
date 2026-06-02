@@ -155,6 +155,26 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 
 .plan-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:14px; padding:28px; margin-bottom:28px; }
 .plan-card h3 { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:20px; }
+.plan-section-label { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.scenarios-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.scenario-card { background:var(--bg-overlay); border-radius:10px; padding:14px; }
+.scenario-card .sc-label { font-size:11px; font-weight:700; color:var(--color-primary); margin-bottom:8px; }
+.scenario-card .sc-pension { font-size:20px; font-weight:900; letter-spacing:-0.03em; margin-bottom:2px; }
+.scenario-card .sc-epargne { font-size:12px; color:var(--text-muted); margin-bottom:6px; }
+.scenario-card .sc-comment { font-size:11px; color:var(--text-faint); line-height:1.5; }
+.enveloppes-list { display:flex; flex-direction:column; gap:8px; }
+.enveloppe-item { background:var(--bg-overlay); border-radius:10px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.enveloppe-nom { font-size:13px; font-weight:700; min-width:80px; }
+.enveloppe-montant { font-size:13px; color:var(--color-primary); font-weight:700; white-space:nowrap; }
+.enveloppe-avantage { font-size:12px; color:var(--text-muted); flex:1; }
+.enveloppe-economie { font-size:11px; color:#22C55E; font-weight:600; white-space:nowrap; }
+.premium-extra-card { background:var(--bg-overlay); border-radius:10px; padding:14px 16px; }
+.premium-extra-card .pec-label { font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:6px; }
+.premium-extra-card .pec-value { font-size:13px; color:var(--text-muted); line-height:1.6; }
+.plan-upgrade-cta { background:var(--color-primary-subtle); border:1px solid var(--color-primary-border); border-radius:12px; padding:20px; text-align:center; margin-top:4px; }
+.plan-upgrade-cta p { font-size:13px; color:var(--text-muted); margin-bottom:14px; }
+.plan-upgrade-cta a { background:var(--color-primary); color:#fff; padding:10px 22px; border-radius:8px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+@media(max-width:640px){ .scenarios-grid{ grid-template-columns:1fr; } }
 .plan-loading { display:flex; align-items:center; gap:10px; color:var(--text-muted); font-size:14px; padding:12px 0; }
 .plan-loading i { color:var(--color-primary); font-size:18px; animation:spin 1s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
@@ -355,12 +375,29 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
       </div>
     </div>
 
-    <div class="plan-card reveal">
-      <h3>Ton plan d'action personnalisé</h3>
+    <div class="plan-card reveal" id="plan-card">
+      <h3 id="plan-card-title">Ton plan d'action personnalisé</h3>
       <div class="plan-loading" id="plan-loading">
         <i class="ti ti-loader-2" aria-hidden="true"></i> Génération de ton plan en cours...
       </div>
-      <div class="plan-steps" id="plan-steps" style="display:none"></div>
+      <div id="plan-body" style="display:none">
+        <div class="plan-steps" id="plan-steps"></div>
+        <!-- Scénarios (Pro + Premium) -->
+        <div id="plan-scenarios" style="display:none;margin-top:28px">
+          <p class="plan-section-label"><i class="ti ti-chart-bar" aria-hidden="true"></i> 3 Scénarios de retraite</p>
+          <div class="scenarios-grid" id="scenarios-grid"></div>
+        </div>
+        <!-- Enveloppes fiscales (Pro + Premium) -->
+        <div id="plan-enveloppes" style="display:none;margin-top:24px">
+          <p class="plan-section-label"><i class="ti ti-building-bank" aria-hidden="true"></i> Enveloppes fiscales recommandées</p>
+          <div class="enveloppes-list" id="enveloppes-list"></div>
+        </div>
+        <!-- Succession + résumé fiscal (Premium) -->
+        <div id="plan-premium-extra" style="display:none;margin-top:24px">
+          <div class="premium-extra-card" id="plan-succession"></div>
+          <div class="premium-extra-card" id="plan-fiscal" style="margin-top:12px"></div>
+        </div>
+      </div>
     </div>
 
     <div class="email-cta reveal" id="cta-account">
@@ -670,11 +707,79 @@ function simulate() {
 
 /* ─── Generate plan (via proxy sécurisé) ───────────────────────── */
 
+function renderSteps(container, steps) {
+  container.innerHTML = '';
+  steps.forEach((step, i) => {
+    const div   = document.createElement('div');  div.className = 'plan-step'; div.style.animationDelay = `${i * 0.12}s`;
+    const badge = document.createElement('div');  badge.className = 'step-num'; badge.textContent = i + 1;
+    const body  = document.createElement('div');  body.className = 'step-content';
+    const h4    = document.createElement('h4');   h4.textContent = step.title;
+    const p     = document.createElement('p');    p.textContent  = step.desc;
+    body.append(h4, p);
+    div.append(badge, body);
+    container.appendChild(div);
+  });
+}
+
+function renderScenarios(data) {
+  const wrap = $('plan-scenarios');
+  const grid = $('scenarios-grid');
+  if (!data?.scenarios?.length) return;
+  grid.innerHTML = '';
+  data.scenarios.forEach(s => {
+    const card = document.createElement('div'); card.className = 'scenario-card';
+    card.innerHTML = `
+      <div class="sc-label">${escHtml(s.label)}</div>
+      <div class="sc-pension">${fmt(s.pension_estimee)}<span style="font-size:13px;font-weight:500;color:var(--text-muted)">/mois</span></div>
+      <div class="sc-epargne">Épargne cible : ${fmt(s.epargne_mensuelle_cible)}/mois</div>
+      ${s.patrimoine_10ans ? `<div class="sc-epargne">Patrimoine 10 ans : ${fmt(s.patrimoine_10ans)}</div>` : ''}
+      ${s.patrimoine_20ans ? `<div class="sc-epargne">Patrimoine 20 ans : ${fmt(s.patrimoine_20ans)}</div>` : ''}
+      <div class="sc-comment">${escHtml(s.commentaire)}</div>`;
+    grid.appendChild(card);
+  });
+  wrap.style.display = 'block';
+}
+
+function renderEnveloppes(data) {
+  const wrap = $('plan-enveloppes');
+  const list = $('enveloppes-list');
+  if (!data?.enveloppes?.length) return;
+  list.innerHTML = '';
+  data.enveloppes.forEach(e => {
+    const item = document.createElement('div'); item.className = 'enveloppe-item';
+    item.innerHTML = `
+      <span class="enveloppe-nom">${escHtml(e.nom)}</span>
+      <span class="enveloppe-montant">${fmt(e.montant_mensuel_recommande)}/mois</span>
+      <span class="enveloppe-avantage">${escHtml(e.avantage)}</span>
+      ${e.economie_impot_annuelle ? `<span class="enveloppe-economie">-${fmt(e.economie_impot_annuelle)}/an d'impôts</span>` : ''}`;
+    list.appendChild(item);
+  });
+  wrap.style.display = 'block';
+}
+
+function renderPremiumExtra(data) {
+  const wrap = $('plan-premium-extra');
+  if (data.succession) {
+    $('plan-succession').innerHTML = `
+      <div class="pec-label"><i class="ti ti-home" aria-hidden="true"></i> Succession & transmission</div>
+      <div class="pec-value">${escHtml(data.succession.conseil)} — <strong>${escHtml(data.succession.dispositif_recommande)}</strong></div>`;
+  }
+  if (data.resume_fiscal) {
+    $('plan-fiscal').innerHTML = `
+      <div class="pec-label"><i class="ti ti-receipt-tax" aria-hidden="true"></i> Optimisation fiscale</div>
+      <div class="pec-value">${escHtml(data.resume_fiscal)}</div>`;
+  }
+  if (data.succession || data.resume_fiscal) wrap.style.display = 'block';
+}
+
 async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
-  const loading   = $('plan-loading');
-  const container = $('plan-steps');
-  loading.style.display   = 'flex';
-  container.style.display = 'none';
+  const loading = $('plan-loading');
+  const body    = $('plan-body');
+  const title   = $('plan-card-title');
+  loading.style.display = 'flex';
+  body.style.display    = 'none';
+  // Reset sections
+  ['plan-scenarios','plan-enveloppes','plan-premium-extra'].forEach(id => { $(id).style.display = 'none'; });
 
   try {
     const resp = await fetch('/api/plan', {
@@ -685,28 +790,32 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
     });
 
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
 
-    const { steps } = await resp.json();
+    renderSteps($('plan-steps'), data.steps);
 
-    if (!Array.isArray(steps) || steps.length !== 3) throw new Error('Format inattendu');
+    const PLAN_LABELS = { free:'Teaser', starter:'Starter', pro:'Pro', premium:'Premium' };
+    const planLabel   = PLAN_LABELS[data.plan] ?? '';
 
-    container.innerHTML = '';
-    steps.forEach((step, i) => {
-      const div   = document.createElement('div');  div.className = 'plan-step'; div.style.animationDelay = `${i * 0.12}s`;
-      const badge = document.createElement('div');  badge.className = 'step-num'; badge.textContent = i + 1;
-      const body  = document.createElement('div');  body.className = 'step-content';
-      const h4    = document.createElement('h4');   h4.textContent = step.title;
-      const p     = document.createElement('p');    p.textContent  = step.desc;
-      body.append(h4, p);
-      div.append(badge, body);
-      container.appendChild(div);
-    });
+    if (data.plan === 'free' || data.teaser) {
+      title.textContent = 'Aperçu de ton plan';
+      const cta = document.createElement('div');
+      cta.className = 'plan-upgrade-cta';
+      cta.innerHTML = `<p>Débloque ton plan complet personnalisé avec une offre Prevano — 3 actions prioritaires chiffrées dès le Starter.</p>
+        <a href="/tarifs.html"><i class="ti ti-bolt" aria-hidden="true"></i> Voir les offres</a>`;
+      $('plan-steps').after(cta);
+    } else {
+      title.textContent = `Ton plan ${planLabel} — ${data.steps.length} actions`;
+      renderScenarios(data);
+      renderEnveloppes(data);
+      if (data.plan === 'premium') renderPremiumExtra(data);
+    }
 
-    loading.style.display   = 'none';
-    container.style.display = 'flex';
+    loading.style.display = 'none';
+    body.style.display    = 'block';
   } catch (err) {
     console.error('[generatePlan]', err);
-    loading.innerHTML = '<span style="color:var(--text-muted);font-size:13px">Plan disponible une fois connecté à Prevano.</span>';
+    loading.innerHTML = '<span style="color:var(--text-muted);font-size:13px">Erreur lors de la génération. Réessaie dans un moment.</span>';
   }
 }
 
