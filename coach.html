@@ -9,6 +9,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 <script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -105,6 +106,15 @@ nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(
 .skeleton{background:linear-gradient(90deg,var(--bg-raised) 25%,var(--bg-overlay) 50%,var(--bg-raised) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @keyframes spin{to{transform:rotate(360deg);}}
+/* Markdown inside assistant bubbles */
+.msg.assistant .msg-bubble strong{font-weight:700;}
+.msg.assistant .msg-bubble em{font-style:italic;}
+.msg.assistant .msg-bubble ul,.msg.assistant .msg-bubble ol{padding-left:18px;margin:6px 0;}
+.msg.assistant .msg-bubble li{margin:3px 0;}
+.msg.assistant .msg-bubble p{margin:0 0 6px;}
+.msg.assistant .msg-bubble p:last-child{margin-bottom:0;}
+.msg.assistant .msg-bubble h1,.msg.assistant .msg-bubble h2,.msg.assistant .msg-bubble h3{font-weight:700;margin:8px 0 4px;}
+.msg.assistant .msg-bubble code{background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;font-size:12px;}
 @media(max-width:640px){
   nav{padding:0 16px;}
   .chat-shell{padding:0 16px;}
@@ -212,6 +222,10 @@ function nl2br(s) {
   return escHtml(s).replace(/\n/g, '<br>');
 }
 
+function renderMarkdown(s) {
+  return marked.parse(String(s ?? ''), { breaks: true, gfm: true });
+}
+
 function fmtTime(d) {
   return d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
 }
@@ -240,7 +254,7 @@ function appendMessage(role, content) {
   div.innerHTML = `
     ${!isUser ? '<div class="msg-avatar" aria-hidden="true">PC</div>' : ''}
     <div class="msg-wrap">
-      <div class="msg-bubble">${nl2br(content)}</div>
+      <div class="msg-bubble">${isUser ? nl2br(content) : renderMarkdown(content)}</div>
       <span class="msg-time">${fmtTime(now)}</span>
     </div>
   `;
