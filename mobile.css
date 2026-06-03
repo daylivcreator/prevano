@@ -1,102 +1,340 @@
-/* ── Prevano — correctifs responsive partagés ── */
+/* ═══════════════════════════════════════════════════════════════
+   Prevano — Mobile & Tablet Optimisation (v2)
+   Chargé sur toutes les pages via <link rel="stylesheet">
+   ═══════════════════════════════════════════════════════════════ */
 
-/* ── Tablet (768px) ────────────────────────────────────────────── */
+/* ── Globals ─────────────────────────────────────────────────── */
+html {
+  -webkit-text-size-adjust: 100%;   /* Empêche iOS de changer la taille du texte */
+  scroll-behavior: smooth;
+}
+body {
+  overflow-x: hidden;               /* Pas de scroll horizontal */
+}
+
+/* Safe area pour les iPhones à encoche */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .prv-bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+  body.has-bottom-nav main { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+}
+
+/* ── Inputs — prévention zoom iOS (font-size < 16px = zoom) ─── */
 @media (max-width: 768px) {
-  /* Nav */
-  nav { padding: 0 24px !important; }
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ── Touch — supprimer les transforms hover sur mobile ──────── */
+@media (hover: none) {
+  .plan-card:hover,
+  .hero-cta:hover,
+  .btn-primary:hover,
+  .btn-plan:hover,
+  .upsell-cta:hover { transform: none !important; }
+}
+
+/* ── Hamburger button (injecté par mobile-nav.js) ─────────────── */
+.prv-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 40px;
+  height: 40px;
+  padding: 10px 8px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 200;
+  flex-shrink: 0;
+}
+.prv-hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #F5F4F0;
+  border-radius: 2px;
+  transition: transform 0.25s, opacity 0.25s;
+  transform-origin: center;
+}
+.prv-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.prv-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.prv-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Drawer menu */
+.prv-drawer-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9800;
+  backdrop-filter: blur(4px);
+}
+.prv-drawer-backdrop.open { display: block; }
+.prv-drawer {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 280px;
+  height: 100%;
+  background: #141413;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  z-index: 9900;
+  transition: right 0.3s cubic-bezier(.25,.8,.25,1);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.prv-drawer.open { right: 0; }
+.prv-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.prv-drawer-close {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.06);
+  border: none; border-radius: 8px;
+  color: #A8A79F; font-size: 20px;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+}
+.prv-drawer-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  flex: 1;
+}
+.prv-drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  color: #A8A79F;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+.prv-drawer-link:hover,
+.prv-drawer-link.active {
+  background: rgba(226,75,74,0.08);
+  color: #F5F4F0;
+  border-left-color: #E24B4A;
+}
+.prv-drawer-link i { font-size: 20px; color: #E24B4A; flex-shrink: 0; }
+.prv-drawer-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 8px 20px;
+}
+.prv-drawer-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.prv-drawer-cta {
+  display: block;
+  background: #E24B4A;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+}
+
+/* ── Bottom navigation bar (logged-in pages) ─────────────────── */
+.prv-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(20,20,19,0.97);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  z-index: 8500;
+  padding: 8px 0 10px;
+  backdrop-filter: blur(12px);
+}
+.prv-bottom-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.prv-bnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: #5F5E5A;
+  min-width: 60px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: color 0.2s;
+}
+.prv-bnav-item.active  { color: #E24B4A; }
+.prv-bnav-item:hover   { color: #A8A79F; }
+.prv-bnav-item i       { font-size: 22px; }
+.prv-bnav-item span    { font-size: 10px; font-weight: 600; letter-spacing: 0.03em; }
+
+/* ── Tablet (max 768px) ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  nav { padding: 0 20px !important; }
   .nav-inner { height: 52px !important; }
 
-  /* Grilles 2 colonnes → 1 colonne */
+  /* Masquer les liens nav — le drawer prend le relais */
+  .nav-links { display: none !important; }
+
+  /* Afficher le hamburger */
+  .prv-hamburger { display: flex !important; }
+
+  /* Grilles */
   .profile-grid  { grid-template-columns: 1fr !important; }
   .tools-grid    { grid-template-columns: 1fr 1fr !important; }
   .budget-layout { grid-template-columns: 1fr !important; }
-  .fields-row    { grid-template-columns: 1fr !important; }
 
   /* Main padding */
-  main { padding-left: 24px !important; padding-right: 24px !important; }
+  main { padding-left: 20px !important; padding-right: 20px !important; }
+
+  /* Avis grid */
+  .avis-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* Plans grid */
+  .plans-grid { grid-template-columns: 1fr !important; max-width: 480px !important; margin: 0 auto !important; }
+
+  /* Bottom nav visible */
+  .prv-bottom-nav { display: block; }
+  body.has-bottom-nav main { padding-bottom: 80px; }
 }
 
-/* ── Mobile (480px) ─────────────────────────────────────────────── */
+/* ── Mobile (max 480px) ──────────────────────────────────────── */
 @media (max-width: 480px) {
-  /* Nav — compresser */
   nav { padding: 0 16px !important; }
-  .nav-links { gap: 6px !important; }
-  .nav-link  { font-size: 13px !important; }
 
-  /* Masquer les liens texte non-essentiels dans la nav sur petits écrans */
-  .nav-link:not(:last-child):not([href="/tarifs.html"]) { display: none !important; }
+  /* Hero */
+  .hero { padding: 48px 16px 40px !important; }
+  .hero h1 { font-size: 30px !important; letter-spacing: -0.03em !important; line-height: 1.1 !important; }
+  .hero-sub { font-size: 15px !important; margin-bottom: 14px !important; }
+  .hero-note { margin-bottom: 32px !important; }
+  .hero-cta { width: 100% !important; justify-content: center; padding: 15px 20px !important; }
 
-  /* Boutons nav plus petits */
-  .btn-nav, .btn-nav-ghost {
-    padding: 7px 12px !important;
-    font-size: 12px !important;
-  }
+  /* Stats */
+  .stats-row { flex-wrap: wrap !important; gap: 16px 32px !important; padding-top: 28px !important; }
 
-  /* Texte "Bonjour, Prénom" tronqué */
-  #nav-auth .nav-link {
-    max-width: 90px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: inline-block !important;
-  }
-
-  /* Main */
-  main { padding: 24px 16px 60px !important; }
-
-  /* Hero h1 sur très petits écrans */
-  .hero h1         { font-size: 30px !important; letter-spacing: -0.03em !important; }
+  /* Pricing hero */
+  .pricing-hero { padding: 40px 16px 28px !important; }
   .pricing-hero h1 { font-size: 26px !important; }
-  .page-title      { font-size: 22px !important; }
+  .pricing-hero p  { font-size: 14px !important; }
 
-  /* Stats row — vertical */
-  .stats-row {
-    flex-direction: column !important;
-    gap: 20px !important;
-    align-items: center;
-  }
+  /* Plans section */
+  .plans-section { padding: 0 16px 40px !important; }
+  .plan-card { padding: 24px 18px !important; }
+  .plan-price { font-size: 32px !important; }
 
-  /* Grilles 1 colonne */
-  .tools-grid    { grid-template-columns: 1fr !important; }
-  .profile-grid  { grid-template-columns: 1fr !important; }
-  .budget-layout { grid-template-columns: 1fr !important; }
-  .fields-row    { grid-template-columns: 1fr !important; }
-  .upsell-plans  { grid-template-columns: 1fr !important; }
+  /* Profile */
+  .page-title  { font-size: 22px !important; }
+  .page-sub    { margin-bottom: 24px !important; }
+  main { padding: 24px 16px 80px !important; }
 
-  /* Score card dashboard */
-  .score-dash { flex-direction: column; align-items: flex-start !important; }
+  /* Tools grid */
+  .tools-grid   { grid-template-columns: 1fr !important; }
+  .fields-row   { grid-template-columns: 1fr !important; }
+  .upsell-plans { grid-template-columns: 1fr !important; }
 
-  /* Buttons full width */
+  /* Avis */
+  .avis-grid  { grid-template-columns: 1fr !important; }
+  .avis-section { padding: 40px 16px !important; }
+  .avis-header h2 { font-size: 24px !important; }
+
+  /* Buttons full-width */
   .btn-row { flex-direction: column !important; }
-  .btn-primary, .btn-secondary, .btn-danger { width: 100% !important; justify-content: center; }
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger  { width: 100% !important; justify-content: center; }
 
-  /* Checkout modal plein écran */
+  /* Email CTA */
+  .email-cta   { padding: 24px 16px !important; }
+  .email-row   { flex-direction: column !important; }
+  .email-input { width: 100% !important; }
+  .btn-email   { justify-content: center; }
+
+  /* Shock section */
+  .shock { padding: 0 16px !important; }
+  .shock-grid { grid-template-columns: 1fr !important; }
+  .shock-banner h2 { font-size: 22px !important; }
+
+  /* Score card */
+  .score-dash { flex-direction: column; align-items: flex-start !important; gap: 12px !important; }
+
+  /* Upsell block */
+  .upsell-block  { padding: 20px 16px !important; }
+  .upsell-gap-num { font-size: 30px !important; }
+
+  /* FAQ */
+  .faq-section { padding: 40px 16px !important; }
+  .faq-title   { font-size: 22px !important; }
+  .faq-q       { font-size: 13px !important; padding: 16px 18px !important; }
+  .faq-a       { padding: 0 18px 16px !important; }
+
+  /* Checkout modal — bottom sheet */
   .checkout-overlay { padding: 0 !important; align-items: flex-end !important; }
-  .checkout-modal   { border-radius: 20px 20px 0 0 !important; max-height: 95vh !important; }
+  .checkout-modal   { border-radius: 20px 20px 0 0 !important; max-height: 92vh !important; }
 
-  /* Plan cards sur tarifs */
-  .plan-card { padding: 24px 20px !important; }
-  .plan-price { font-size: 34px !important; }
+  /* Chat shell */
+  .chat-shell  { padding: 0 12px !important; }
+  .input-area  { padding: 10px 0 14px !important; }
+  .suggestions { gap: 6px !important; }
+  .suggestion  { font-size: 11px !important; padding: 7px 12px !important; }
+
+  /* Compare table */
+  .compare-section { padding-left: 16px !important; padding-right: 16px !important; }
 
   /* Footer */
   footer { padding: 16px !important; }
-  .footer-inner { flex-direction: column !important; gap: 8px !important; }
+  .footer-inner { flex-direction: column !important; gap: 8px !important; align-items: flex-start !important; }
 
-  /* Coach input area */
-  .chat-shell { padding: 0 12px !important; }
-  .input-area { padding: 12px 0 16px !important; }
+  /* Activity popup */
+  .activity-popup { max-width: calc(100vw - 32px) !important; left: 16px !important; bottom: 16px !important; }
+
+  /* Back to top — décaler pour la bottom nav */
+  .btn-top { bottom: 84px !important; right: 16px !important; }
+
+  /* Feedback button — décaler pour la bottom nav */
+  .fb-btn { bottom: 80px !important; right: 16px !important; }
 }
 
-/* ── Petits téléphones (360px) ───────────────────────────────────── */
+/* ── Très petits écrans (max 360px) ─────────────────────────── */
 @media (max-width: 360px) {
-  .hero h1         { font-size: 26px !important; }
+  .hero h1         { font-size: 24px !important; }
   .pricing-hero h1 { font-size: 22px !important; }
-  .btn-nav, .btn-nav-ghost { font-size: 11px !important; padding: 6px 10px !important; }
+  .plan-price      { font-size: 28px !important; }
 }
 
-/* ── Touch — supprimer hover transform sur mobile ────────────────── */
-@media (hover: none) {
-  .plan-card:hover   { transform: none !important; }
-  .hero-cta:hover    { transform: none !important; }
-  .btn-primary:hover { transform: none !important; }
+/* ── Landscape mobile ────────────────────────────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero { padding-top: 32px !important; padding-bottom: 28px !important; }
+  .hero h1 { font-size: 26px !important; }
+  .stats-row { display: none !important; }
+  .prv-bottom-nav { display: none !important; }
+  body.has-bottom-nav main { padding-bottom: 24px !important; }
 }
