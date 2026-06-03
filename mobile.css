@@ -1,0 +1,102 @@
+/* ── Prevano — correctifs responsive partagés ── */
+
+/* ── Tablet (768px) ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Nav */
+  nav { padding: 0 24px !important; }
+  .nav-inner { height: 52px !important; }
+
+  /* Grilles 2 colonnes → 1 colonne */
+  .profile-grid  { grid-template-columns: 1fr !important; }
+  .tools-grid    { grid-template-columns: 1fr 1fr !important; }
+  .budget-layout { grid-template-columns: 1fr !important; }
+  .fields-row    { grid-template-columns: 1fr !important; }
+
+  /* Main padding */
+  main { padding-left: 24px !important; padding-right: 24px !important; }
+}
+
+/* ── Mobile (480px) ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Nav — compresser */
+  nav { padding: 0 16px !important; }
+  .nav-links { gap: 6px !important; }
+  .nav-link  { font-size: 13px !important; }
+
+  /* Masquer les liens texte non-essentiels dans la nav sur petits écrans */
+  .nav-link:not(:last-child):not([href="/tarifs.html"]) { display: none !important; }
+
+  /* Boutons nav plus petits */
+  .btn-nav, .btn-nav-ghost {
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* Texte "Bonjour, Prénom" tronqué */
+  #nav-auth .nav-link {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block !important;
+  }
+
+  /* Main */
+  main { padding: 24px 16px 60px !important; }
+
+  /* Hero h1 sur très petits écrans */
+  .hero h1         { font-size: 30px !important; letter-spacing: -0.03em !important; }
+  .pricing-hero h1 { font-size: 26px !important; }
+  .page-title      { font-size: 22px !important; }
+
+  /* Stats row — vertical */
+  .stats-row {
+    flex-direction: column !important;
+    gap: 20px !important;
+    align-items: center;
+  }
+
+  /* Grilles 1 colonne */
+  .tools-grid    { grid-template-columns: 1fr !important; }
+  .profile-grid  { grid-template-columns: 1fr !important; }
+  .budget-layout { grid-template-columns: 1fr !important; }
+  .fields-row    { grid-template-columns: 1fr !important; }
+  .upsell-plans  { grid-template-columns: 1fr !important; }
+
+  /* Score card dashboard */
+  .score-dash { flex-direction: column; align-items: flex-start !important; }
+
+  /* Buttons full width */
+  .btn-row { flex-direction: column !important; }
+  .btn-primary, .btn-secondary, .btn-danger { width: 100% !important; justify-content: center; }
+
+  /* Checkout modal plein écran */
+  .checkout-overlay { padding: 0 !important; align-items: flex-end !important; }
+  .checkout-modal   { border-radius: 20px 20px 0 0 !important; max-height: 95vh !important; }
+
+  /* Plan cards sur tarifs */
+  .plan-card { padding: 24px 20px !important; }
+  .plan-price { font-size: 34px !important; }
+
+  /* Footer */
+  footer { padding: 16px !important; }
+  .footer-inner { flex-direction: column !important; gap: 8px !important; }
+
+  /* Coach input area */
+  .chat-shell { padding: 0 12px !important; }
+  .input-area { padding: 12px 0 16px !important; }
+}
+
+/* ── Petits téléphones (360px) ───────────────────────────────────── */
+@media (max-width: 360px) {
+  .hero h1         { font-size: 26px !important; }
+  .pricing-hero h1 { font-size: 22px !important; }
+  .btn-nav, .btn-nav-ghost { font-size: 11px !important; padding: 6px 10px !important; }
+}
+
+/* ── Touch — supprimer hover transform sur mobile ────────────────── */
+@media (hover: none) {
+  .plan-card:hover   { transform: none !important; }
+  .hero-cta:hover    { transform: none !important; }
+  .btn-primary:hover { transform: none !important; }
+}

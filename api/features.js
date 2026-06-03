@@ -38,6 +38,10 @@ function rateLimitUser(userId, limit, windowMs) {
   return true;
 }
 
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function sanitizeAmounts(obj) {
   if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) return {};
   const out = {};
@@ -343,6 +347,42 @@ module.exports = async function handler(req, res) {
         `;
         return res.status(200).json({ ok: true });
       } catch (err) { console.error('[features/simulation-save]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
+    // POST type=feedback → envoie email au support via Resend
+    if (type === 'feedback') {
+      const { kind, message, email: userEmail, page } = req.body ?? {};
+      if (!kind || !message || typeof message !== 'string' || message.trim().length < 5) {
+        return res.status(400).json({ error: 'Message trop court.' });
+      }
+      const resendKey = process.env.RESEND_API_KEY;
+      const emailFrom = process.env.EMAIL_FROM ?? 'noreply@prevano.fr';
+      if (!resendKey) return res.status(503).json({ error: 'Service indisponible.' });
+
+      const kindLabel = kind === 'avis' ? '⭐ Avis utilisateur' : '🐛 Problème signalé';
+      const subject   = kind === 'avis' ? `[Prevano] Nouvel avis — ${new Date().toLocaleDateString('fr-FR')}` : `[Prevano] Problème signalé — ${new Date().toLocaleDateString('fr-FR')}`;
+
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: emailFrom,
+            to:   'prevano.app@outlook.fr',
+            reply_to: userEmail || undefined,
+            subject,
+            html: `<h2>${kindLabel}</h2>
+              <p><strong>Page :</strong> ${escapeHtml(page ?? '/')}</p>
+              ${userEmail ? `<p><strong>Email :</strong> ${escapeHtml(userEmail)}</p>` : ''}
+              <p><strong>Message :</strong></p>
+              <blockquote style="border-left:4px solid #E24B4A;padding-left:12px;color:#555">${escapeHtml(message.trim()).replace(/\n/g,'<br>')}</blockquote>`,
+          }),
+        });
+        return res.status(200).json({ ok: true });
+      } catch (err) {
+        console.error('[feedback]', err.message);
+        return res.status(500).json({ error: 'Erreur envoi.' });
+      }
     }
 
     return res.status(400).json({ error: 'Paramètre type manquant. Valeurs : budget, coach, daily, simulation.' });
