@@ -129,7 +129,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
 <script>
 'use strict';
 fetch('/api/auth/me', { credentials: 'include' })
-  .then(r => { if (r.ok) location.replace('/profil.html'); })
+  .then(r => { if (r.ok) location.replace('/profil.html?welcome=1'); })
   .catch(() => {});
 
 // Pré-remplir l'email depuis ?email=xxx (venant du CTA simulateur)
@@ -176,7 +176,7 @@ form.addEventListener('submit', async e => {
 
     if (!res.ok) { errEl.textContent = data.error ?? 'Erreur lors de la création.'; return; }
 
-    location.replace('/profil.html');
+    location.replace('/profil.html?welcome=1');
   } catch {
     errEl.textContent = 'Erreur réseau. Réessaie dans un moment.';
   } finally {

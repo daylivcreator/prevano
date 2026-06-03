@@ -194,6 +194,25 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .plan-upgrade-cta { background:var(--color-primary-subtle); border:1px solid var(--color-primary-border); border-radius:12px; padding:20px; text-align:center; margin-top:4px; }
 .plan-upgrade-cta p { font-size:13px; color:var(--text-muted); margin-bottom:14px; }
 .plan-upgrade-cta a { background:var(--color-primary); color:#fff; padding:10px 22px; border-radius:8px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+/* Teaser flou */
+.plan-steps-teaser { position:relative; }
+.plan-step-locked { filter:blur(5px); user-select:none; pointer-events:none; opacity:0.6; }
+.plan-teaser-overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:linear-gradient(to bottom, transparent 0%, var(--bg-surface) 55%); border-radius:0 0 12px 12px; padding-bottom:12px; }
+.plan-teaser-lock { font-size:28px; }
+.plan-teaser-text { font-size:13px; color:var(--text-muted); font-weight:600; }
+/* Bloc upsell fort */
+.upsell-block { margin-top:20px; background:var(--bg-raised); border:1px solid var(--border-default); border-radius:16px; padding:28px 24px; text-align:center; }
+.upsell-gap-num { font-size:40px; font-weight:900; letter-spacing:-0.04em; color:var(--color-primary); line-height:1; margin-bottom:4px; }
+.upsell-gap-label { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+.upsell-plans { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:20px 0; }
+.upsell-plan { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:12px; padding:14px 10px; text-decoration:none; color:var(--text-primary); transition:border-color .2s; }
+.upsell-plan:hover { border-color:var(--color-primary-border); }
+.upsell-plan-name { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-faint); margin-bottom:6px; }
+.upsell-plan-price { font-size:18px; font-weight:900; letter-spacing:-0.03em; margin-bottom:4px; }
+.upsell-plan-feature { font-size:11px; color:var(--text-muted); }
+.upsell-cta { display:block; background:var(--color-primary); color:#fff; padding:14px; border-radius:10px; font-size:15px; font-weight:700; text-decoration:none; margin-top:4px; transition:background-color .2s; }
+.upsell-cta:hover { background:var(--color-primary-dark); }
+@media(max-width:480px){ .upsell-plans{grid-template-columns:1fr;} .upsell-gap-num{font-size:32px;} }
 @media(max-width:640px){ .scenarios-grid{ grid-template-columns:1fr; } }
 .plan-loading { display:flex; align-items:center; gap:10px; color:var(--text-muted); font-size:14px; padding:12px 0; }
 .plan-loading i { color:var(--color-primary); font-size:18px; animation:spin 1s linear infinite; }
@@ -1024,12 +1043,64 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
     const planLabel   = PLAN_LABELS[data.plan] ?? '';
 
     if (data.plan === 'free' || data.teaser) {
-      title.textContent = 'Aperçu de ton plan';
-      const cta = document.createElement('div');
-      cta.className = 'plan-upgrade-cta';
-      cta.innerHTML = `<p>Débloque ton plan complet personnalisé avec une offre Prevano — 3 actions prioritaires chiffrées dès le Starter.</p>
-        <a href="/tarifs.html"><i class="ti ti-bolt" aria-hidden="true"></i> Voir les offres</a>`;
-      $('plan-steps').after(cta);
+      title.textContent = 'Aperçu de ton plan (1 action sur 3)';
+
+      // Teaser : première action visible, les suivantes floutées
+      const stepsEl = $('plan-steps');
+      const stepsWrap = document.createElement('div');
+      stepsWrap.className = 'plan-steps-teaser';
+      stepsEl.parentNode.replaceChild(stepsWrap, stepsEl);
+      stepsWrap.appendChild(stepsEl);
+
+      // Ajouter 2 faux steps floutés
+      const fakeSteps = [
+        { title: 'Action prioritaire #2', desc: 'Optimisation de tes enveloppes fiscales selon ton profil et tes objectifs de retraite.' },
+        { title: 'Action prioritaire #3', desc: 'Stratégie d\'épargne mensuelle chiffrée pour combler ton déficit de retraite.' },
+      ];
+      fakeSteps.forEach((s, i) => {
+        const div = document.createElement('div');
+        div.className = 'plan-step plan-step-locked';
+        div.style.animationDelay = `${(i + 1) * 0.12}s`;
+        div.innerHTML = `<div class="step-num">${i + 2}</div><div class="step-content"><h4>${s.title}</h4><p>${s.desc}</p></div>`;
+        stepsEl.appendChild(div);
+      });
+
+      // Overlay de verrouillage
+      const overlay = document.createElement('div');
+      overlay.className = 'plan-teaser-overlay';
+      overlay.innerHTML = `<span class="plan-teaser-lock">🔒</span><span class="plan-teaser-text">2 actions verrouillées — débloque le plan complet</span>`;
+      stepsWrap.appendChild(overlay);
+
+      // Bloc upsell fort avec le gap mis en avant
+      const gapVal = $('stat-gap')?.textContent ?? '';
+      const upsell = document.createElement('div');
+      upsell.className = 'upsell-block';
+      upsell.innerHTML = `
+        <div class="upsell-gap-num">${gapVal}</div>
+        <div class="upsell-gap-label">à combler chaque mois pour maintenir ton niveau de vie à la retraite</div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.65;max-width:400px;margin:0 auto 4px">
+          Le plan complet te donne <strong style="color:var(--text-primary)">3 actions concrètes et chiffrées</strong> adaptées à ton profil pour réduire ce gap dès ce mois-ci.
+        </p>
+        <div class="upsell-plans">
+          <a href="/tarifs.html" class="upsell-plan">
+            <div class="upsell-plan-name">Starter</div>
+            <div class="upsell-plan-price">9,99€<span style="font-size:12px;font-weight:500;color:var(--text-muted)">/mois</span></div>
+            <div class="upsell-plan-feature">Plan IA 3 actions</div>
+          </a>
+          <a href="/tarifs.html" class="upsell-plan" style="border-color:var(--color-primary-border)">
+            <div class="upsell-plan-name" style="color:var(--color-primary)">⚡ Coach Pro</div>
+            <div class="upsell-plan-price">19,99€<span style="font-size:12px;font-weight:500;color:var(--text-muted)">/mois</span></div>
+            <div class="upsell-plan-feature">Coach IA illimité</div>
+          </a>
+          <a href="/tarifs.html" class="upsell-plan">
+            <div class="upsell-plan-name">Daily Finance</div>
+            <div class="upsell-plan-price">34,99€<span style="font-size:12px;font-weight:500;color:var(--text-muted)">/mois</span></div>
+            <div class="upsell-plan-feature">Coaching quotidien</div>
+          </a>
+        </div>
+        <a href="/tarifs.html" class="upsell-cta"><i class="ti ti-bolt" aria-hidden="true"></i> Débloquer mon plan complet</a>`;
+      $('plan-card').appendChild(upsell);
+
     } else {
       title.textContent = `Ton plan ${planLabel} — ${data.steps.length} actions`;
       renderScenarios(data);
@@ -1248,6 +1319,35 @@ function incSimCount() {
   return n;
 }
 
+// Streak gratuit — nb de jours distincts où l'utilisateur a simulé
+(function initStreak() {
+  const STREAK_KEY = 'prv_sim_days';
+  const today = new Date().toISOString().slice(0, 10);
+  let days = [];
+  try { days = JSON.parse(localStorage.getItem(STREAK_KEY) || '[]'); } catch {}
+  if (!days.includes(today)) return; // Pas encore simulé aujourd'hui — on affiche après la simu
+  const streak = calcStreak(days, today);
+  if (streak < 2) return;
+  const heroCounter = document.querySelector('.hero-counter');
+  if (!heroCounter) return;
+  const badge = document.createElement('div');
+  badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;background:rgba(255,180,0,0.12);border:1px solid rgba(255,180,0,0.25);border-radius:100px;padding:5px 14px;font-size:12px;color:#FFB400;font-weight:600;margin-top:8px;';
+  badge.innerHTML = `🔥 ${streak} jours consécutifs`;
+  heroCounter.insertAdjacentElement('afterend', badge);
+
+  function calcStreak(days, today) {
+    const sorted = [...new Set(days)].sort().reverse();
+    let streak = 0, cur = new Date(today);
+    for (const d of sorted) {
+      const diff = (cur - new Date(d)) / 86400000;
+      if (diff > 1) break;
+      streak++;
+      cur = new Date(d);
+    }
+    return streak;
+  }
+})();
+
 // Pré-remplir le formulaire depuis la dernière simulation
 (function prefillForm() {
   const saved = loadSimFromStorage();
@@ -1320,6 +1420,14 @@ window.simulate = async function simulateWrapped() {
 
     // localStorage (toujours)
     saveSimToStorage({ age, sal, ep, dep, statut });
+
+    // Streak : enregistrer le jour
+    try {
+      const STREAK_KEY = 'prv_sim_days';
+      const today = new Date().toISOString().slice(0, 10);
+      let days = JSON.parse(localStorage.getItem(STREAK_KEY) || '[]');
+      if (!days.includes(today)) { days.push(today); days = days.slice(-60); localStorage.setItem(STREAK_KEY, JSON.stringify(days)); }
+    } catch {}
 
     // DB (si connecté) — calcul score + save
     if (isLoggedIn) {

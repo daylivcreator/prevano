@@ -93,6 +93,15 @@ main{flex:1;padding:48px 48px 80px;max-width:1100px;margin:0 auto;width:100%;}
 /* Loading skeleton */
 .skeleton{background:linear-gradient(90deg,var(--bg-raised) 25%,var(--bg-overlay) 50%,var(--bg-raised) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:14px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* Onboarding modal */
+.onboard-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+.onboard-modal{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:20px;max-width:480px;width:100%;padding:40px 36px;text-align:center;}
+.onboard-steps{display:flex;flex-direction:column;gap:14px;margin:24px 0;text-align:left;}
+.onboard-step{display:flex;align-items:flex-start;gap:14px;background:var(--bg-raised);border-radius:12px;padding:14px 16px;}
+.onboard-step-num{width:28px;height:28px;background:var(--color-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
+.onboard-step-body{flex:1;}
+.onboard-step-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.onboard-step-desc{font-size:12px;color:var(--text-muted);}
 /* Footer */
 footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
 .footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
@@ -398,10 +407,56 @@ function renderProfile(user) {
 }
 
 async function init() {
-  // Afficher le banner succès si redirection depuis Stripe
-  if (new URLSearchParams(location.search).get('success') === '1') {
+  const params = new URLSearchParams(location.search);
+
+  // Banner succès Stripe
+  if (params.get('success') === '1') {
     document.getElementById('success-banner').style.display = 'flex';
     history.replaceState({}, '', '/profil.html');
+  }
+
+  // Modal onboarding après inscription
+  if (params.get('welcome') === '1') {
+    history.replaceState({}, '', '/profil.html');
+    const overlay = document.createElement('div');
+    overlay.className = 'onboard-overlay';
+    overlay.innerHTML = `
+      <div class="onboard-modal">
+        <div style="font-size:36px;margin-bottom:12px">👋</div>
+        <h2 style="font-size:22px;font-weight:900;letter-spacing:-0.04em;margin-bottom:8px">Bienvenue sur Prevano !</h2>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.65">Voici comment tirer le maximum de ton compte en 3 étapes :</p>
+        <div class="onboard-steps">
+          <div class="onboard-step">
+            <div class="onboard-step-num">1</div>
+            <div class="onboard-step-body">
+              <div class="onboard-step-title">Simule ta retraite</div>
+              <div class="onboard-step-desc">Remplis les 5 champs du simulateur pour connaître ta pension estimée et ton score.</div>
+            </div>
+          </div>
+          <div class="onboard-step">
+            <div class="onboard-step-num">2</div>
+            <div class="onboard-step-body">
+              <div class="onboard-step-title">Découvre ton plan IA</div>
+              <div class="onboard-step-desc">Le simulateur génère 1 action gratuite personnalisée — vois ce qui est possible.</div>
+            </div>
+          </div>
+          <div class="onboard-step">
+            <div class="onboard-step-num">3</div>
+            <div class="onboard-step-body">
+              <div class="onboard-step-title">Passe à l'action</div>
+              <div class="onboard-step-desc">Débloque le plan complet avec une offre Prevano pour combler ton déficit de retraite.</div>
+            </div>
+          </div>
+        </div>
+        <a href="/" style="display:block;background:var(--color-primary);color:#fff;border-radius:10px;padding:14px;font-weight:700;font-size:15px;text-decoration:none;margin-bottom:10px;">
+          Lancer ma simulation <i class="ti ti-arrow-right"></i>
+        </a>
+        <button onclick="this.closest('.onboard-overlay').remove()" style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;">
+          Rester sur mon profil
+        </button>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   }
 
   try {
@@ -418,6 +473,17 @@ document.getElementById('btn-logout').addEventListener('click', async () => {
 });
 
 init();
+
+// Animations reveal
+const _revealObs = new IntersectionObserver(entries => {
+  entries.forEach(({ target, isIntersecting }) => {
+    if (isIntersecting) { target.style.opacity='1'; target.style.transform='none'; _revealObs.unobserve(target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.card,.tool-link,.upgrade-row').forEach(el => {
+  el.style.cssText += 'opacity:0;transform:translateY(16px);transition:opacity .4s ease,transform .4s ease;';
+  _revealObs.observe(el);
+});
 </script>
 </body>
 </html>
