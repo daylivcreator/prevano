@@ -99,6 +99,32 @@ main{flex:1;padding:40px 48px 80px;max-width:800px;margin:0 auto;width:100%;}
 .btn-complete:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 .btn-complete.done{background:rgba(34,197,94,.15);color:#22C55E;border:1px solid rgba(34,197,94,.3);}
 .complete-hint{font-size:12px;color:var(--text-faint);}
+/* Quiz multi-step */
+.quiz-progress{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.quiz-q-counter{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);white-space:nowrap;}
+.quiz-progress-track{flex:1;height:4px;background:var(--bg-overlay);border-radius:100px;overflow:hidden;}
+.quiz-progress-fill{height:100%;background:var(--grad-brand);border-radius:100px;transition:width .4s ease;}
+.quiz-score-display{font-size:14px;font-weight:700;padding:12px 16px;border-radius:8px;background:var(--bg-raised);border:1px solid var(--border-subtle);text-align:center;margin-top:12px;}
+.btn-next-q{width:100%;margin-top:10px;padding:12px;background:var(--bg-raised);border:1.5px solid var(--border-default);color:var(--text-primary);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-next-q:hover{border-color:var(--color-primary);color:var(--color-primary);}
+/* Integrated tools */
+.tool-section{margin-top:24px;background:var(--bg-raised);border:1px solid var(--color-primary-border);border-radius:12px;padding:20px;}
+.tool-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-primary);margin-bottom:14px;}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.tool-field{display:flex;flex-direction:column;gap:5px;}
+.tool-label{font-size:11px;color:var(--text-muted);font-weight:600;}
+.tool-input{padding:9px 12px;border-radius:8px;border:1.5px solid var(--border-subtle);background:var(--bg-overlay);color:var(--text-primary);font-size:13px;outline:none;transition:border-color .2s;width:100%;}
+.tool-input:focus{border-color:var(--color-primary);}
+.tool-sub-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin:10px 0 8px;}
+.btn-tool{width:100%;padding:11px;background:var(--color-primary-subtle);border:1px solid var(--color-primary-border);color:var(--color-primary);border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-tool:hover{background:var(--color-primary);color:#fff;}
+.tool-result{margin-top:12px;padding:14px 16px;border-radius:9px;background:var(--bg-overlay);border:1px solid var(--border-subtle);display:none;}
+.tool-result-label{font-size:10px;color:var(--text-faint);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.tool-result-value{font-size:24px;font-weight:900;letter-spacing:-0.03em;color:var(--color-primary);}
+.tool-result-sub{font-size:12px;color:var(--text-muted);margin-top:5px;line-height:1.5;}
+.tool-link{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:9px;background:transparent;border:1.5px solid var(--color-primary-border);color:var(--color-primary);text-decoration:none;font-size:13px;font-weight:600;transition:all .2s;}
+.tool-link:hover{background:var(--color-primary);color:#fff;}
+@media(max-width:640px){.tool-grid{grid-template-columns:1fr;}}
 /* New badge toast */
 .badge-toast{position:fixed;bottom:24px;right:24px;background:var(--bg-surface);border:1px solid var(--color-primary-border);border-radius:14px;padding:16px 20px;box-shadow:0 8px 32px rgba(0,0,0,.5);display:flex;align-items:center;gap:14px;z-index:9000;transform:translateY(120%);transition:transform .4s cubic-bezier(.25,.8,.25,1);max-width:300px;}
 .badge-toast.show{transform:translateY(0);}
@@ -260,130 +286,127 @@ const LESSONS = [
   {
     theme: 'investissement', themeLabel: 'Investissement',
     title: 'Commencer à investir avec 50€/mois',
+    toolType: 'compound',
     body: [
       "Le meilleur investissement est celui qu'on commence. Même une petite somme régulière peut transformer ton patrimoine sur le long terme.",
       "50€/mois investis en ETF World sur 30 ans à 7%/an en moyenne : tu accumules environ 60 000€ pour seulement 18 000€ versés. Les 42 000€ restants sont les intérêts composés qui travaillent pour toi.",
       "La clé ? La régularité, pas le montant. Un versement automatique mensuel, même modeste, bat un gros versement ponctuel retardé de 5 ans.",
     ],
-    quiz: {
-      question: "Quel est l'effet principal des intérêts composés sur le long terme ?",
-      options: [
-        "Doubler votre argent chaque année sans risque",
-        "Faire croître exponentiellement votre capital avec le temps",
-        "Éliminer le risque de perte en bourse",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est l'effet principal des intérêts composés sur le long terme ?", options: ["Doubler votre argent chaque année sans risque", "Faire croître exponentiellement votre capital avec le temps", "Éliminer le risque de perte en bourse"], correct: 1 },
+      { q: "50€/mois à 7%/an pendant 30 ans donnent environ :", options: ["18 000€ (uniquement vos versements)", "60 000€ grâce aux intérêts composés", "120 000€"], correct: 1 },
+      { q: "Qu'est-ce qui est plus déterminant pour réussir à investir ?", options: ["Le montant de chaque versement", "La régularité des versements dans le temps", "Le timing parfait du marché"], correct: 1 },
+      { q: "Un gros versement ponctuel retardé de 5 ans est-il meilleur qu'une épargne régulière immédiate ?", options: ["Oui, un gros capital de départ est toujours plus efficace", "Non, la régularité bat le timing sur le long terme", "Cela dépend des conditions de marché"], correct: 1 },
+      { q: "Quel est le meilleur moment pour commencer à investir ?", options: ["Quand les marchés baissent fortement", "Le plus tôt possible, même avec peu", "Quand on a constitué 10 000€ d'épargne"], correct: 1 },
+    ],
     action: "Ouvre un PEA ou une assurance-vie et programme un virement automatique mensuel — même 50€.",
   },
   {
     theme: 'investissement', themeLabel: 'Investissement',
     title: 'Le PEA : l\'arme fiscale de l\'investisseur français',
+    toolType: null,
     body: [
       "Le Plan d'Épargne en Actions (PEA) permet d'investir en actions et ETF européens avec une fiscalité imbattable : après 5 ans, tes gains ne sont soumis qu'aux prélèvements sociaux (17,2%) — pas d'impôt sur le revenu.",
       "Sur un compte-titres classique, la flat tax de 30% s'applique. Sur un PEA après 5 ans, c'est 17,2%. Sur 100 000€ de plus-values, ça représente 12 800€ d'économie.",
       "Plafond de versement : 150 000€. Conseil : ouvre ton PEA le plus tôt possible, même avec 100€, pour commencer à faire courir le délai de 5 ans.",
     ],
-    quiz: {
-      question: "Après combien d'années les gains du PEA sont-ils exonérés d'impôt sur le revenu ?",
-      options: ["3 ans", "5 ans", "8 ans"],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Après combien d'années les gains du PEA sont-ils exonérés d'impôt sur le revenu ?", options: ["3 ans", "5 ans", "8 ans"], correct: 1 },
+      { q: "Quel est le plafond de versement maximum sur un PEA ?", options: ["50 000€", "150 000€", "300 000€"], correct: 1 },
+      { q: "Que se passe-t-il si tu retires de l'argent d'un PEA avant 5 ans ?", options: ["Tu paies une pénalité de 10%", "Le PEA est clôturé et tu perds l'avantage fiscal", "Rien, tu peux retirer librement"], correct: 1 },
+      { q: "Sur 100 000€ de plus-values, l'économie du PEA vs compte-titres est de :", options: ["2 800€", "12 800€", "30 000€"], correct: 1 },
+      { q: "Dans quoi peut-on investir via un PEA ?", options: ["Uniquement les actions françaises", "Actions et ETF principalement européens", "Tous actifs mondiaux dont obligations"], correct: 1 },
+    ],
     action: "Vérifie si tu as déjà un PEA ouvert. Si non, ouvre-en un dès aujourd'hui — même avec 100€ pour démarrer le compteur.",
   },
   {
     theme: 'investissement', themeLabel: 'Investissement',
     title: 'ETF vs fonds actifs : où vont tes frais ?',
+    toolType: 'fees',
     body: [
       "Un fonds actif géré par des professionnels prélève en moyenne 1,5 à 2% de frais annuels. Un ETF (fonds indiciel coté) réplique un indice pour 0,1 à 0,3% seulement.",
       "Sur 20 ans avec 200€/mois investis, la différence de 1,5% de frais représente plus de 15 000€ perdus. Et les études montrent que 80% des fonds actifs sous-performent leur indice de référence sur le long terme.",
       "Conclusion : la majorité des investisseurs particuliers s'en sortent mieux avec un simple ETF World ou S&P500 qu'avec des fonds actifs coûteux.",
     ],
-    quiz: {
-      question: "Quelle est la principale différence entre un ETF et un fonds actif ?",
-      options: [
-        "Les ETF sont toujours plus risqués",
-        "Les ETF ont des frais de gestion beaucoup plus faibles",
-        "Les ETF garantissent un meilleur rendement",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quelle est la principale différence entre un ETF et un fonds actif ?", options: ["Les ETF sont toujours plus risqués", "Les ETF ont des frais de gestion beaucoup plus faibles", "Les ETF garantissent un meilleur rendement"], correct: 1 },
+      { q: "Quel pourcentage des fonds actifs sous-performe leur indice sur le long terme ?", options: ["20%", "50%", "80%"], correct: 2 },
+      { q: "Les frais annuels d'un ETF World sont généralement de :", options: ["0,1 à 0,3%", "1 à 1,5%", "3 à 5%"], correct: 0 },
+      { q: "Sur 20 ans, 1,5% de frais supplémentaires sur 200€/mois représentent :", options: ["Moins de 1 000€", "Environ 5 000€", "Plus de 15 000€"], correct: 2 },
+      { q: "Le TER, c'est quoi ?", options: ["Un type d'ETF spécialisé", "Le taux de frais total annuel d'un fonds", "Une stratégie d'investissement"], correct: 1 },
+    ],
     action: "Compare les frais (TER) de tes placements actuels sur leurs fiches produit. Cherche la ligne 'frais courants'.",
   },
   {
     theme: 'investissement', themeLabel: 'Investissement',
     title: 'La diversification : ne pas mettre tous ses œufs dans le même panier',
+    toolType: 'link_simulator',
     body: [
       "Un ETF MSCI World investit dans ~1 600 entreprises de 23 pays en une seule transaction. Si une entreprise fait faillite, son impact sur ton portefeuille est infime.",
       "En achetant une seule action, même d'une grande entreprise, tu prends un risque concentré. Des géants comme Enron, Kodak ou Nokia ont un jour valu des milliards avant de s'effondrer.",
       "La diversification ne supprime pas le risque, mais elle le répartit intelligemment. C'est l'une des rares stratégies qui réduit le risque sans sacrifier le rendement espéré.",
     ],
-    quiz: {
-      question: "Quel instrument offre la meilleure diversification pour un investisseur particulier ?",
-      options: [
-        "Une action d'une grande entreprise française",
-        "Un portefeuille de 10 actions françaises",
-        "Un ETF MSCI World couvrant 1 600 entreprises mondiales",
-      ],
-      correct: 2,
-    },
+    quiz: [
+      { q: "Quel instrument offre la meilleure diversification pour un investisseur particulier ?", options: ["Une action d'une grande entreprise française", "Un portefeuille de 10 actions françaises", "Un ETF MSCI World couvrant 1 600 entreprises mondiales"], correct: 2 },
+      { q: "Un ETF MSCI World couvre combien de pays ?", options: ["10 pays", "23 pays", "50 pays"], correct: 1 },
+      { q: "Pourquoi la diversification réduit-elle le risque sans pénaliser le rendement ?", options: ["Elle sélectionne les meilleures entreprises", "Elle répartit le risque sur de nombreux actifs décorrélés", "Elle garantit des rendements positifs"], correct: 1 },
+      { q: "Quel risque prend-on en concentrant ses placements uniquement en France ?", options: ["Un risque pays excessif", "Des frais de courtage plus élevés", "Des contraintes fiscales particulières"], correct: 0 },
+      { q: "Enron, Kodak et Nokia illustrent :", options: ["La force des grandes capitalisations mondiales", "Que même les plus grandes entreprises peuvent s'effondrer", "L'importance d'investir tôt dans sa carrière"], correct: 1 },
+    ],
     action: "Vérifie si tes investissements sont diversifiés géographiquement. Si tout est en France, tu prends un risque pays inutile.",
   },
   {
     theme: 'investissement', themeLabel: 'Investissement',
     title: 'L\'immobilier sans acheter : les SCPI',
+    toolType: 'compound',
     body: [
       "Les SCPI (Sociétés Civiles de Placement Immobilier) permettent d'investir dans l'immobilier professionnel (bureaux, commerces, entrepôts) à partir de 1 000€, sans gestion et sans emprunt.",
       "Rendement moyen des SCPI : entre 4 et 5,5%/an distribués trimestriellement. Tu achètes des parts, la société gère tout — locataires, travaux, comptabilité.",
       "Avantage clé : tu peux accéder aux SCPI via ton assurance-vie et bénéficier de la fiscalité avantageuse de l'enveloppe après 8 ans. Inconvénient : liquidité limitée, risque de perte en capital.",
     ],
-    quiz: {
-      question: "Quel est le principal avantage des SCPI pour un investisseur ?",
-      options: [
-        "Investir dans l'immobilier sans contraintes de gestion",
-        "Garantir un rendement fixe sans risque",
-        "Être totalement exonéré d'impôts",
-      ],
-      correct: 0,
-    },
+    quiz: [
+      { q: "Quel est le principal avantage des SCPI pour un investisseur ?", options: ["Investir dans l'immobilier sans contraintes de gestion", "Garantir un rendement fixe sans risque", "Être totalement exonéré d'impôts"], correct: 0 },
+      { q: "Quel est le rendement moyen des SCPI ?", options: ["1 à 2%/an", "4 à 5,5%/an", "8 à 10%/an"], correct: 1 },
+      { q: "À partir de quel montant peut-on investir en SCPI ?", options: ["100€", "1 000€", "10 000€"], correct: 1 },
+      { q: "Quel est l'avantage d'acheter des SCPI via une assurance-vie ?", options: ["Rendement supérieur garanti", "Fiscalité avantageuse de l'AV après 8 ans", "Absence totale de frais de gestion"], correct: 1 },
+      { q: "Quel est le principal inconvénient des SCPI ?", options: ["Un rendement trop faible", "Une liquidité limitée et un risque de perte en capital", "Une durée minimale de détention de 20 ans"], correct: 1 },
+    ],
     action: "Recherche les meilleures SCPI sur un comparateur indépendant. Regarde le taux de distribution sur valeur de marché (TDVM) des 5 dernières années.",
   },
   {
     theme: 'investissement', themeLabel: 'Investissement',
     title: 'La volatilité : ton alliée sur le long terme',
+    toolType: null,
     body: [
       "La bourse peut perdre 30 à 50% lors d'une crise — 2008, 2020, 2022. Ces chutes font peur. Pourtant, depuis 1900, les marchés actions ont toujours récupéré et progressé sur le long terme.",
       "Sur 20 ans glissants, un portefeuille en ETF World a généré du positif dans 95% des cas historiques. La volatilité courte terme ne change pas la tendance longue terme.",
       "Mieux encore : quand les marchés baissent et que tu continues tes versements programmés, tu achètes plus de parts au même prix. La baisse devient une opportunité pour les investisseurs réguliers.",
     ],
-    quiz: {
-      question: "Quelle est la meilleure réaction face à un krach boursier pour un investisseur long terme ?",
-      options: [
-        "Vendre immédiatement pour limiter les pertes",
-        "Tout mettre sur livret d'épargne en attendant",
-        "Continuer ses versements programmés, voire les augmenter",
-      ],
-      correct: 2,
-    },
+    quiz: [
+      { q: "Quelle est la meilleure réaction face à un krach boursier pour un investisseur long terme ?", options: ["Vendre immédiatement pour limiter les pertes", "Tout mettre sur livret d'épargne en attendant", "Continuer ses versements programmés, voire les augmenter"], correct: 2 },
+      { q: "Sur 20 ans glissants, un portefeuille ETF World a généré du positif dans :", options: ["50% des cas", "75% des cas", "95% des cas"], correct: 2 },
+      { q: "Pourquoi la baisse des marchés est-elle une opportunité pour les investisseurs réguliers ?", options: ["Les dividendes augmentent lors des baisses", "On achète plus de parts pour le même montant mensuel", "Les frais de gestion diminuent pendant les crises"], correct: 1 },
+      { q: "La volatilité à court terme change-t-elle la tendance de long terme ?", options: ["Oui, les krachs sont souvent permanents", "Non, les marchés ont historiquement toujours récupéré", "Cela dépend entièrement du pays"], correct: 1 },
+      { q: "Depuis 1900, les marchés actions ont :", options: ["Stagné en termes réels", "Toujours récupéré et progressé sur le long terme", "Perdu de la valeur réelle en moyenne"], correct: 1 },
+    ],
     action: "Définis ton horizon d'investissement. Si c'est pour la retraite dans 20+ ans, une baisse aujourd'hui est une opportunité, pas une raison de paniquer.",
   },
   {
     theme: 'investissement', themeLabel: 'Investissement',
     title: 'Le DCA : investir sans stresser le marché',
+    toolType: 'link_budget',
     body: [
       "Le Dollar-Cost Averaging (DCA), ou investissement programmé, consiste à investir la même somme chaque mois quelle que soit la situation du marché. Résultat : tu achètes naturellement plus de parts quand les prix sont bas.",
       "Exemple : 200€/mois sur 12 mois. En janvier le cours est à 100€ (tu achètes 2 parts), en mars il chute à 50€ (tu en achètes 4). Tu accumules plus de parts aux meilleurs prix sans avoir à 'timer' le marché.",
       "95% des investisseurs professionnels ne battent pas le marché sur le long terme. Pour un particulier, le DCA avec des ETF indiciels est probablement la stratégie la plus efficace et la moins stressante.",
     ],
-    quiz: {
-      question: "Quel est le principal avantage de la méthode DCA ?",
-      options: [
-        "Acheter toujours au prix le plus bas",
-        "Réduire l'impact du mauvais timing de marché",
-        "Garantir un rendement minimum",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est le principal avantage de la méthode DCA ?", options: ["Acheter toujours au prix le plus bas", "Réduire l'impact du mauvais timing de marché", "Garantir un rendement minimum"], correct: 1 },
+      { q: "DCA signifie :", options: ["Diversified Capital Allocation", "Dollar-Cost Averaging (investissement programmé)", "Direct Capital Access"], correct: 1 },
+      { q: "Quand les prix baissent avec le DCA :", options: ["On perd de l'argent immédiatement", "On achète automatiquement plus de parts avec le même montant", "On doit augmenter ses versements manuellement"], correct: 1 },
+      { q: "Quel % des investisseurs professionnels bat le marché sur le long terme ?", options: ["5%", "25%", "50%"], correct: 0 },
+      { q: "Quand programmer son virement mensuel pour maximiser l'effet DCA ?", options: ["En début de mois, avant toute dépense", "Juste après réception du salaire", "À la fin du mois avec ce qui reste"], correct: 1 },
+    ],
     action: "Programme un virement automatique vers ton PEA ou assurance-vie le jour après chaque virement de salaire.",
   },
 
@@ -391,122 +414,127 @@ const LESSONS = [
   {
     theme: 'epargne', themeLabel: 'Épargne',
     title: 'Livret A vs inflation : la vérité qui dérange',
+    toolType: null,
     body: [
       "Avec un Livret A à 2,4% et une inflation à 3-4%, ton épargne perd du pouvoir d'achat chaque année. 10 000€ laissés 10 ans sur Livret A ne valent plus que ~8 500€ en termes réels.",
       "Le Livret A reste indispensable pour une chose : l'épargne d'urgence. Son atout majeur est la disponibilité immédiate et la garantie de capital. Mais ce n'est pas un outil de construction de patrimoine.",
       "Pour tout ce qui dépasse 3-6 mois de dépenses courantes, d'autres enveloppes (PEA, assurance-vie, PER) offrent de meilleures perspectives de rendement réel à long terme.",
     ],
-    quiz: {
-      question: "Pour quel usage le Livret A est-il le mieux adapté ?",
-      options: [
-        "Construire un patrimoine significatif sur 20 ans",
-        "Constituer une épargne d'urgence accessible immédiatement",
-        "Préparer sa retraite en toute sécurité",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Pour quel usage le Livret A est-il le mieux adapté ?", options: ["Construire un patrimoine significatif sur 20 ans", "Constituer une épargne d'urgence accessible immédiatement", "Préparer sa retraite en toute sécurité"], correct: 1 },
+      { q: "Livret A à 2,4%, inflation à 3,5% : ton épargne :", options: ["Croît en termes réels", "Reste stable en pouvoir d'achat", "Perd du pouvoir d'achat chaque année"], correct: 2 },
+      { q: "10 000€ sur Livret A pendant 10 ans avec inflation à 3% valent réellement :", options: ["Plus de 10 000€ en pouvoir d'achat", "Environ 10 000€ (stable)", "Environ 7 400€ en pouvoir d'achat réel"], correct: 2 },
+      { q: "Quel est le principal atout du Livret A face aux autres placements ?", options: ["Son rendement supérieur à l'inflation", "Sa disponibilité immédiate et son capital garanti", "Ses avantages fiscaux spéciaux"], correct: 1 },
+      { q: "Au-delà de 3-6 mois de dépenses, l'excédent du Livret A devrait aller vers :", options: ["Rester sur le Livret A pour la sécurité", "Des enveloppes plus performantes (PEA, AV, PER)", "Des obligations d'État uniquement"], correct: 1 },
+    ],
     action: "Calcule combien tu as sur ton Livret A. Si c'est plus de 3-6 mois de dépenses, l'excédent mérite une enveloppe plus performante.",
   },
   {
     theme: 'epargne', themeLabel: 'Épargne',
     title: 'Le PER : épargne retraite et économie fiscale maintenant',
+    toolType: 'per',
     body: [
       "Le Plan d'Épargne Retraite (PER) est une enveloppe bloquée jusqu'à la retraite, mais avec un avantage immédiat : les versements sont déductibles de ton revenu imposable.",
       "Exemple concret : 3 000€ versés sur un PER avec une tranche marginale à 30% = 900€ d'impôt économisé dès cette année. C'est un rendement garanti de 30% sur ta mise, avant même que l'argent soit investi.",
       "À la retraite, sortie en capital (en une fois ou progressivement) ou en rente viagère. Le capital est alors imposable — mais en retraite, ta tranche d'imposition sera souvent plus faible qu'en activité.",
     ],
-    quiz: {
-      question: "Quel est l'avantage fiscal immédiat du PER ?",
-      options: [
-        "Une garantie de capital à 100%",
-        "Une déduction fiscale sur les versements cette année",
-        "Un rendement annuel garanti de 5%",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est l'avantage fiscal immédiat du PER ?", options: ["Une garantie de capital à 100%", "Une déduction fiscale sur les versements cette année", "Un rendement annuel garanti de 5%"], correct: 1 },
+      { q: "3 000€ versés sur un PER avec une TMI à 30%, tu économises :", options: ["300€ d'impôt", "900€ d'impôt", "3 000€ d'impôt"], correct: 1 },
+      { q: "Quand peut-on récupérer l'argent d'un PER ?", options: ["À tout moment sans pénalité", "À la retraite (ou cas exceptionnels : achat résidence, invalidité…)", "Après 8 ans minimum"], correct: 1 },
+      { q: "Quel est le plafond annuel de déduction PER pour un salarié ?", options: ["1 000€ fixe", "10% des revenus professionnels nets (avec plafond)", "Pas de plafond"], correct: 1 },
+      { q: "Pourquoi le PER est-il plus avantageux pour les hauts revenus ?", options: ["Les frais de gestion sont plus faibles", "L'économie est proportionnelle à la tranche marginale d'imposition", "L'argent est disponible plus tôt"], correct: 1 },
+    ],
     action: "Consulte ta dernière déclaration de revenus pour trouver ta tranche marginale d'imposition et estimer ton économie potentielle avec un PER.",
   },
   {
     theme: 'epargne', themeLabel: 'Épargne',
     title: 'L\'assurance-vie : l\'enveloppe polyvalente',
+    toolType: 'link_simulator',
     body: [
       "L'assurance-vie n'est pas une assurance décès — c'est une enveloppe d'investissement permettant d'accéder à des fonds euros (capital garanti, ~2-3%/an) et des unités de compte (ETF, SCPI, actions).",
       "Après 8 ans : abattement annuel de 4 600€ sur les gains pour une personne seule, 9 200€ pour un couple. Au-delà, taux réduit de 24,7% (contre 30% avant 8 ans).",
       "Avantage succession souvent méconnu : jusqu'à 152 500€ transmis hors droits de succession par bénéficiaire désigné. Idéal pour organiser sa transmission sans testament.",
     ],
-    quiz: {
-      question: "Quel est l'abattement annuel sur les gains d'une assurance-vie après 8 ans pour une personne seule ?",
-      options: ["1 500€", "4 600€", "9 200€"],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est l'abattement annuel sur les gains d'une AV après 8 ans pour une personne seule ?", options: ["1 500€", "4 600€", "9 200€"], correct: 1 },
+      { q: "L'assurance-vie est principalement :", options: ["Une assurance décès", "Une enveloppe d'investissement fiscalement avantageuse", "Un livret d'épargne garanti"], correct: 1 },
+      { q: "Quel est l'avantage successoral de l'assurance-vie ?", options: ["Jusqu'à 152 500€ par bénéficiaire hors droits de succession", "Transmission sans aucune limite", "Pas de transmission possible"], correct: 0 },
+      { q: "Qu'est-ce qu'un fonds en euros dans une AV ?", options: ["Un investissement en ETF européens", "Un fonds à capital garanti (~2-3%/an)", "Un fonds 100% actions"], correct: 1 },
+      { q: "Après 8 ans, le taux sur les gains au-delà de l'abattement est de :", options: ["30% (flat tax)", "24,7%", "0%"], correct: 1 },
+    ],
     action: "Vérifie la date d'ouverture de ton contrat d'assurance-vie. Si elle approche des 8 ans, planifie tes retraits après cet anniversaire.",
   },
   {
     theme: 'epargne', themeLabel: 'Épargne',
     title: 'L\'épargne d\'urgence : ton filet de sécurité',
+    toolType: 'emergency',
     body: [
       "Sans épargne d'urgence, la moindre dépense imprévue (panne de voiture, frais médicaux, chômage) te force à puiser dans tes investissements au pire moment ou à contracter un crédit coûteux.",
       "La règle : 3 mois de dépenses courantes si tu as un emploi stable, 6 mois si tu es en CDD, indépendant ou que ton secteur est instable. Soit entre 6 000€ et 15 000€ selon ta situation.",
       "Placement idéal : Livret A ou LDDS — taux acceptable, capital garanti, disponible sous 48h. Ce n'est pas un investissement, c'est une assurance contre les aléas de la vie.",
     ],
-    quiz: {
-      question: "Combien de mois de dépenses doit couvrir une épargne d'urgence idéale ?",
-      options: ["1 mois", "3 à 6 mois", "12 mois minimum"],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Combien de mois de dépenses doit couvrir une épargne d'urgence idéale ?", options: ["1 mois", "3 à 6 mois", "12 mois minimum"], correct: 1 },
+      { q: "Pour un indépendant ou en CDD, quelle épargne d'urgence est recommandée ?", options: ["1 mois de dépenses", "3 mois de dépenses", "6 mois de dépenses"], correct: 2 },
+      { q: "Quel placement est le plus adapté pour l'épargne d'urgence ?", options: ["Un ETF World pour le rendement", "Le Livret A ou LDDS (dispo 48h, capital garanti)", "L'assurance-vie pour la fiscalité"], correct: 1 },
+      { q: "Pourquoi ne pas investir l'épargne d'urgence en bourse ?", options: ["Les rendements sont trop faibles", "Les marchés peuvent baisser exactement quand on a besoin de l'argent", "Les frais de courtage sont trop élevés"], correct: 1 },
+      { q: "Un salarié dépensant 2 000€/mois devrait avoir en épargne d'urgence :", options: ["2 000€ minimum", "6 000 à 12 000€", "20 000€ pour être tranquille"], correct: 1 },
+    ],
     action: "Calcule tes dépenses mensuelles incontournables. Fixe-toi un objectif d'épargne d'urgence et vérifie où tu en es.",
   },
   {
     theme: 'epargne', themeLabel: 'Épargne',
     title: 'La règle des 50/30/20 pour ton budget',
+    toolType: 'budget',
     body: [
       "50% de tes revenus nets pour les besoins (loyer, courses, transport, santé), 30% pour les envies (restaurants, loisirs, shopping), 20% pour l'épargne et le remboursement de dettes.",
       "Un salarié à 2 500€ nets devrait épargner 500€/mois. Si c'est impossible, c'est que les dépenses fixes (loyer trop élevé ?) ou les envies empiètent sur l'épargne.",
       "Cette règle n'est pas rigide — elle sert de boussole. Si tu épargnes 30%, parfait. Si tu ne peux faire que 10%, identifie le poste à réduire en priorité.",
     ],
-    quiz: {
-      question: "Dans la règle 50/30/20, quel pourcentage est dédié à l'épargne ?",
-      options: ["10%", "30%", "20%"],
-      correct: 2,
-    },
+    quiz: [
+      { q: "Dans la règle 50/30/20, quel pourcentage est dédié à l'épargne ?", options: ["10%", "30%", "20%"], correct: 2 },
+      { q: "Pour un salarié à 3 000€ nets, combien devrait aller à l'épargne selon cette règle ?", options: ["300€/mois", "600€/mois", "900€/mois"], correct: 1 },
+      { q: "Les 50% de la règle correspondent à :", options: ["Les envies et loisirs", "Les besoins essentiels (loyer, courses, transport)", "L'épargne et remboursements de dettes"], correct: 1 },
+      { q: "Si tu épargnes moins de 20%, quelle est la première chose à examiner ?", options: ["Si ton salaire est suffisant", "Quel poste de dépenses est trop élevé", "Si tu dois changer d'emploi"], correct: 1 },
+      { q: "Les 30% d'envies incluent :", options: ["Le loyer et les charges", "Restaurants, loisirs, shopping", "Remboursements de crédit immobilier"], correct: 1 },
+    ],
     action: "Calcule tes ratios actuels. Quel pourcentage de tes revenus va à l'épargne ce mois-ci ?",
   },
   {
     theme: 'epargne', themeLabel: 'Épargne',
     title: 'Les intérêts composés : le huitième miracle',
+    toolType: 'compound',
     body: [
       "200€/mois investis à 7%/an pendant 30 ans = 226 000€. Les 10 premières années génèrent 36 000€. Les 10 dernières en génèrent 113 000€. L'accélération est exponentielle.",
       "Le secret : les intérêts générés produisent eux-mêmes des intérêts. Chaque euro gagné travaille à son tour. Plus le temps passe, plus cet effet boule de neige s'emballe.",
       "Commencer 10 ans plus tard avec le même effort mensuel divise presque par 2,5 le capital final. Chaque année de retard représente une perte irréversible de puissance de capitalisation.",
     ],
-    quiz: {
-      question: "Que se passe-t-il avec les intérêts composés sur le long terme ?",
-      options: [
-        "Ils restent constants chaque année",
-        "Ils diminuent progressivement avec le temps",
-        "Ils s'accélèrent de façon exponentielle avec le temps",
-      ],
-      correct: 2,
-    },
-    action: "Utilise un simulateur d'intérêts composés en ligne pour visualiser la différence entre commencer aujourd'hui vs dans 5 ans.",
+    quiz: [
+      { q: "Que se passe-t-il avec les intérêts composés sur le long terme ?", options: ["Ils restent constants chaque année", "Ils diminuent progressivement avec le temps", "Ils s'accélèrent de façon exponentielle avec le temps"], correct: 2 },
+      { q: "200€/mois à 7%/an pendant 30 ans donnent :", options: ["72 000€ (versements seuls)", "226 000€", "1 000 000€"], correct: 1 },
+      { q: "Dans l'exemple 200€/mois × 30 ans à 7%, la part des versements dans le capital final est d'environ :", options: ["65%", "32%", "10%"], correct: 1 },
+      { q: "Commencer 10 ans plus tard avec le même effort mensuel :", options: ["Réduit le capital de 20%", "Divise presque par 2,5 le capital final", "N'a quasiment pas d'impact"], correct: 1 },
+      { q: "Le 'huitième miracle du monde' selon Einstein désigne :", options: ["L'investissement immobilier locatif", "Les intérêts composés", "La diversification géographique"], correct: 1 },
+    ],
+    action: "Utilise le simulateur ci-dessus pour visualiser la différence entre commencer aujourd'hui vs dans 5 ans.",
   },
   {
     theme: 'epargne', themeLabel: 'Épargne',
     title: 'Retraite : commencer à 30 ans vs 40 ans',
+    toolType: 'link_simulator',
     body: [
       "À 30 ans, 200€/mois sur 35 ans à 6%/an = 284 000€. À 40 ans, 200€/mois sur 25 ans = 138 000€. La différence de départ de 10 ans engendre 146 000€ de moins — pour le même effort mensuel.",
       "Pire : pour atteindre le même objectif en commençant 10 ans plus tard, il faut presque doubler son épargne mensuelle. 10 ans de retard = effort doublé pour le même résultat.",
       "La bonne nouvelle : il n'est jamais trop tard pour commencer. Même à 50 ans, chaque euro épargné compte. Mais les bénéfices marginaux de commencer maintenant plutôt que demain sont réels.",
     ],
-    quiz: {
-      question: "Quel est le meilleur moment pour commencer à épargner pour la retraite ?",
-      options: [
-        "Quand les taux d'intérêt sont au plus haut",
-        "Le plus tôt possible, même avec de petites sommes",
-        "À 50 ans, quand les revenus sont au maximum",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est le meilleur moment pour commencer à épargner pour la retraite ?", options: ["Quand les taux d'intérêt sont au plus haut", "Le plus tôt possible, même avec de petites sommes", "À 50 ans, quand les revenus sont au maximum"], correct: 1 },
+      { q: "200€/mois à 30 vs 40 ans (6%/an), la différence de capital est de :", options: ["Environ 30 000€", "Environ 75 000€", "Environ 146 000€"], correct: 2 },
+      { q: "Pour atteindre le même capital en commençant 10 ans plus tard, il faut :", options: ["Épargner 10% de plus par mois", "Presque doubler son épargne mensuelle", "Prendre beaucoup plus de risques"], correct: 1 },
+      { q: "Est-il trop tard pour commencer à épargner à 50 ans ?", options: ["Oui, les intérêts composés n'ont plus le temps d'agir", "Non, chaque euro compte même à 50 ans", "Cela dépend uniquement du niveau de vie souhaité"], correct: 1 },
+      { q: "L'enjeu principal de commencer tôt est :", options: ["D'obtenir un meilleur taux de rémunération", "De maximiser le temps pendant lequel les intérêts composés travaillent", "De bénéficier de meilleures conditions fiscales"], correct: 1 },
+    ],
     action: "Ouvre un PER dès aujourd'hui avec au minimum 50€/mois. L'important n'est pas le montant, c'est de démarrer le compteur.",
   },
 
@@ -514,114 +542,127 @@ const LESSONS = [
   {
     theme: 'fiscalite', themeLabel: 'Fiscalité',
     title: 'Flat tax ou barème IR : lequel choisir ?',
+    toolType: null,
     body: [
       "La flat tax (Prélèvement Forfaitaire Unique, PFU) de 30% s'applique automatiquement à tous les revenus du capital : dividendes, intérêts, plus-values. Elle comprend 17,2% de prélèvements sociaux + 12,8% d'IR.",
       "Elle est avantageuse si ta tranche marginale d'imposition (TMI) est de 30% ou plus. En dessous — TMI à 11% — le barème progressif peut être plus favorable.",
       "Pour opter pour le barème, il faut le cocher explicitement dans ta déclaration. Le calcul s'applique à l'ensemble de tes revenus du capital de l'année, pas au choix par produit.",
     ],
-    quiz: {
-      question: "À quel taux total est fixée la flat tax (PFU) en France ?",
-      options: ["17,2%", "30%", "45%"],
-      correct: 1,
-    },
+    quiz: [
+      { q: "À quel taux total est fixée la flat tax (PFU) en France ?", options: ["17,2%", "30%", "45%"], correct: 1 },
+      { q: "Pour qui le barème progressif est-il plus avantageux que la flat tax ?", options: ["Pour les personnes à la TMI de 30% ou plus", "Pour les personnes à la TMI de 11%", "Le barème est toujours moins favorable"], correct: 1 },
+      { q: "La flat tax de 30% comprend :", options: ["17,2% prélèvements sociaux + 12,8% IR", "12% PS + 18% IR", "30% d'impôt sur le revenu uniquement"], correct: 0 },
+      { q: "Comment opter pour le barème progressif plutôt que la flat tax ?", options: ["Automatiquement selon tes revenus", "En le cochant sur ta déclaration de revenus", "En faisant une demande à ta banque"], correct: 1 },
+      { q: "La flat tax s'applique à :", options: ["Uniquement les plus-values boursières", "Uniquement les dividendes", "Dividendes, intérêts et plus-values du capital"], correct: 2 },
+    ],
     action: "Vérifie ta tranche marginale d'imposition sur ta dernière déclaration de revenus (avis d'imposition, ligne 'taux effectif').",
   },
   {
     theme: 'fiscalite', themeLabel: 'Fiscalité',
     title: 'Réduire ses impôts légalement avec le PER',
+    toolType: 'per',
     body: [
       "Le PER est l'outil de défiscalisation le plus puissant pour les salariés. Les versements sont déductibles de ton revenu imposable dans la limite d'un plafond annuel.",
       "Plafond de déduction : 10% des revenus professionnels nets de l'année précédente, dans la limite de 10% de 8 PASS (soit ~35 000€ en 2025). Les plafonds non utilisés des 3 dernières années sont reportables.",
       "Exemple : TMI 30%, versement PER de 5 000€ = 1 500€ d'impôt économisé. C'est un rendement garanti de 30% sur ta mise, avant investissement. Impossible à battre à court terme.",
     ],
-    quiz: {
-      question: "Comment calcule-t-on le plafond de déduction du PER pour un salarié ?",
-      options: [
-        "1 000€ fixe par an",
-        "10% des revenus professionnels nets (avec plafond)",
-        "Il n'y a pas de plafond de déduction",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Comment calcule-t-on le plafond de déduction du PER pour un salarié ?", options: ["1 000€ fixe par an", "10% des revenus professionnels nets (avec plafond)", "Il n'y a pas de plafond de déduction"], correct: 1 },
+      { q: "Les plafonds PER non utilisés les années précédentes :", options: ["Sont perdus définitivement", "Sont reportables sur les 3 dernières années", "Sont reportables 1 an seulement"], correct: 1 },
+      { q: "5 000€ versés sur un PER avec une TMI à 41% génèrent une économie fiscale de :", options: ["500€", "1 500€", "2 050€"], correct: 2 },
+      { q: "Où trouver son plafond d'épargne retraite disponible ?", options: ["Sur le site impots.gouv.fr uniquement", "En bas de son avis d'imposition", "Sur son relevé bancaire annuel"], correct: 1 },
+      { q: "Le PER est particulièrement avantageux quand :", options: ["Tu prévois une TMI plus basse à la retraite qu'en activité", "Tu auras les mêmes revenus à la retraite", "Tu as moins de 30 ans"], correct: 0 },
+    ],
     action: "Consulte ton avis d'imposition N-1 pour trouver ton plafond d'épargne retraite disponible. Il figure en bas de page.",
   },
   {
     theme: 'fiscalite', themeLabel: 'Fiscalité',
     title: 'La fiscalité de l\'assurance-vie expliquée',
+    toolType: null,
     body: [
       "Avant 8 ans : 30% flat tax sur les gains retirés (ou barème sur option). Après 8 ans : abattement annuel de 4 600€ pour une personne seule (9 200€ en couple), puis 24,7% seulement.",
       "Les contrats ouverts avant 1998 bénéficient d'une exonération totale sur les versements d'avant 1998. Les versements de 1998 à 2017 ont leur propre régime intermédiaire (7,5% après 8 ans).",
       "En cas de décès, le capital transmis aux bénéficiaires désignés bénéficie d'un abattement de 152 500€ par bénéficiaire — entièrement hors succession civile.",
     ],
-    quiz: {
-      question: "Quel est le taux d'imposition sur les gains d'une assurance-vie après 8 ans et au-delà de l'abattement ?",
-      options: ["30% flat tax", "24,7% (7,5% IR + 17,2% PS)", "17,2% uniquement"],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est le taux sur les gains d'une AV après 8 ans et au-delà de l'abattement ?", options: ["30% flat tax", "24,7% (7,5% IR + 17,2% PS)", "17,2% uniquement"], correct: 1 },
+      { q: "L'abattement annuel pour un couple sur une AV de plus de 8 ans est de :", options: ["4 600€", "9 200€", "15 000€"], correct: 1 },
+      { q: "Avant 8 ans, quelle fiscalité s'applique sur les gains retirés ?", options: ["0% (exonération totale)", "24,7%", "30% (flat tax par défaut)"], correct: 2 },
+      { q: "En cas de décès, l'abattement par bénéficiaire désigné d'une AV est de :", options: ["50 000€", "152 500€", "Il n'y a pas d'abattement"], correct: 1 },
+      { q: "Pourquoi vaut-il mieux attendre les 8 ans avant de retirer de son AV ?", options: ["Pour obtenir un meilleur rendement", "Pour bénéficier de l'abattement et du taux réduit à 24,7%", "Pour éviter la clôture du contrat"], correct: 1 },
+    ],
     action: "Calcule tes gains sur ton contrat d'assurance-vie. Si tu approches des 8 ans, planifie tes rachats pour profiter de l'abattement.",
   },
   {
     theme: 'fiscalite', themeLabel: 'Fiscalité',
     title: 'Plus-values immobilières : quand paie-t-on ?',
+    toolType: null,
     body: [
       "La résidence principale est totalement exonérée de plus-value. Pour un bien locatif ou une résidence secondaire, des abattements progressifs s'appliquent selon la durée de détention.",
       "Exonération d'IR à partir de 22 ans de détention. Exonération totale (IR + prélèvements sociaux) à partir de 30 ans. Avant 6 ans : pas d'abattement.",
       "La plus-value imposable = prix de vente - prix d'achat - travaux (prouvés) - frais d'acquisition (forfait 7,5% ou frais réels). Ne pas confondre avec les revenus fonciers annuels.",
     ],
-    quiz: {
-      question: "Après combien d'années de détention une plus-value immobilière locative est-elle totalement exonérée ?",
-      options: ["15 ans", "22 ans", "30 ans"],
-      correct: 2,
-    },
+    quiz: [
+      { q: "Après combien d'années de détention une plus-value locative est-elle totalement exonérée ?", options: ["15 ans", "22 ans", "30 ans"], correct: 2 },
+      { q: "La résidence principale est-elle soumise à la taxe sur les plus-values ?", options: ["Oui, au taux normal", "Non, elle est totalement exonérée", "Seulement au-delà de 300 000€"], correct: 1 },
+      { q: "À partir de combien d'années la plus-value locative est-elle exonérée d'IR uniquement ?", options: ["8 ans", "15 ans", "22 ans"], correct: 2 },
+      { q: "La plus-value imposable se calcule :", options: ["Prix de vente uniquement", "Prix de vente − achat − travaux − frais d'acquisition", "Prix de vente × 30%"], correct: 1 },
+      { q: "Le forfait pour frais d'acquisition dans le calcul de plus-value est de :", options: ["3%", "7,5%", "10%"], correct: 1 },
+    ],
     action: "Calcule depuis combien d'années tu détiens tes biens immobiliers. Cela impacte directement la fiscalité d'une éventuelle revente.",
   },
   {
     theme: 'fiscalite', themeLabel: 'Fiscalité',
     title: 'Le PEA : zéro impôt sur le revenu après 5 ans',
+    toolType: null,
     body: [
       "Dans un PEA, dividendes et plus-values s'accumulent sans imposition pendant la durée de vie du contrat. Tant que tu n'effectues pas de retrait, aucun impôt n'est dû.",
       "Après 5 ans, les retraits ne sont soumis qu'aux prélèvements sociaux de 17,2% — pas d'IR. Sur 100 000€ de plus-values, l'économie vs un compte-titres est de 12 800€.",
       "Piège à éviter : retirer de l'argent avant 5 ans clôture le plan. Une seule erreur annule l'avantage fiscal et t'oblige à tout recommencer. Traite le PEA comme un compte intouchable pendant 5 ans.",
     ],
-    quiz: {
-      question: "Quel est le risque d'effectuer un retrait sur un PEA avant 5 ans ?",
-      options: [
-        "Une pénalité de 10% sur le montant retiré",
-        "La clôture du plan et la perte de l'avantage fiscal",
-        "Aucun risque, c'est autorisé",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est le risque d'effectuer un retrait sur un PEA avant 5 ans ?", options: ["Une pénalité de 10% sur le montant retiré", "La clôture du plan et la perte de l'avantage fiscal", "Aucun risque, c'est autorisé"], correct: 1 },
+      { q: "Dans un PEA, dividendes et plus-values sont imposés :", options: ["Chaque année automatiquement", "Seulement lors d'un retrait après 5 ans (17,2%)", "Au même taux qu'un compte-titres"], correct: 1 },
+      { q: "Après 5 ans, quel impôt s'applique aux retraits PEA ?", options: ["0% total", "17,2% de prélèvements sociaux uniquement", "30% flat tax"], correct: 1 },
+      { q: "Pourquoi ouvrir un PEA même avec 1€ aujourd'hui ?", options: ["Pour bloquer du capital à un bon taux", "Pour démarrer le compteur des 5 ans le plus tôt possible", "Pour bénéficier d'une déduction fiscale immédiate"], correct: 1 },
+      { q: "Un PEA peut être ouvert par :", options: ["Les personnes morales (entreprises)", "Toute personne physique domiciliée fiscalement en France", "Uniquement les personnes de plus de 18 ans avec revenus"], correct: 1 },
+    ],
     action: "Vérifie la date d'ouverture de ton PEA. Si tu n'en as pas, ouvre-en un aujourd'hui même avec 1€ pour démarrer le compteur des 5 ans.",
   },
   {
     theme: 'fiscalite', themeLabel: 'Fiscalité',
     title: 'Le plafond global des niches fiscales',
+    toolType: null,
     body: [
       "Toutes les réductions d'impôt (hors exceptions) sont soumises à un plafond global de 10 000€/an. Au-delà, l'excédent ne s'impute pas. Cela concerne : investissement Pinel, FCPI/FIP, emploi à domicile, etc.",
       "Certains dispositifs bénéficient d'un plafond majoré (18 000€) comme le Girardin industriel ou Sofica. Et certains (PER, dons, Malraux) sont hors plafond.",
       "Conséquence pratique : si tu as déjà 8 000€ de réductions d'impôt, l'ajout d'un nouveau dispositif dans le plafond global ne te rapportera que 2 000€ max.",
     ],
-    quiz: {
-      question: "Quel est le plafond général des niches fiscales applicables à l'impôt sur le revenu ?",
-      options: ["5 000€", "10 000€", "20 000€"],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est le plafond général des niches fiscales applicables à l'impôt sur le revenu ?", options: ["5 000€", "10 000€", "20 000€"], correct: 1 },
+      { q: "Le PER est-il soumis au plafond des niches fiscales ?", options: ["Oui, dans les 10 000€", "Non, il est hors plafond global", "Cela dépend du montant versé"], correct: 1 },
+      { q: "Le plafond majoré pour certains dispositifs (Girardin, Sofica) est de :", options: ["10 000€", "15 000€", "18 000€"], correct: 2 },
+      { q: "Si tu as déjà 8 000€ de réductions d'impôt, un nouveau dispositif dans le plafond ne peut rapporter que :", options: ["0€", "2 000€ maximum", "10 000€"], correct: 1 },
+      { q: "Les dons aux associations sont-ils soumis au plafond global des niches fiscales ?", options: ["Oui, dans les 10 000€", "Non, ils sont hors plafond", "Seulement les dons supérieurs à 1 000€"], correct: 1 },
+    ],
     action: "Liste tes réductions d'impôt actuelles pour estimer si tu as encore de la marge sous le plafond des niches fiscales.",
   },
   {
     theme: 'fiscalite', themeLabel: 'Fiscalité',
     title: 'Donation et succession : anticiper pour transmettre',
+    toolType: null,
     body: [
       "Chaque parent peut donner 100 000€ par enfant tous les 15 ans sans droits de donation. Une donation faite aujourd'hui purge la succession future à hauteur du montant donné.",
       "L'assurance-vie reste la reine de la transmission : jusqu'à 152 500€ par bénéficiaire désigné transmis hors droits et hors succession civile. Pour les versements après 70 ans, les règles sont différentes.",
       "Le démembrement de propriété (donner la nue-propriété, conserver l'usufruit) permet de transmettre avec une valeur fiscale réduite — de 30 à 50% selon l'âge — tout en conservant les revenus du bien.",
     ],
-    quiz: {
-      question: "Quel est le montant de l'abattement de donation parent-enfant renouvelable tous les 15 ans ?",
-      options: ["50 000€", "100 000€", "150 000€"],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est l'abattement de donation parent-enfant renouvelable tous les 15 ans ?", options: ["50 000€", "100 000€", "150 000€"], correct: 1 },
+      { q: "L'abattement successoral par bénéficiaire désigné d'une AV est de :", options: ["50 000€", "152 500€", "Pas de limite"], correct: 1 },
+      { q: "Le démembrement permet de transmettre avec une valeur fiscale réduite de :", options: ["10 à 20%", "30 à 50% selon l'âge", "70 à 80%"], correct: 1 },
+      { q: "Les versements sur une AV après 70 ans :", options: ["Bénéficient du même régime successoral", "Ont des règles fiscales différentes et moins avantageuses", "Sont interdits par la loi"], correct: 1 },
+      { q: "Une donation faite aujourd'hui :", options: ["N'impacte pas la succession future", "Purge la succession future à hauteur du montant donné", "Augmente les droits de succession"], correct: 1 },
+    ],
     action: "Vérifie si tu as effectué une donation dans les 15 dernières années. Si non, tu disposes de l'abattement complet.",
   },
 
@@ -629,131 +670,128 @@ const LESSONS = [
   {
     theme: 'patrimoine', themeLabel: 'Patrimoine',
     title: 'Construire son patrimoine par décennie',
+    toolType: null,
     body: [
       "À 30 ans : priorité à la résidence principale (si le marché le permet), premiers placements réguliers, constitution de l'épargne de précaution. L'objectif est de poser les bases.",
       "À 40 ans : accélération des versements sur PEA et PER, diversification immobilière (locatif), éventuellement SCPI. Le patrimoine commence à prendre de l'ampleur.",
       "À 50-60 ans : sécurisation progressive (réduire la part actions au profit d'obligations), optimisation fiscale, préparation de la succession. L'objectif passe de l'accumulation à la préservation.",
     ],
-    quiz: {
-      question: "Quelle est la priorité patrimoniale principale à 30 ans ?",
-      options: [
-        "Maximiser les placements spéculatifs",
-        "Établir les bases : résidence et premiers placements diversifiés",
-        "Tout sécuriser en fonds euros",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quelle est la priorité patrimoniale principale à 30 ans ?", options: ["Maximiser les placements spéculatifs", "Établir les bases : résidence et premiers placements diversifiés", "Tout sécuriser en fonds euros"], correct: 1 },
+      { q: "À 50-60 ans, que doit-on faire progressivement ?", options: ["Augmenter la part actions pour maximiser les gains", "Réduire la part actions au profit d'obligations et sécuriser", "Tout mettre en immobilier locatif"], correct: 1 },
+      { q: "À 40 ans, quelle enveloppe accélérer en priorité ?", options: ["Livret A et LDDS uniquement", "PEA et PER", "Fonds monétaires uniquement"], correct: 1 },
+      { q: "Le passage de l'accumulation à la préservation du patrimoine se fait typiquement :", options: ["À 30 ans", "À 50-60 ans", "Uniquement à la retraite"], correct: 1 },
+      { q: "À 30 ans avec peu d'épargne, quelle est la stratégie la plus efficace ?", options: ["Attendre d'avoir 20 000€ avant d'investir", "Commencer avec de petits versements réguliers immédiatement", "Tout miser sur une seule grande opportunité"], correct: 1 },
+    ],
     action: "Identifie ta phase patrimoniale actuelle et liste les 2-3 objectifs prioritaires pour les 5 prochaines années.",
   },
   {
     theme: 'patrimoine', themeLabel: 'Patrimoine',
     title: 'Immobilier locatif : micro-foncier ou régime réel ?',
+    toolType: null,
     body: [
       "Micro-foncier (loyers bruts < 15 000€/an) : abattement automatique de 30%, sans justificatifs. Simple, mais tu ne peux déduire aucune charge réelle au-delà du forfait.",
       "Régime réel : déduction de toutes les charges (intérêts d'emprunt, travaux, assurances, frais de gestion) + possibilité de créer un déficit foncier imputable sur le revenu global jusqu'à 10 700€/an.",
       "Le régime réel devient rentable dès que tes charges dépassent 30% des loyers, ou si tu as des travaux importants. Une simple simulation chiffrée permet de trancher.",
     ],
-    quiz: {
-      question: "Quel est le seuil de revenus fonciers bruts pour accéder au régime micro-foncier ?",
-      options: ["5 000€/an", "15 000€/an", "30 000€/an"],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est le seuil de revenus fonciers bruts pour le régime micro-foncier ?", options: ["5 000€/an", "15 000€/an", "30 000€/an"], correct: 1 },
+      { q: "Quel est l'abattement automatique du micro-foncier ?", options: ["20%", "30%", "50%"], correct: 1 },
+      { q: "Avantage principal du régime réel vs micro-foncier ?", options: ["Déclaration plus simple", "Déduction de toutes les charges réelles + déficit foncier", "Pas de comptabilité nécessaire"], correct: 1 },
+      { q: "Le déficit foncier est imputable sur le revenu global jusqu'à :", options: ["5 000€/an", "10 700€/an", "15 000€/an"], correct: 1 },
+      { q: "Le régime réel devient rentable quand :", options: ["Toujours, car plus avantageux", "Les charges dépassent 30% des loyers", "On possède plus de 3 biens"], correct: 1 },
+    ],
     action: "Calcule le ratio charges/loyers bruts de ton bien locatif. Si c'est plus de 30%, le régime réel t'est probablement favorable.",
   },
   {
     theme: 'patrimoine', themeLabel: 'Patrimoine',
     title: 'Le démembrement de propriété : une stratégie puissante',
+    toolType: null,
     body: [
       "Décomposer la propriété en nue-propriété (droit de revendre) et usufruit (droit d'habiter ou de percevoir les loyers). Donner la nue-propriété à ses enfants tout en conservant l'usufruit permet de transmettre à moindre coût fiscal.",
       "La valeur de la nue-propriété est réduite selon un barème fiscal basé sur l'âge de l'usufruitier : à 60 ans, la nue-propriété vaut 50% de la pleine propriété. C'est 50% d'assiette taxable en moins.",
       "À terme, quand l'usufruit s'éteint (décès), les enfants récupèrent la pleine propriété sans droits supplémentaires. L'économie peut atteindre plusieurs dizaines de milliers d'euros.",
     ],
-    quiz: {
-      question: "Quel est l'avantage fiscal du démembrement de propriété pour la transmission ?",
-      options: [
-        "Exonération totale de droits de succession",
-        "Réduction de la base taxable grâce à la valeur réduite de la nue-propriété",
-        "Permettre la vente immédiate du bien sans impôt",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Quel est l'avantage fiscal du démembrement pour la transmission ?", options: ["Exonération totale de droits de succession", "Réduction de la base taxable grâce à la valeur réduite de la nue-propriété", "Permettre la vente immédiate sans impôt"], correct: 1 },
+      { q: "À 60 ans, la nue-propriété vaut fiscalement :", options: ["30% de la pleine propriété", "50% de la pleine propriété", "70% de la pleine propriété"], correct: 1 },
+      { q: "Qui conserve les revenus (loyers) lors d'un démembrement ?", options: ["Le nu-propriétaire", "L'usufruitier", "Les deux à parts égales"], correct: 1 },
+      { q: "Quand l'usufruit s'éteint (décès), les enfants récupèrent la pleine propriété :", options: ["En payant des droits de succession normaux", "Sans droits supplémentaires", "Seulement s'ils versent une compensation"], correct: 1 },
+      { q: "Le démembrement permet de transmettre à moindre coût car :", options: ["La nue-propriété est sous-évaluée par rapport au marché", "La loi fixe une valeur fiscale réduite selon l'âge de l'usufruitier", "C'est une donation déguisée tolérée"], correct: 1 },
+    ],
     action: "Si tu as des biens immobiliers et des enfants, consulte un notaire pour évaluer l'opportunité du démembrement selon ton âge.",
   },
   {
     theme: 'patrimoine', themeLabel: 'Patrimoine',
     title: 'La SCI : outil de transmission ou piège ?',
+    toolType: null,
     body: [
       "La Société Civile Immobilière (SCI) est utile pour : détenir l'immobilier à plusieurs sans indivision, faciliter la donation progressive de parts, et parfois choisir l'IS pour amortir les biens.",
       "Ses limites : frais de constitution (1 500-3 000€), comptabilité annuelle, et à l'IS, une fiscalité sur les plus-values calculée après amortissement (souvent lourde à la revente).",
       "Verdict : la SCI n'a de sens que si tu détiens plusieurs biens, souhaites les transmettre progressivement, ou si tu gères l'immobilier à plusieurs. Pour un bien unique en famille, souvent trop complexe.",
     ],
-    quiz: {
-      question: "Dans quel cas la SCI est-elle particulièrement pertinente ?",
-      options: [
-        "Pour un seul appartement locatif en nom propre",
-        "Pour détenir plusieurs biens et faciliter leur transmission familiale",
-        "Pour éviter de payer l'impôt sur les revenus fonciers",
-      ],
-      correct: 1,
-    },
+    quiz: [
+      { q: "Dans quel cas la SCI est-elle particulièrement pertinente ?", options: ["Un seul appartement en nom propre", "Plusieurs biens et transmission familiale progressive", "Pour éviter l'impôt sur les revenus fonciers"], correct: 1 },
+      { q: "Coût approximatif de création d'une SCI :", options: ["Gratuit", "1 500 à 3 000€", "Plus de 10 000€"], correct: 1 },
+      { q: "Inconvénient de la SCI à l'IS lors de la revente :", options: ["Impossibilité de vendre", "Fiscalité lourde (plus-value calculée après amortissements)", "Obligation de vendre à un proche"], correct: 1 },
+      { q: "La SCI nécessite :", options: ["Aucune formalité annuelle", "Une comptabilité annuelle", "Un expert-comptable à temps plein"], correct: 1 },
+      { q: "Pour un seul bien immobilier en famille, la SCI est souvent :", options: ["Toujours recommandée", "Trop complexe pour peu d'avantages réels", "Obligatoire au-delà de 300 000€"], correct: 1 },
+    ],
     action: "Liste ton patrimoine immobilier et tes objectifs de transmission. Si tu as plusieurs biens et des héritiers, demande un avis à un notaire sur la SCI.",
   },
   {
     theme: 'patrimoine', themeLabel: 'Patrimoine',
     title: 'Prévoyance : le parent pauvre du patrimoine',
+    toolType: null,
     body: [
       "1 actif sur 3 n'a pas de couverture prévoyance suffisante. En cas d'invalidité totale ou partielle, les indemnités journalières de la Sécurité sociale couvrent souvent moins de 50% du salaire net.",
       "Pour les TNS (indépendants, chefs d'entreprise), la protection est encore moindre. Un contrat prévoyance individuelle (Madelin pour les TNS) peut maintenir 70-80% du salaire pour 30-60€/mois.",
       "Ne pas confondre avec l'assurance décès : la prévoyance couvre l'invalidité et l'incapacité de travail pendant que tu es vivant. C'est souvent plus important financièrement que la protection décès.",
     ],
-    quiz: {
-      question: "Pour qui la prévoyance individuelle est-elle particulièrement indispensable ?",
-      options: [
-        "Les fonctionnaires déjà couverts par l'État",
-        "Les salariés avec accord collectif de prévoyance complet",
-        "Les travailleurs non-salariés et les salariés sans bonne couverture collective",
-      ],
-      correct: 2,
-    },
+    quiz: [
+      { q: "Pour qui la prévoyance individuelle est-elle particulièrement indispensable ?", options: ["Les fonctionnaires déjà couverts par l'État", "Les salariés avec accord collectif de prévoyance complet", "Les TNS et salariés sans bonne couverture collective"], correct: 2 },
+      { q: "En cas d'invalidité, la Sécu couvre souvent :", options: ["80-90% du salaire net", "50-60% du salaire net", "Moins de 50% du salaire net"], correct: 2 },
+      { q: "Coût approximatif d'un contrat prévoyance individuel pour un TNS :", options: ["5-10€/mois", "30-60€/mois", "200-300€/mois"], correct: 1 },
+      { q: "Quelle est la différence entre assurance décès et prévoyance ?", options: ["C'est exactement la même chose", "La prévoyance couvre l'invalidité et l'incapacité pendant la vie", "L'assurance décès est obligatoire pour tous"], correct: 1 },
+      { q: "Le contrat Madelin est destiné à :", options: ["Tous les salariés en CDI", "Les travailleurs non-salariés (TNS)", "Les fonctionnaires sans couverture complémentaire"], correct: 1 },
+    ],
     action: "Vérifie ton taux d'indemnisation en cas d'invalidité dans ta convention collective ou ton contrat prévoyance actuel.",
   },
   {
     theme: 'patrimoine', themeLabel: 'Patrimoine',
     title: 'L\'effet de levier immobilier : s\'enrichir avec l\'argent des autres',
+    toolType: 'fees',
     body: [
       "C'est le seul actif où tu peux emprunter 80-90% du prix d'achat à taux fixe. Si tu apportes 20 000€ pour acheter 200 000€, et que le bien génère 4%/an de rendement locatif net, ton rendement sur fonds propres dépasse 15-20%/an.",
       "En plus, si le bien prend 2% de valeur par an sur 200 000€ = 4 000€ de plus-value/an. Rapporté à tes 20 000€ d'apport, c'est encore 20% de rendement sur ta mise — sans compter les loyers.",
       "L'effet de levier amplifie aussi les pertes : si le bien perd de la valeur ET que les loyers ne couvrent pas le crédit, la situation peut devenir difficile. D'où l'importance d'une sélection rigoureuse.",
     ],
-    quiz: {
-      question: "Quel est le principal avantage de l'effet de levier dans l'immobilier ?",
-      options: [
-        "Éviter de payer des intérêts bancaires",
-        "Maximiser le rendement sur son capital propre grâce au crédit",
-        "Garantir un rendement positif quoi qu'il arrive",
-      ],
-      correct: 1,
-    },
-    action: "Calcule le rendement brut d'un projet locatif hypothétique : loyer annuel / prix d'achat. Un ratio supérieur à 5% est un point de départ acceptable.",
+    quiz: [
+      { q: "Quel est le principal avantage de l'effet de levier dans l'immobilier ?", options: ["Éviter de payer des intérêts bancaires", "Maximiser le rendement sur son capital propre grâce au crédit", "Garantir un rendement positif quoi qu'il arrive"], correct: 1 },
+      { q: "20 000€ d'apport sur un bien à 200 000€ à 4% de rendement net — le rendement sur fonds propres est :", options: ["4% (rendement brut)", "15-20% grâce à l'effet de levier", "100%"], correct: 1 },
+      { q: "L'effet de levier amplifie :", options: ["Uniquement les gains", "Les gains ET les pertes", "Uniquement les pertes"], correct: 1 },
+      { q: "Le rendement brut locatif se calcule :", options: ["Loyer mensuel × 12", "Loyer annuel ÷ prix d'achat × 100", "Loyer annuel × (1 − impôt)"], correct: 1 },
+      { q: "Ce qui détermine si un projet locatif est réellement rentable :", options: ["La taille et l'emplacement du bien uniquement", "Le rendement net après charges, fiscalité et vacance locative", "Le montant de l'apport initial"], correct: 1 },
+    ],
+    action: "Calcule le rendement brut d'un projet locatif : loyer annuel / prix d'achat × 100. Un ratio supérieur à 5% est un bon point de départ.",
   },
   {
     theme: 'patrimoine', themeLabel: 'Patrimoine',
     title: 'Faire son bilan patrimonial : où en suis-je ?',
+    toolType: 'networth',
     body: [
       "Le bilan patrimonial, c'est un état des lieux : actif (ce que tu possèdes) moins passif (ce que tu dois) = patrimoine net. Immobilier, placements, épargne, véhicule, objets de valeur côté actif ; crédits, dettes, impôts à payer côté passif.",
       "L'exercice permet de repérer les déséquilibres : trop de cash non investi, concentration excessive sur un seul actif (l'immobilier souvent), oubli de certains passifs, sous-assurance.",
       "Idéalement, le faire une fois par an. Les wealth managers le font pour leurs clients à 1 000€/heure. Tu peux le faire toi-même en 2 heures avec un tableau. L'important est de commencer.",
     ],
-    quiz: {
-      question: "Comment calcule-t-on le patrimoine net ?",
-      options: [
-        "Revenus annuels × 10",
-        "Total actifs − Total passifs (dettes et crédits)",
-        "Valeur immobilière uniquement",
-      ],
-      correct: 1,
-    },
-    action: "Ouvre un tableau et liste tous tes actifs avec leur valeur estimée, puis toutes tes dettes. Calcule ton patrimoine net aujourd'hui.",
+    quiz: [
+      { q: "Comment calcule-t-on le patrimoine net ?", options: ["Revenus annuels × 10", "Total actifs − Total passifs (dettes et crédits)", "Valeur immobilière uniquement"], correct: 1 },
+      { q: "Quel est l'objectif principal du bilan patrimonial ?", options: ["Calculer ses impôts", "Repérer les déséquilibres et angles morts de son patrimoine", "Valoriser ses biens pour la vente"], correct: 1 },
+      { q: "Quelle est la fréquence recommandée pour faire son bilan patrimonial ?", options: ["Tous les 5 ans", "Une fois par an", "Uniquement avant une grosse décision"], correct: 1 },
+      { q: "Quelle erreur repère souvent un bilan patrimonial ?", options: ["Trop de diversification géographique", "Concentration excessive sur un seul actif (souvent l'immobilier)", "Trop de contrats d'assurance"], correct: 1 },
+      { q: "Les placements financiers (PEA, AV, PER) figurent dans un bilan :", options: ["Dans les passifs", "Dans les actifs", "Ils n'apparaissent pas dans le bilan"], correct: 1 },
+    ],
+    action: "Utilise le calculateur ci-dessus pour faire ton premier bilan patrimonial en 2 minutes.",
   },
 ];
 
@@ -815,121 +853,182 @@ function escHtml(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+let quizCurrent  = 0;
+let quizScore    = 0;
 let quizAnswered = false;
-let quizCorrect  = false;
+
+function fmt(n) {
+  return Math.round(n).toLocaleString('fr-FR') + ' €';
+}
+
+function renderToolHtml(lesson) {
+  const t = lesson.toolType;
+  if (!t) return '';
+  const titles = { compound:'Simulateur d\'intérêts composés', per:'Calculateur d\'économie fiscale PER', fees:'Comparateur de frais de gestion', networth:'Calculateur de patrimoine net', budget:'Calculateur 50/30/20', emergency:'Calculateur d\'épargne d\'urgence' };
+  const title = titles[t] || '';
+  if (t === 'compound') return `<div class="tool-section" id="lesson-tool"><div class="tool-title">${escHtml(title)}</div><div class="tool-grid"><div class="tool-field"><label class="tool-label">Versement mensuel (€)</label><input type="number" class="tool-input" id="t-a" value="200" min="0" max="10000"></div><div class="tool-field"><label class="tool-label">Taux annuel moyen (%)</label><input type="number" class="tool-input" id="t-b" value="7" min="0" max="30" step="0.5"></div><div class="tool-field"><label class="tool-label">Durée (années)</label><input type="number" class="tool-input" id="t-c" value="25" min="1" max="50"></div></div><button class="btn-tool" id="btn-tool">Calculer →</button><div class="tool-result" id="tool-result"><div class="tool-result-label">Capital total estimé</div><div class="tool-result-value" id="t-r1"></div><div class="tool-result-sub" id="t-r2"></div></div></div>`;
+  if (t === 'per') return `<div class="tool-section" id="lesson-tool"><div class="tool-title">${escHtml(title)}</div><div class="tool-grid"><div class="tool-field"><label class="tool-label">Versement annuel PER (€)</label><input type="number" class="tool-input" id="t-a" value="3000" min="0" max="35000"></div><div class="tool-field"><label class="tool-label">Tranche marginale d'imposition (%)</label><input type="number" class="tool-input" id="t-b" value="30" min="0" max="45" step="1"></div></div><button class="btn-tool" id="btn-tool">Calculer →</button><div class="tool-result" id="tool-result"><div class="tool-result-label">Économie fiscale cette année</div><div class="tool-result-value" id="t-r1"></div><div class="tool-result-sub" id="t-r2"></div></div></div>`;
+  if (t === 'fees') return `<div class="tool-section" id="lesson-tool"><div class="tool-title">${escHtml(title)}</div><div class="tool-grid"><div class="tool-field"><label class="tool-label">Versement mensuel (€)</label><input type="number" class="tool-input" id="t-a" value="300" min="0" max="10000"></div><div class="tool-field"><label class="tool-label">Durée (années)</label><input type="number" class="tool-input" id="t-c" value="20" min="1" max="50"></div><div class="tool-field"><label class="tool-label">Frais ETF (%/an)</label><input type="number" class="tool-input" id="t-d" value="0.2" min="0" max="5" step="0.1"></div><div class="tool-field"><label class="tool-label">Frais fonds actif (%/an)</label><input type="number" class="tool-input" id="t-e" value="1.7" min="0" max="5" step="0.1"></div></div><button class="btn-tool" id="btn-tool">Comparer →</button><div class="tool-result" id="tool-result"><div class="tool-result-label">Économie en choisissant l'ETF</div><div class="tool-result-value" id="t-r1"></div><div class="tool-result-sub" id="t-r2"></div></div></div>`;
+  if (t === 'networth') return `<div class="tool-section" id="lesson-tool"><div class="tool-title">${escHtml(title)}</div><div class="tool-sub-label">Actifs</div><div class="tool-grid"><div class="tool-field"><label class="tool-label">Immobilier (€)</label><input type="number" class="tool-input" id="t-a1" value="0" min="0"></div><div class="tool-field"><label class="tool-label">Épargne (livrets, €)</label><input type="number" class="tool-input" id="t-a2" value="0" min="0"></div><div class="tool-field"><label class="tool-label">Placements (PEA, AV, €)</label><input type="number" class="tool-input" id="t-a3" value="0" min="0"></div><div class="tool-field"><label class="tool-label">Autres actifs (€)</label><input type="number" class="tool-input" id="t-a4" value="0" min="0"></div></div><div class="tool-sub-label">Passifs</div><div class="tool-grid"><div class="tool-field"><label class="tool-label">Crédits restants (€)</label><input type="number" class="tool-input" id="t-p1" value="0" min="0"></div><div class="tool-field"><label class="tool-label">Autres dettes (€)</label><input type="number" class="tool-input" id="t-p2" value="0" min="0"></div></div><button class="btn-tool" id="btn-tool">Calculer →</button><div class="tool-result" id="tool-result"><div class="tool-result-label">Patrimoine net</div><div class="tool-result-value" id="t-r1"></div><div class="tool-result-sub" id="t-r2"></div></div></div>`;
+  if (t === 'budget') return `<div class="tool-section" id="lesson-tool"><div class="tool-title">${escHtml(title)}</div><div class="tool-grid"><div class="tool-field"><label class="tool-label">Revenus nets mensuels (€)</label><input type="number" class="tool-input" id="t-a" value="2500" min="0" max="50000"></div></div><button class="btn-tool" id="btn-tool">Répartir →</button><div class="tool-result" id="tool-result"><div class="tool-result-label">Épargne recommandée (20%)</div><div class="tool-result-value" id="t-r1"></div><div class="tool-result-sub" id="t-r2"></div></div></div>`;
+  if (t === 'emergency') return `<div class="tool-section" id="lesson-tool"><div class="tool-title">${escHtml(title)}</div><div class="tool-grid"><div class="tool-field"><label class="tool-label">Dépenses mensuelles (€)</label><input type="number" class="tool-input" id="t-a" value="2000" min="0" max="20000"></div><div class="tool-field"><label class="tool-label">Situation</label><select class="tool-input" id="t-b"><option value="3">Salarié CDI stable</option><option value="6">CDD / Indépendant</option></select></div></div><button class="btn-tool" id="btn-tool">Calculer →</button><div class="tool-result" id="tool-result"><div class="tool-result-label">Épargne d'urgence recommandée</div><div class="tool-result-value" id="t-r1"></div><div class="tool-result-sub" id="t-r2"></div></div></div>`;
+  if (t === 'link_budget') return `<div class="tool-section" id="lesson-tool"><div class="tool-title">Action dans Prevano</div><a href="/budget.html" class="tool-link"><i class="ti ti-calculator" aria-hidden="true"></i> Ouvrir mon calculateur budget →</a></div>`;
+  if (t === 'link_simulator') return `<div class="tool-section" id="lesson-tool"><div class="tool-title">Action dans Prevano</div><a href="/" class="tool-link"><i class="ti ti-chart-line" aria-hidden="true"></i> Ouvrir mon simulateur retraite →</a></div>`;
+  return '';
+}
+
+function bindTool(lesson) {
+  const btn = document.getElementById('btn-tool');
+  if (!btn) return;
+  const t = lesson.toolType;
+  btn.addEventListener('click', () => {
+    const res = document.getElementById('tool-result');
+    const r1  = document.getElementById('t-r1');
+    const r2  = document.getElementById('t-r2');
+    if (t === 'compound') {
+      const m  = parseFloat(document.getElementById('t-a').value) || 0;
+      const r  = (parseFloat(document.getElementById('t-b').value) || 7) / 100 / 12;
+      const n  = (parseInt(document.getElementById('t-c').value) || 25) * 12;
+      const fv = m * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+      const vs = m * n;
+      r1.textContent = fmt(fv);
+      r2.textContent = `dont ${fmt(vs)} versés et ${fmt(fv - vs)} d'intérêts composés`;
+    } else if (t === 'per') {
+      const v  = parseFloat(document.getElementById('t-a').value) || 0;
+      const tm = (parseFloat(document.getElementById('t-b').value) || 30) / 100;
+      r1.textContent = fmt(v * tm);
+      r2.textContent = `soit un rendement garanti de ${Math.round(tm * 100)}% sur votre mise, avant tout investissement`;
+    } else if (t === 'fees') {
+      const m  = parseFloat(document.getElementById('t-a').value) || 0;
+      const y  = parseInt(document.getElementById('t-c').value) || 20;
+      const f1 = (parseFloat(document.getElementById('t-d').value) || 0.2) / 100;
+      const f2 = (parseFloat(document.getElementById('t-e').value) || 1.7) / 100;
+      const base = 0.07;
+      const fv1 = (r => m * ((Math.pow(1+r, y*12)-1)/r)*(1+r))((base-f1)/12);
+      const fv2 = (r => m * ((Math.pow(1+r, y*12)-1)/r)*(1+r))((base-f2)/12);
+      r1.textContent = fmt(fv1 - fv2);
+      r2.textContent = `ETF : ${fmt(fv1)} — Fonds actif : ${fmt(fv2)} sur ${y} ans`;
+    } else if (t === 'networth') {
+      const a = ['t-a1','t-a2','t-a3','t-a4'].reduce((s,id) => s + (parseFloat(document.getElementById(id).value)||0), 0);
+      const p = ['t-p1','t-p2'].reduce((s,id) => s + (parseFloat(document.getElementById(id).value)||0), 0);
+      r1.textContent = fmt(a - p);
+      r2.textContent = `Actifs : ${fmt(a)} — Passifs : ${fmt(p)}`;
+    } else if (t === 'budget') {
+      const v = parseFloat(document.getElementById('t-a').value) || 0;
+      r1.textContent = `${fmt(v * 0.2)} / mois`;
+      r2.textContent = `Besoins 50% : ${fmt(v*.5)} — Envies 30% : ${fmt(v*.3)} — Épargne 20% : ${fmt(v*.2)}`;
+    } else if (t === 'emergency') {
+      const d = parseFloat(document.getElementById('t-a').value) || 0;
+      const m = parseInt(document.getElementById('t-b').value) || 3;
+      r1.textContent = fmt(d * m);
+      r2.textContent = `${m} mois × ${fmt(d)}/mois — à constituer sur Livret A`;
+    }
+    res.style.display = 'block';
+  });
+}
 
 function renderLesson(lesson, todayDone) {
-  const themeColors = {
-    investissement: 'theme-investissement',
-    epargne:        'theme-epargne',
-    fiscalite:      'theme-fiscalite',
-    patrimoine:     'theme-patrimoine',
-  };
-  const themeIcons = {
-    investissement: 'ti-trending-up',
-    epargne:        'ti-piggy-bank',
-    fiscalite:      'ti-receipt-tax',
-    patrimoine:     'ti-building-bank',
-  };
+  quizCurrent  = 0;
+  quizScore    = 0;
+  quizAnswered = false;
 
+  const themeColors = { investissement:'theme-investissement', epargne:'theme-epargne', fiscalite:'theme-fiscalite', patrimoine:'theme-patrimoine' };
+  const themeIcons  = { investissement:'ti-trending-up', epargne:'ti-piggy-bank', fiscalite:'ti-receipt-tax', patrimoine:'ti-building-bank' };
   const bodyHtml = lesson.body.map(p => `<p>${escHtml(p)}</p>`).join('');
-  const optionsHtml = lesson.quiz.options.map((o, i) => `
-    <button class="quiz-option" data-idx="${i}" ${todayDone ? 'disabled' : ''}>
-      <span class="quiz-icon" aria-hidden="true"></span>
-      ${escHtml(o)}
-    </button>
-  `).join('');
-
-  const today = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+  const today    = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+  const total    = lesson.quiz.length;
+  const firstQ   = lesson.quiz[0];
+  const optHtml  = firstQ.options.map((o,i) => `<button class="quiz-option" data-idx="${i}" ${todayDone?'disabled':''}><span class="quiz-icon" aria-hidden="true"></span>${escHtml(o)}</button>`).join('');
 
   document.getElementById('lesson-card').innerHTML = `
     <div class="lesson-meta">
       <span class="theme-badge ${themeColors[lesson.theme]}">
-        <i class="ti ${themeIcons[lesson.theme]}" aria-hidden="true"></i>
-        ${escHtml(lesson.themeLabel)}
+        <i class="ti ${themeIcons[lesson.theme]}" aria-hidden="true"></i> ${escHtml(lesson.themeLabel)}
       </span>
       <span class="lesson-day">${today}</span>
     </div>
     <h1 class="lesson-title">${escHtml(lesson.title)}</h1>
     <div class="lesson-body">${bodyHtml}</div>
-
-    <div class="quiz-section">
-      <hr class="quiz-divider">
-      <div class="quiz-label">Quiz</div>
-      <div class="quiz-question">${escHtml(lesson.quiz.question)}</div>
-      <div class="quiz-options" id="quiz-options" role="group" aria-label="Options de réponse">
-        ${optionsHtml}
-      </div>
-      <div id="quiz-feedback" class="quiz-feedback" style="display:none"></div>
-    </div>
-
+    ${renderToolHtml(lesson)}
     <div class="action-section">
       <hr class="action-divider">
       <div class="action-label">Action concrète du jour</div>
-      <div class="action-box">
-        <i class="ti ti-arrow-right action-icon" aria-hidden="true"></i>
-        <span>${escHtml(lesson.action)}</span>
-      </div>
+      <div class="action-box"><i class="ti ti-arrow-right action-icon" aria-hidden="true"></i><span>${escHtml(lesson.action)}</span></div>
     </div>
+    <div class="quiz-section">
+      <hr class="quiz-divider">
+      ${todayDone ? `
+        <div class="quiz-feedback ok" style="display:block">✓ Leçon déjà complétée aujourd'hui — reviens demain !</div>
+        <div class="complete-row">
+          <button class="btn-complete done" id="btn-complete" disabled>
+            <i class="ti ti-circle-check" aria-hidden="true"></i> Leçon complétée !
+          </button>
+        </div>` : `
+        <div class="quiz-progress">
+          <span class="quiz-q-counter">Question <span id="q-num">1</span>/${total}</span>
+          <div class="quiz-progress-track"><div class="quiz-progress-fill" id="q-fill" style="width:0%"></div></div>
+        </div>
+        <div class="quiz-question" id="quiz-question">${escHtml(firstQ.q)}</div>
+        <div class="quiz-options" id="quiz-options" role="group" aria-label="Options de réponse">${optHtml}</div>
+        <div id="quiz-feedback" class="quiz-feedback" style="display:none"></div>
+        <button class="btn-next-q" id="btn-next-q" style="display:none">Question suivante →</button>
+        <div id="quiz-final" style="display:none"></div>
+        <div class="complete-row" id="complete-row" style="display:none">
+          <button class="btn-complete" id="btn-complete">
+            <i class="ti ti-check" aria-hidden="true"></i> Marquer comme terminé
+          </button>
+        </div>`}
+    </div>`;
 
-    <div class="complete-row">
-      <button class="btn-complete ${todayDone ? 'done' : ''}" id="btn-complete" ${todayDone ? 'disabled' : ''}>
-        ${todayDone
-          ? '<i class="ti ti-circle-check" aria-hidden="true"></i> Leçon complétée !'
-          : '<i class="ti ti-check" aria-hidden="true"></i> Marquer comme terminé'
-        }
-      </button>
-    </div>
-  `;
-
-  if (todayDone) {
-    quizAnswered = true;
-    markQuizDone(lesson.quiz.correct, null, true);
-  }
-
-  bindQuiz(lesson.quiz.correct);
-  bindComplete(lesson);
+  if (!todayDone) { bindQuizMulti(lesson); bindComplete(lesson); }
+  if (lesson.toolType && lesson.toolType !== 'link_budget' && lesson.toolType !== 'link_simulator') bindTool(lesson);
 }
 
-function markQuizDone(correctIdx, selectedIdx, skipAnim) {
-  const opts = document.querySelectorAll('.quiz-option');
-  opts.forEach((btn, i) => {
-    btn.disabled = true;
-    if (i === correctIdx) btn.classList.add('correct');
-    else if (i === selectedIdx) btn.classList.add('wrong');
-
-    const icon = btn.querySelector('.quiz-icon');
-    if (i === correctIdx)         icon.textContent = '✓';
-    else if (i === selectedIdx)   icon.textContent = '✗';
-  });
-
-  const fb = document.getElementById('quiz-feedback');
-  fb.style.display = 'block';
-
-  if (skipAnim) {
-    fb.className = 'quiz-feedback ok';
-    fb.textContent = 'Bonne réponse !';
-    return;
-  }
-
-  if (selectedIdx === correctIdx) {
-    fb.className    = 'quiz-feedback ok';
-    fb.textContent  = '✓ Bonne réponse !';
-    quizCorrect     = true;
-  } else {
-    fb.className    = 'quiz-feedback ko';
-    fb.textContent  = '✗ Pas tout à fait — la bonne réponse est surlignée en vert.';
-    quizCorrect     = false;
-  }
-}
-
-function bindQuiz(correctIdx) {
-  document.getElementById('quiz-options')?.addEventListener('click', (e) => {
+function bindQuizMulti(lesson) {
+  document.getElementById('quiz-options').addEventListener('click', (e) => {
     if (quizAnswered) return;
     const btn = e.target.closest('.quiz-option');
     if (!btn) return;
     quizAnswered = true;
-    markQuizDone(correctIdx, Number(btn.dataset.idx), false);
+    const q = lesson.quiz[quizCurrent];
+    const sel = Number(btn.dataset.idx);
+    if (sel === q.correct) quizScore++;
+    document.querySelectorAll('.quiz-option').forEach((b, i) => {
+      b.disabled = true;
+      if (i === q.correct) { b.classList.add('correct'); b.querySelector('.quiz-icon').textContent = '✓'; }
+      else if (i === sel)  { b.classList.add('wrong');   b.querySelector('.quiz-icon').textContent = '✗'; }
+    });
+    const fb = document.getElementById('quiz-feedback');
+    fb.style.display = 'block';
+    if (sel === q.correct) { fb.className = 'quiz-feedback ok'; fb.textContent = '✓ Bonne réponse !'; }
+    else { fb.className = 'quiz-feedback ko'; fb.textContent = '✗ Pas tout à fait — la bonne réponse est surlignée en vert.'; }
+    const isLast = quizCurrent === lesson.quiz.length - 1;
+    if (isLast) {
+      setTimeout(() => {
+        const pct = Math.round((quizScore / lesson.quiz.length) * 100);
+        const emoji = pct === 100 ? '🎉' : pct >= 60 ? '👍' : '💪';
+        document.getElementById('quiz-final').innerHTML = `<div class="quiz-score-display">${emoji} Score : <strong>${quizScore}/${lesson.quiz.length}</strong>${pct === 100 ? ' — Parfait !' : ''}</div>`;
+        document.getElementById('quiz-final').style.display = 'block';
+        document.getElementById('complete-row').style.display = 'flex';
+        document.getElementById('btn-next-q').style.display = 'none';
+      }, 700);
+    } else {
+      document.getElementById('btn-next-q').style.display = 'block';
+    }
+  });
+
+  document.getElementById('btn-next-q').addEventListener('click', () => {
+    quizCurrent++;
+    quizAnswered = false;
+    const q = lesson.quiz[quizCurrent];
+    const pct = Math.round((quizCurrent / lesson.quiz.length) * 100);
+    document.getElementById('q-num').textContent = quizCurrent + 1;
+    document.getElementById('q-fill').style.width = pct + '%';
+    document.getElementById('quiz-question').textContent = q.q;
+    document.getElementById('quiz-options').innerHTML = q.options.map((o,i) =>
+      `<button class="quiz-option" data-idx="${i}"><span class="quiz-icon" aria-hidden="true"></span>${escHtml(o)}</button>`).join('');
+    document.getElementById('quiz-feedback').style.display = 'none';
+    document.getElementById('btn-next-q').style.display = 'none';
   });
 }
 
@@ -938,35 +1037,24 @@ function bindComplete(lesson) {
     const btn = document.getElementById('btn-complete');
     btn.disabled = true;
     btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Enregistrement…';
-
     try {
       const lessonIndex = Math.floor(Date.now() / 86_400_000) % 28;
+      const quizCorrect = quizScore >= Math.ceil(lesson.quiz.length / 2);
       const res  = await fetch('/api/features', {
-        method:      'POST',
-        headers:     { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body:        JSON.stringify({ type: 'daily', lesson_index: lessonIndex, quiz_correct: quizCorrect }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify({ type: 'daily', lesson_index: lessonIndex, quiz_correct: quizCorrect }),
       });
       const data = await res.json();
-
-      if (!res.ok) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Marquer comme terminé';
-        return;
-      }
-
-      btn.className   = 'btn-complete done';
-      btn.innerHTML   = '<i class="ti ti-circle-check" aria-hidden="true"></i> Leçon complétée !';
-
+      if (!res.ok) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Marquer comme terminé'; return; }
+      btn.className = 'btn-complete done';
+      btn.innerHTML = '<i class="ti ti-circle-check" aria-hidden="true"></i> Leçon complétée !';
       document.getElementById('streak-num').textContent = data.streak;
       document.getElementById('total-done').textContent = data.total_completed;
-
       updateLevelBar(data.total_completed);
       renderBadges(data.total_completed, data.streak);
-
       if (data.new_badge) showBadgeToast(data.new_badge);
     } catch {
-      btn.disabled  = false;
+      btn.disabled = false;
       btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Marquer comme terminé';
     }
   });
