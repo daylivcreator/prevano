@@ -44,7 +44,7 @@ module.exports = async function handler(req, res) {
         method:  'POST',
         headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sender:      { name: process.env.EMAIL_SENDER_NAME ?? 'Prevano', email: process.env.EMAIL_SENDER_EMAIL ?? 'prevano.app@outlook.fr' },
+          sender:      { name: process.env.EMAIL_SENDER_NAME ?? 'Prevano', email: process.env.EMAIL_SENDER_EMAIL ?? 'noreply@prevano.fr' },
           to:          [{ email: normalizedEmail }],
           subject:     'Réinitialisation de ton mot de passe Prevano',
           htmlContent: `<div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;color:#1a1a1a">

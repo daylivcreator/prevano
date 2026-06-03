@@ -22,6 +22,15 @@ sql`
   )
 `.catch(e => console.error('[migrate] user_simulations:', e.message));
 
+sql`
+  CREATE TABLE IF NOT EXISTS simulation_history (
+    id         BIGSERIAL   PRIMARY KEY,
+    user_id    UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    data       JSONB       NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )
+`.catch(e => console.error('[migrate] simulation_history:', e.message));
+
 sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits_balance  INTEGER     NOT NULL DEFAULT 0`
   .catch(e => console.error('[migrate] credits_balance:', e.message));
 sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits_reset_at TIMESTAMPTZ`
@@ -157,6 +166,20 @@ module.exports = async function handler(req, res) {
           costs:      CREDIT_COSTS,
         });
       } catch (err) { console.error('[credits]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
+    // GET ?t=sim-history → historique des 8 dernières simulations
+    if (t === 'sim-history') {
+      const session = requireSession(req, res);
+      if (!session) return;
+      try {
+        const result = await sql`
+          SELECT data, created_at FROM simulation_history
+          WHERE user_id = ${session.userId}
+          ORDER BY created_at DESC LIMIT 8
+        `;
+        return res.status(200).json({ history: result.rows });
+      } catch (err) { console.error('[features/sim-history]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
     // GET ?t=simulation → dernière simulation retraite
@@ -414,6 +437,9 @@ module.exports = async function handler(req, res) {
           INSERT INTO user_simulations (user_id, data, updated_at)
           VALUES (${session.userId}, ${data}, NOW())
           ON CONFLICT (user_id) DO UPDATE SET data = ${data}, updated_at = NOW()
+        `;
+        await sql`
+          INSERT INTO simulation_history (user_id, data) VALUES (${session.userId}, ${data})
         `;
         return res.status(200).json({ ok: true });
       } catch (err) { console.error('[features/simulation-save]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
