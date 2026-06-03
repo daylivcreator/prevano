@@ -152,6 +152,9 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
   <h1 class="page-title" id="page-title">Mon profil</h1>
   <p class="page-sub" id="page-sub">Gérer ton compte et ton abonnement</p>
 
+  <!-- Mount point crédits (rempli par credits.js après le chargement) -->
+  <div id="credits-card-mount" style="grid-column:1/-1"></div>
+
   <div class="profile-grid" id="profile-grid">
     <!-- Skeleton -->
     <div class="card">
@@ -486,6 +489,7 @@ document.querySelectorAll('.card,.tool-link,.upgrade-row').forEach(el => {
   _revealObs.observe(el);
 });
 </script>
+<script src="/credits.js" defer></script>
 <script src="/mobile-nav.js" defer></script>
 <script src="/feedback.js" defer></script>
 </body>

@@ -13,7 +13,7 @@ const { requireSession }             = require('./_lib/auth');
 const { sql }                        = require('./_lib/db');
 const { calcStreak }                 = require('./_lib/daily-helpers');
 
-// Migration automatique : idempotente, une seule exécution par cold start
+// Migrations automatiques : idempotentes, une seule exécution par cold start
 sql`
   CREATE TABLE IF NOT EXISTS user_simulations (
     user_id    UUID        PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
@@ -21,6 +21,36 @@ sql`
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   )
 `.catch(e => console.error('[migrate] user_simulations:', e.message));
+
+sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits_balance  INTEGER     NOT NULL DEFAULT 0`
+  .catch(e => console.error('[migrate] credits_balance:', e.message));
+sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits_reset_at TIMESTAMPTZ`
+  .catch(e => console.error('[migrate] credits_reset_at:', e.message));
+
+// ── Constantes crédits ──────────────────────────────────────────────────────
+const CREDIT_ALLOWANCES = { starter: 100, pro: 300, premium: 600 };
+const CREDIT_COSTS      = { plan_retraite: 10, coach_message: 3, budget_plan: 8 };
+
+async function deductCredits(userId, cost) {
+  const r = await sql`
+    UPDATE users SET credits_balance = credits_balance - ${cost}
+    WHERE id = ${userId} AND credits_balance >= ${cost}
+    RETURNING credits_balance
+  `;
+  if (!r.rows.length) return null; // crédits insuffisants
+  return r.rows[0].credits_balance;
+}
+
+async function grantCredits(userId, plan) {
+  const allowance = CREDIT_ALLOWANCES[plan] ?? 0;
+  if (!allowance) return;
+  await sql`
+    UPDATE users SET
+      credits_balance  = ${allowance},
+      credits_reset_at = (NOW() + INTERVAL '1 month')
+    WHERE id = ${userId}
+  `;
+}
 
 const PAID_PLANS = new Set(['starter', 'pro', 'premium']);
 const PRO_PLANS  = new Set(['pro', 'premium']);
@@ -109,6 +139,26 @@ module.exports = async function handler(req, res) {
       } catch (err) { console.error('[features/budget-entry]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
+    // GET ?t=credits → solde de crédits
+    if (t === 'credits') {
+      const session = requireSession(req, res);
+      if (!session) return;
+      try {
+        const r = await sql`
+          SELECT plan, credits_balance, credits_reset_at FROM users WHERE id = ${session.userId}
+        `;
+        const u = r.rows[0];
+        if (!u) return res.status(401).json({ error: 'Compte introuvable.' });
+        return res.status(200).json({
+          balance:    u.credits_balance,
+          allowance:  CREDIT_ALLOWANCES[u.plan] ?? 0,
+          reset_at:   u.credits_reset_at,
+          plan:       u.plan,
+          costs:      CREDIT_COSTS,
+        });
+      } catch (err) { console.error('[credits]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
     // GET ?t=simulation → dernière simulation retraite
     if (t === 'simulation') {
       const session = requireSession(req, res);
@@ -165,6 +215,20 @@ module.exports = async function handler(req, res) {
       if (!resendKey) return res.status(503).json({ error: 'Resend non configuré.' });
 
       try {
+        // Reset des crédits mensuels
+        await sql`
+          UPDATE users SET
+            credits_balance  = CASE plan
+              WHEN 'starter' THEN 100
+              WHEN 'pro'     THEN 300
+              WHEN 'premium' THEN 600
+              ELSE 0
+            END,
+            credits_reset_at = (NOW() + INTERVAL '1 month')
+          WHERE plan IN ('starter','pro','premium')
+          AND subscription_status = 'active'
+        `;
+
         // Récupérer tous les abonnés actifs
         const users = await sql`
           SELECT email, first_name, plan FROM users
@@ -214,6 +278,8 @@ module.exports = async function handler(req, res) {
         const user = userResult.rows[0];
         if (!user) return res.status(401).json({ error: 'Compte introuvable.' });
         if (!PAID_PLANS.has(user.plan)) return res.status(403).json({ error: 'Accès réservé aux abonnés Starter, Coach Pro et Daily Finance.' });
+        const budgetCredits = await deductCredits(session.userId, CREDIT_COSTS.budget_plan);
+        if (budgetCredits === null) return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent le 1er du mois.' });
 
         const body     = req.body ?? {};
         const revenus  = sanitizeAmounts(body.revenus);
@@ -265,6 +331,10 @@ module.exports = async function handler(req, res) {
           const msgCount = await sql`SELECT COUNT(*)::int AS n FROM coach_messages WHERE user_id = ${session.userId} AND role = 'user'`;
           const used = msgCount.rows[0]?.n ?? 0;
           if (used >= 1) return res.status(403).json({ error: 'free_limit', message: 'Tu as utilisé ton message gratuit. Passe à Coach Pro pour des conseils illimités.' });
+        } else {
+          // Déduire crédits pour les abonnés
+          const remaining = await deductCredits(session.userId, CREDIT_COSTS.coach_message);
+          if (remaining === null) return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent le 1er du mois.' });
         }
         if (!rateLimitUser(session.userId, 20, 3_600_000)) return res.status(429).json({ error: 'Limite de 20 messages par heure atteinte. Reviens plus tard !' });
 

@@ -100,8 +100,19 @@ module.exports = async function handler(req, res) {
   const session = getSession(req);
   if (session) {
     try {
-      const r = await sql`SELECT plan FROM users WHERE id = ${session.userId}`;
+      const r = await sql`SELECT plan, credits_balance FROM users WHERE id = ${session.userId}`;
       userPlan = r.rows[0]?.plan ?? 'free';
+
+      // Déduire crédits pour les abonnés
+      if (userPlan !== 'free') {
+        const COST = 10;
+        const credits = r.rows[0]?.credits_balance ?? 0;
+        if (credits < COST) {
+          return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent le 1er du mois.', balance: credits });
+        }
+        sql`UPDATE users SET credits_balance = credits_balance - ${COST} WHERE id = ${session.userId}`.catch(() => {});
+      }
+
       // Persiste les paramètres de simulation (non-bloquant)
       const simData = JSON.stringify({ age, sal, pension, gap, ep, annees, statut });
       sql`

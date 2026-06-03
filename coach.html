@@ -312,6 +312,15 @@ async function sendMessage(text) {
       history.pop();
       return;
     }
+    if (res.status === 402) {
+      const upsell = document.createElement('div');
+      upsell.style.cssText = 'margin:12px 0;background:rgba(226,75,74,0.1);border:1px solid rgba(226,75,74,0.25);border-radius:12px;padding:16px 18px;font-size:13px;color:#E24B4A;display:flex;align-items:center;gap:10px;';
+      upsell.innerHTML = `<i class="ti ti-diamond" style="font-size:18px;flex-shrink:0"></i><span>Crédits épuisés — <a href="/profil.html" style="color:#E24B4A;font-weight:700">voir ton solde</a>. Ils se renouvellent le 1er du mois.</span>`;
+      messagesWrap.appendChild(upsell);
+      scrollBottom();
+      history.pop();
+      return;
+    }
 
     if (!res.ok) {
       if (data.error === 'free_limit') {
@@ -339,6 +348,7 @@ async function sendMessage(text) {
     const reply = data.reply ?? '';
     appendMessage('assistant', reply);
     history.push({ role:'assistant', content:reply });
+    window.showCreditDeduction?.(3);
   } catch {
     removeTyping();
     appendMessage('assistant', 'Erreur de connexion. Vérifie ta connexion et réessaie.');
@@ -507,6 +517,7 @@ async function init() {
 
 init();
 </script>
+<script src="/credits.js" defer></script>
 <script src="/mobile-nav.js" defer></script>
 <script src="/feedback.js" defer></script>
 </body>

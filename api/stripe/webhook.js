@@ -2,6 +2,18 @@
 const Stripe  = require('stripe');
 const { sql } = require('../_lib/db');
 
+const CREDIT_ALLOWANCES = { starter: 100, pro: 300, premium: 600 };
+async function grantMonthlyCredits(userId, plan) {
+  const allowance = CREDIT_ALLOWANCES[plan] ?? 0;
+  if (!allowance) return;
+  await sql`
+    UPDATE users SET
+      credits_balance  = ${allowance},
+      credits_reset_at = (NOW() + INTERVAL '1 month')
+    WHERE id = ${userId}
+  `;
+}
+
 function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -45,14 +57,16 @@ async function handler(req, res) {
         const plan   = planFromPriceId(sub.items.data[0]?.price?.id);
         const periodEnd = new Date(sub.current_period_end * 1000);
 
-        await sql`
+        const updatedUser = await sql`
           UPDATE users SET
             stripe_subscription_id          = ${sub.id},
             plan                            = ${plan},
             subscription_status             = ${sub.status},
             subscription_current_period_end = ${periodEnd}
           WHERE stripe_customer_id = ${session.customer}
+          RETURNING id
         `;
+        if (updatedUser.rows[0]) await grantMonthlyCredits(updatedUser.rows[0].id, plan);
         break;
       }
 
@@ -92,6 +106,18 @@ async function handler(req, res) {
             stripe_subscription_id          = NULL
           WHERE stripe_subscription_id = ${sub.id}
         `;
+        break;
+      }
+
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object;
+        if (invoice.billing_reason !== 'subscription_cycle') break; // seulement les renouvellements
+        const subRenew = await stripe.subscriptions.retrieve(invoice.subscription);
+        const planRenew = planFromPriceId(subRenew.items.data[0]?.price?.id);
+        const renewUser = await sql`SELECT id FROM users WHERE stripe_customer_id = ${invoice.customer}`;
+        if (renewUser.rows[0] && planRenew !== 'free') {
+          await grantMonthlyCredits(renewUser.rows[0].id, planRenew);
+        }
         break;
       }
 
