@@ -21,6 +21,7 @@
 <meta name="twitter:title" content="Tarifs — Prevano">
 <meta name="twitter:description" content="Starter, Coach Pro ou Daily Finance — l'offre Prevano adaptée à ta situation pour sécuriser ta retraite dès aujourd'hui.">
 <script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 input,button{font-family:inherit;font-size:inherit;}
@@ -143,6 +144,13 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
 .annual-teaser{text-align:center;padding:0 48px 48px;font-size:13px;color:var(--text-faint);}
 .annual-teaser strong{color:var(--text-muted);}
 @media(max-width:640px){.compare-section,.annual-teaser{padding-left:20px;padding-right:20px;}}
+/* Checkout embedded modal */
+.checkout-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.checkout-overlay.active{display:flex;}
+.checkout-modal{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;position:relative;padding:8px;}
+.checkout-modal-close{position:absolute;top:10px;right:10px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;z-index:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;}
+.checkout-modal-close:hover{background:#f0f0f0;color:#333;}
+#stripe-checkout-container{min-height:300px;}
 </style>
 </head>
 <body>
@@ -299,6 +307,14 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quelle différence avec mon conseiller bancaire ?","acceptedAnswer":{"@type":"Answer","text":"Un conseiller bancaire est limité aux produits de sa banque. Prevano est indépendant — il analyse toute ta situation et recommande les meilleurs outils selon ton profil sans commission."}},{"@type":"Question","name":"Sans engagement — comment ça marche ?","acceptedAnswer":{"@type":"Answer","text":"Tu souscris mois par mois. Tu peux annuler à tout moment depuis ton espace profil, sans frais et sans justificatif."}},{"@type":"Question","name":"Le simulateur est-il précis ?","acceptedAnswer":{"@type":"Answer","text":"Il utilise les taux officiels de la CNAV. Les utilisateurs constatent un écart moyen inférieur à 5% avec leur relevé de carrière."}},{"@type":"Question","name":"Mes données sont-elles sécurisées ?","acceptedAnswer":{"@type":"Answer","text":"Tes données sont chiffrées, hébergées en Europe, jamais revendues. Prevano est conforme RGPD."}},{"@type":"Question","name":"Puis-je changer d'offre ?","acceptedAnswer":{"@type":"Answer","text":"Oui, à tout moment depuis ton espace profil. Le changement prend effet immédiatement avec un pro-rata automatique."}}]}</script>
 </main>
 
+<!-- Stripe Embedded Checkout modal -->
+<div class="checkout-overlay" id="checkout-overlay" role="dialog" aria-modal="true" aria-label="Paiement sécurisé">
+  <div class="checkout-modal">
+    <button class="checkout-modal-close" id="checkout-close" aria-label="Fermer le paiement">×</button>
+    <div id="stripe-checkout-container"></div>
+  </div>
+</div>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-links">
@@ -323,12 +339,18 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
 <script>
 'use strict';
 
-// Price IDs chargés dynamiquement depuis /api/config (env vars Vercel côté serveur)
-const PRICE_IDS = { starter: null, pro: null, premium: null };
+// Config chargée depuis /api/config (env vars Vercel côté serveur)
+const CONFIG = { publishableKey: null, starter: null, pro: null, premium: null };
+let stripeInstance = null;
 
 fetch('/api/config')
   .then(r => r.ok ? r.json() : null)
-  .then(data => { if (data?.stripe) Object.assign(PRICE_IDS, data.stripe); })
+  .then(data => {
+    if (data?.stripe) Object.assign(CONFIG, data.stripe);
+    if (CONFIG.publishableKey && typeof Stripe !== 'undefined') {
+      stripeInstance = Stripe(CONFIG.publishableKey);
+    }
+  })
   .catch(() => {});
 
 function escHtml(s) {
@@ -363,11 +385,13 @@ async function initNav() {
 }
 
 /* Checkout */
+let activeCheckout = null;
+
 async function startCheckout(plan) {
   const PLAN_LABELS = { starter: 'Starter', pro: 'Coach Pro', premium: 'Daily Finance' };
   window.plausible?.('Voir Offre', { props: { plan: PLAN_LABELS[plan] ?? plan } });
 
-  const priceId = PRICE_IDS[plan];
+  const priceId = CONFIG[plan];
   const btn = document.getElementById(`btn-${plan}`);
   btn.disabled = true;
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Chargement…';
@@ -382,6 +406,8 @@ async function startCheckout(plan) {
 
     if (!priceId) {
       alert('Configuration Stripe manquante. Configure les variables STRIPE_*_PRICE_ID dans Vercel.');
+      btn.disabled = false;
+      btn.innerHTML = `Choisir ${PLAN_LABELS[plan] ?? plan} <i class="ti ti-arrow-right" aria-hidden="true"></i>`;
       return;
     }
 
@@ -392,22 +418,40 @@ async function startCheckout(plan) {
       body:        JSON.stringify({ priceId }),
     });
     const data = await res.json();
-
     if (!res.ok) throw new Error(data.error ?? 'Erreur');
-    location.href = data.url;
+
+    const stripe = stripeInstance ?? (CONFIG.publishableKey ? Stripe(CONFIG.publishableKey) : null);
+    if (!stripe) throw new Error('Clé Stripe publique manquante. Configure STRIPE_PUBLISHABLE_KEY dans Vercel.');
+
+    if (activeCheckout) { activeCheckout.destroy(); activeCheckout = null; }
+    document.getElementById('stripe-checkout-container').innerHTML = '';
+
+    activeCheckout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
+    activeCheckout.mount('#stripe-checkout-container');
+
+    const overlay = document.getElementById('checkout-overlay');
+    overlay.classList.add('active');
+    btn.disabled = false;
+    btn.innerHTML = `Choisir ${PLAN_LABELS[plan] ?? plan} <i class="ti ti-arrow-right" aria-hidden="true"></i>`;
   } catch (err) {
     alert(err.message ?? 'Impossible de démarrer le paiement.');
     btn.disabled = false;
-    const PLAN_LABELS = { starter: 'Starter', pro: 'Coach Pro', premium: 'Daily Finance' };
     btn.innerHTML = `Choisir ${PLAN_LABELS[plan] ?? plan} <i class="ti ti-arrow-right" aria-hidden="true"></i>`;
   }
 }
 
-/* Afficher le banner d'annulation */
-if (new URLSearchParams(location.search).get('canceled') === '1') {
-  document.getElementById('cancel-msg').style.display = 'block';
-  history.replaceState({}, '', '/tarifs.html');
+function closeCheckout() {
+  if (activeCheckout) { activeCheckout.destroy(); activeCheckout = null; }
+  document.getElementById('checkout-overlay').classList.remove('active');
+  document.getElementById('stripe-checkout-container').innerHTML = '';
 }
+
+document.getElementById('checkout-close')?.addEventListener('click', closeCheckout);
+document.getElementById('checkout-overlay')?.addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeCheckout();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCheckout(); });
 
 /* Events */
 ['starter','pro','premium'].forEach(plan => {

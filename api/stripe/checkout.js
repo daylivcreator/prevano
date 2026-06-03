@@ -52,15 +52,15 @@ module.exports = async function handler(req, res) {
       mode:                 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${siteUrl}/profil.html?success=1`,
-      cancel_url:  `${siteUrl}/tarifs.html?canceled=1`,
-      allow_promotion_codes:     true,
+      ui_mode:    'embedded',
+      return_url: `${siteUrl}/profil.html?success=1&session_id={CHECKOUT_SESSION_ID}`,
+      allow_promotion_codes:      true,
       billing_address_collection: 'required',
-      customer_update:           { address: 'auto' },
-      metadata:                  { userId: session.userId },
+      customer_update:            { address: 'auto' },
+      metadata:                   { userId: session.userId },
     });
 
-    return res.status(200).json({ url: checkoutSession.url });
+    return res.status(200).json({ clientSecret: checkoutSession.client_secret });
   } catch (err) {
     console.error('[checkout]', err.message);
     return res.status(500).json({ error: 'Impossible de créer la session de paiement.' });

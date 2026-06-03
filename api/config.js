@@ -6,9 +6,10 @@ module.exports = function handler(req, res) {
 
   return res.status(200).json({
     stripe: {
-      starter: process.env.STRIPE_STARTER_PRICE_ID ?? null,
-      pro:     process.env.STRIPE_PRO_PRICE_ID     ?? null,
-      premium: process.env.STRIPE_PREMIUM_PRICE_ID ?? null,
+      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY ?? null,
+      starter:        process.env.STRIPE_STARTER_PRICE_ID ?? null,
+      pro:            process.env.STRIPE_PRO_PRICE_ID     ?? null,
+      premium:        process.env.STRIPE_PREMIUM_PRICE_ID ?? null,
     },
   });
 };
