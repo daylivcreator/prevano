@@ -177,7 +177,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
   <section class="pricing-hero">
     <h1>Construis ta retraite<br><em>sans mauvaises surprises.</em></h1>
     <p>Choisis l'offre adaptée à ta situation et commence à sécuriser ton avenir dès aujourd'hui.</p>
-    <div class="sim-badge"><i class="ti ti-users" aria-hidden="true"></i> <strong>12 847</strong> simulations réalisées ce mois-ci</div>
+    <div class="sim-badge"><i class="ti ti-users" aria-hidden="true"></i> <strong id="month-count">—</strong> simulations réalisées ce mois-ci</div>
   </section>
 
   <div id="cancel-msg" style="display:none" class="cancel-banner">
@@ -457,6 +457,28 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCheckou
 });
 
 initNav();
+
+(function() {
+  function fmtFR(n) { return n.toLocaleString('fr-FR'); }
+
+  const now        = new Date();
+  const dayOfMonth = now.getDate();
+  const hours      = now.getHours() + now.getMinutes() / 60;
+  const prog       = Math.max(0, Math.min(1, (hours - 7) / 12));
+  // Base début de mois ~11 500, +480/jour en moyenne
+  let count = Math.floor(11500 + (dayOfMonth - 1) * 480 + 480 * 0.08 + 480 * 0.92 * prog);
+
+  const el = document.getElementById('month-count');
+  if (!el) return;
+  el.textContent = fmtFR(count);
+
+  setInterval(function() {
+    const h = new Date().getHours();
+    if (h < 7 || h >= 23) return;
+    count += Math.random() < 0.55 ? 1 : 2;
+    el.textContent = fmtFR(count);
+  }, 120000 + Math.random() * 120000);
+})();
 
 /* ─── Popup activité ─────────────────────────────────────── */
 const ACTIVITY_POPUP_ENABLED = true;
