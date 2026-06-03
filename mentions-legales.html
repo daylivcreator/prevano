@@ -73,7 +73,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
   <div class="article-wrap">
     <p class="article-eyebrow">Juridique</p>
     <h1 class="article-title">Mentions Légales &amp; Politique de Confidentialité</h1>
-    <p class="article-meta">Dernière mise à jour : 1er juin 2025</p>
+    <p class="article-meta">Dernière mise à jour : 3 juin 2026</p>
 
     <div class="article-body">
 
@@ -107,9 +107,12 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
       <p>Nous collectons les données suivantes :</p>
       <ul>
         <li><strong>Données de compte</strong> : prénom, adresse email, mot de passe (haché avec bcrypt) ;</li>
-        <li><strong>Données de simulation</strong> : âge, salaire, épargne mensuelle, âge de départ souhaité, statut professionnel — traitées en mémoire et non stockées de façon permanente pour les utilisateurs gratuits ;</li>
+        <li><strong>Données de simulation</strong> : âge, salaire, épargne mensuelle, âge de départ souhaité, statut professionnel — stockées pour les abonnés afin de personnaliser le coach IA ;</li>
+        <li><strong>Données de budget</strong> : revenus, dépenses et objectifs d'épargne mensuels (abonnés Starter et supérieur) ;</li>
+        <li><strong>Données de coaching</strong> : historique des échanges avec le coach IA (abonnés Coach Pro et supérieur) ;</li>
+        <li><strong>Données de progression</strong> : avancement dans les leçons quotidiennes, résultats des quiz, badges obtenus (abonnés Daily Finance) ;</li>
         <li><strong>Données de paiement</strong> : traitées exclusivement par Stripe — Prevano ne stocke aucune donnée bancaire ;</li>
-        <li><strong>Données de navigation</strong> : adresse IP, logs d'accès (conservés 30 jours à des fins de sécurité).</li>
+        <li><strong>Données de navigation</strong> : adresse IP, logs d'accès (conservés 30 jours à des fins de sécurité), statistiques d'usage anonymisées via Plausible Analytics.</li>
       </ul>
 
       <h3>4.3 Base légale et finalités</h3>
@@ -139,9 +142,11 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
       <h3>4.6 Sous-traitants</h3>
       <ul>
         <li><strong>Stripe</strong> (paiement) — États-Unis, certifié PCI-DSS ;</li>
-        <li><strong>Vercel</strong> (hébergement) — États-Unis, clauses contractuelles standard UE ;</li>
-        <li><strong>Anthropic</strong> (génération IA) — États-Unis, clauses contractuelles standard UE ;</li>
-        <li><strong>Resend / Brevo</strong> (emails transactionnels) — données UE.</li>
+        <li><strong>Vercel</strong> (hébergement frontend et fonctions serverless) — États-Unis, clauses contractuelles standard UE ;</li>
+        <li><strong>Neon</strong> (base de données PostgreSQL) — États-Unis, clauses contractuelles standard UE ;</li>
+        <li><strong>Anthropic</strong> (génération IA — plan d'action, coach, budget) — États-Unis, clauses contractuelles standard UE ;</li>
+        <li><strong>Resend</strong> (emails transactionnels — réinitialisation de mot de passe) — États-Unis, clauses contractuelles standard UE ;</li>
+        <li><strong>Plausible Analytics</strong> (statistiques de visite anonymisées, sans cookie) — Union Européenne.</li>
       </ul>
 
       <h2>5. Cookies</h2>
@@ -149,7 +154,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
       <ul>
         <li><strong>Un cookie de session</strong> (<code>pv_session</code>) — cookie technique HttpOnly, nécessaire au bon fonctionnement du service. Durée : 7 jours. Ce cookie ne nécessite pas de consentement au titre de l'article 82 de la loi Informatique et Libertés.</li>
       </ul>
-      <p>Aucun cookie publicitaire ou traceur tiers n'est déposé sur votre navigateur.</p>
+      <p>Prevano intègre <strong>Plausible Analytics</strong>, un outil de mesure d'audience qui ne dépose aucun cookie et ne collecte aucune donnée personnelle identifiable. Les statistiques sont agrégées et anonymes. Aucun cookie publicitaire ou traceur tiers n'est déposé sur votre navigateur.</p>
 
       <h2>6. Sécurité</h2>
       <p>Prevano met en œuvre les mesures de sécurité suivantes : chiffrement TLS/HTTPS obligatoire, hachage bcrypt (coût 12) pour les mots de passe, tokens de réinitialisation hachés avec SHA-256, headers de sécurité HTTP (CSP, HSTS, X-Frame-Options), rate limiting sur tous les endpoints d'authentification.</p>
@@ -170,7 +175,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
       <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
       <a href="/contact.html"          class="footer-link">Contact</a>
     </div>
-    <span class="footer-copy">© 2025 Prevano · Tous droits réservés</span>
+    <span class="footer-copy">© 2026 Prevano · Tous droits réservés</span>
   </div>
 </footer>
 </body>
