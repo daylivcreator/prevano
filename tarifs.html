@@ -62,9 +62,9 @@ nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(
 .plan-price{font-size:42px;font-weight:900;letter-spacing:-0.04em;margin-bottom:6px;line-height:1;}
 .plan-price span{font-size:15px;font-weight:500;color:var(--text-muted);}
 .plan-desc{font-size:13px;color:var(--text-muted);margin-bottom:28px;line-height:1.7;border-left:2px solid var(--border-default);padding-left:12px;}
-.plan-features{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;flex:1;}
-.feature{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text-muted);line-height:1.55;}
-.feature i{color:var(--color-primary);font-size:16px;flex-shrink:0;margin-top:2px;}
+.plan-features{display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border-subtle);}
+.feature{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text-muted);line-height:1.5;}
+.feature i{color:var(--color-primary);font-size:18px;flex-shrink:0;}
 .feature.muted i{color:var(--text-faint);}
 .feature.muted{color:var(--text-faint);}
 .plan-divider{border:none;border-top:1px solid var(--border-subtle);margin:4px 0 20px;}
@@ -194,15 +194,15 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
         <div class="plan-name">Starter</div>
         <div class="plan-price">9,99 €<span>/mois</span></div>
         <p class="plan-desc">Analyse ton budget mensuel et reçois 5 actions concrètes pour économiser plus chaque mois.</p>
-        <div class="plan-features">
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Calculateur de <strong>budget mensuel</strong> avec revenus, dépenses fixes et variables</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i><strong>Plan IA en 5 actions chiffrées</strong> pour optimiser chaque poste de dépense</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Score mensuel d'épargne et suivi de progression</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Simulations retraite <strong>illimitées</strong></div>
-        </div>
         <button class="btn-plan btn-plan-secondary" data-plan="starter" id="btn-starter">
           Choisir Starter <i class="ti ti-arrow-right" aria-hidden="true"></i>
         </button>
+        <div class="plan-features">
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Calculateur de <strong>budget mensuel</strong> avec revenus, dépenses fixes et variables</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i><strong>Plan IA en 5 actions chiffrées</strong> pour optimiser chaque poste de dépense</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Score mensuel d'épargne et suivi de progression</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Simulations retraite <strong>illimitées</strong></div>
+        </div>
       </div>
 
       <!-- Coach Pro (featured) -->
@@ -211,16 +211,16 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
         <div class="plan-name">Coach Pro</div>
         <div class="plan-price">19,99 €<span>/mois</span></div>
         <p class="plan-desc">Un coach IA disponible 24h/24 pour tes questions sur le PEA, l'assurance-vie et la fiscalité.</p>
-        <div class="plan-features">
-          <div class="feature-inherit"><i class="ti ti-packages" aria-hidden="true"></i> Tout Starter inclus</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Chat avec le <strong>Coach IA Prevano</strong> — questions illimitées</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Conseils <strong>PEA · Assurance-vie · PER · Immobilier</strong> adaptés à ton profil</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Mise à jour mensuelle de ton <strong>plan retraite personnalisé</strong></div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Support prioritaire 48h</div>
-        </div>
         <button class="btn-plan btn-plan-primary" data-plan="pro" id="btn-pro">
           Choisir Coach Pro <i class="ti ti-arrow-right" aria-hidden="true"></i>
         </button>
+        <div class="plan-features">
+          <div class="feature-inherit"><i class="ti ti-packages" aria-hidden="true"></i> Tout Starter inclus</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Chat avec le <strong>Coach IA Prevano</strong> — questions illimitées</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Conseils <strong>PEA · Assurance-vie · PER · Immobilier</strong> adaptés à ton profil</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Mise à jour mensuelle de ton <strong>plan retraite personnalisé</strong></div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Support prioritaire 48h</div>
+        </div>
       </div>
 
       <!-- Daily Finance -->
@@ -228,16 +228,16 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
         <div class="plan-name">Daily Finance</div>
         <div class="plan-price">34,99 €<span>/mois</span></div>
         <p class="plan-desc">28 leçons financières en 5 min/jour — investissement, fiscalité, patrimoine — avec streak et badges.</p>
-        <div class="plan-features">
-          <div class="feature-inherit"><i class="ti ti-packages" aria-hidden="true"></i> Tout Coach Pro inclus</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Leçon quotidienne de <strong>5 minutes</strong> — 4 thèmes en rotation</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Quiz interactif + <strong>action concrète</strong> à appliquer le jour même</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i><strong>Streak, 6 badges</strong> et progression gamifiée</div>
-          <div class="feature"><i class="ti ti-check" aria-hidden="true"></i>Accès en avant-première aux nouvelles fonctionnalités</div>
-        </div>
         <button class="btn-plan btn-plan-secondary" data-plan="premium" id="btn-premium">
           Choisir Daily Finance <i class="ti ti-arrow-right" aria-hidden="true"></i>
         </button>
+        <div class="plan-features">
+          <div class="feature-inherit"><i class="ti ti-packages" aria-hidden="true"></i> Tout Coach Pro inclus</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Leçon quotidienne de <strong>5 minutes</strong> — 4 thèmes en rotation</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Quiz interactif + <strong>action concrète</strong> à appliquer le jour même</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i><strong>Streak, 6 badges</strong> et progression gamifiée</div>
+          <div class="feature"><i class="ti ti-circle-check-filled" aria-hidden="true"></i>Accès en avant-première aux nouvelles fonctionnalités</div>
+        </div>
       </div>
 
     </div>
