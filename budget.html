@@ -520,7 +520,22 @@ async function init() {
     const entryRes = await fetch('/api/features?t=budget', { credentials:'include' });
     if (entryRes.ok) {
       const { entry } = await entryRes.json();
-      if (entry) { fillForm(entry); updateSummary(); }
+      if (entry) {
+        fillForm(entry); updateSummary();
+      } else {
+        // Premier accès — bannière bienvenue
+        const banner = document.createElement('div');
+        banner.id = 'budget-welcome';
+        banner.style.cssText = 'background:linear-gradient(135deg,rgba(226,75,74,.12),rgba(255,123,53,.08));border:1px solid rgba(226,75,74,.25);border-radius:16px;padding:24px 28px;margin-bottom:28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;';
+        banner.innerHTML = `
+          <div style="font-size:40px;flex-shrink:0">📊</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:16px;font-weight:800;margin-bottom:6px">Bienvenue dans ton calculateur budget !</div>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:12px">Remplis tes revenus et dépenses ci-dessous. Le Coach IA génère ensuite <strong style="color:var(--text-primary)">5 actions concrètes et chiffrées</strong> pour optimiser chaque poste et augmenter ton épargne mensuelle.</p>
+            <button onclick="document.getElementById('f-salaire').focus();this.closest('#budget-welcome').remove();" style="background:var(--color-primary);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Commencer mon bilan →</button>
+          </div>`;
+        document.querySelector('.page-header')?.insertAdjacentElement('afterend', banner);
+      }
     }
   } catch {
     location.replace('/login.html?next=/budget.html');

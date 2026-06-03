@@ -1121,6 +1121,20 @@ async function init() {
     updateLevelBar(prog.total_completed);
     updateBestTheme(prog.best_theme);
 
+    // Bannière bienvenue au premier accès
+    if (prog.total_completed === 0 && prog.streak === 0) {
+      const welcome = document.createElement('div');
+      welcome.style.cssText = 'background:linear-gradient(135deg,rgba(226,75,74,.12),rgba(255,123,53,.08));border:1px solid rgba(226,75,74,.25);border-radius:16px;padding:24px 28px;margin-bottom:24px;';
+      welcome.innerHTML = `
+        <div style="font-size:32px;margin-bottom:10px">🎉</div>
+        <div style="font-size:17px;font-weight:800;margin-bottom:8px">Bienvenue dans Daily Finance !</div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:0">
+          Chaque jour, <strong style="color:var(--text-primary)">une leçon de 5 minutes</strong> sur l'investissement, la fiscalité ou le patrimoine.
+          Réponds au quiz, applique l'action du jour et garde ton 🔥 streak. C'est comme Duolingo — mais pour ta retraite.
+        </p>`;
+      document.getElementById('lesson-card')?.insertAdjacentElement('beforebegin', welcome);
+    }
+
     const lesson = LESSONS[prog.lesson_index] ?? LESSONS[0];
     renderLesson(lesson, prog.today_done);
     renderBadges(prog.total_completed, prog.streak);

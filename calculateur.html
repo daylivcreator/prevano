@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur PEA / PER / Assurance-vie — Prevano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<link rel="stylesheet" href="/mobile.css">
+<script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input,button,select{font-family:inherit;font-size:inherit;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-inner{max-width:1100px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--grad-brand);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo em{font-style:normal;}
+.nav-links{display:flex;align-items:center;gap:14px;}
+.nav-link{font-size:14px;color:var(--text-muted);text-decoration:none;transition:color .2s;}
+.nav-link:hover{color:var(--text-primary);}
+.btn-nav{background:var(--color-primary);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:background-color .2s;display:inline-flex;align-items:center;}
+.btn-nav:hover{background:var(--color-primary-dark);}
+main{flex:1;padding:48px 48px 80px;max-width:1100px;margin:0 auto;width:100%;}
+.page-header{margin-bottom:40px;}
+.page-header h1{font-size:32px;font-weight:900;letter-spacing:-0.04em;margin-bottom:8px;}
+.page-header p{font-size:15px;color:var(--text-muted);max-width:560px;}
+/* Layout */
+.calc-layout{display:grid;grid-template-columns:420px 1fr;gap:24px;align-items:start;}
+/* Form */
+.form-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:16px;padding:28px;}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;}
+.field input,.field select{background:var(--bg-raised);border:1px solid var(--border-default);border-radius:9px;padding:11px 14px;color:var(--text-primary);transition:border-color .2s;font-size:15px;}
+.field input:focus,.field select:focus{outline:none;border-color:var(--color-primary);}
+.field .hint{font-size:11px;color:var(--text-faint);}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin:20px 0 14px;display:flex;align-items:center;gap:8px;}
+.section-label i{color:var(--color-primary);}
+.btn-calc{width:100%;background:var(--color-primary);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s;margin-top:8px;}
+.btn-calc:hover{background:var(--color-primary-dark);}
+/* Résultats */
+.results-section{display:none;}
+.results-section.visible{display:block;}
+.result-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:20px;}
+/* Cards enveloppes */
+.env-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:24px;}
+.env-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:14px;padding:22px 24px;transition:border-color .2s;}
+.env-card.best{border-color:var(--color-primary-border);box-shadow:0 0 24px rgba(226,75,74,.1);}
+.env-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 10px;border-radius:100px;margin-bottom:12px;}
+.env-badge.best-badge{background:var(--color-primary-subtle);color:var(--color-primary);}
+.env-badge.other-badge{background:var(--bg-overlay);color:var(--text-faint);}
+.env-name{font-size:16px;font-weight:800;margin-bottom:4px;}
+.env-amount{font-size:32px;font-weight:900;letter-spacing:-.04em;color:var(--color-primary);line-height:1.1;margin-bottom:4px;}
+.env-amount span{font-size:14px;font-weight:500;color:var(--text-muted);}
+.env-capital{font-size:13px;color:var(--text-muted);margin-bottom:14px;}
+.env-avantages{display:flex;flex-direction:column;gap:7px;}
+.env-av{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text-muted);}
+.env-av i{color:var(--color-primary);font-size:14px;flex-shrink:0;margin-top:1px;}
+.env-av.neg i{color:var(--text-faint);}
+.env-av.neg{color:var(--text-faint);}
+/* Résumé fiscal */
+.fiscal-card{background:var(--bg-raised);border-radius:12px;padding:18px 20px;margin-top:16px;}
+.fiscal-title{font-size:12px;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+.fiscal-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border-subtle);}
+.fiscal-row:last-child{border-bottom:none;}
+.fiscal-val{font-weight:700;color:var(--text-primary);}
+.fiscal-saving{color:#22C55E;font-weight:700;}
+footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.footer-link{font-size:12px;color:var(--text-faint);text-decoration:none;}
+.footer-link:hover{color:var(--text-muted);}
+.footer-copy{font-size:12px;color:var(--text-faint);}
+@media(max-width:900px){.calc-layout{grid-template-columns:1fr;}}
+@media(max-width:640px){main{padding:28px 20px 60px;}.page-header h1{font-size:24px;}footer{padding:16px 20px;}}
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo-wrap">
+        <div class="logo-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="logo" translate="no">Pre<em>vano</em></span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/" class="nav-link">Simulateur</a>
+        <a href="/tarifs.html" class="nav-link">Tarifs</a>
+        <div id="nav-auth" style="display:flex;align-items:center;gap:10px"></div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="page-header">
+    <h1>Calculateur PEA · PER · Assurance-vie</h1>
+    <p>Combien investir chaque mois dans chaque enveloppe pour atteindre ton objectif de retraite ? Trouve la stratégie optimale selon ta tranche d'imposition.</p>
+  </div>
+
+  <div class="calc-layout">
+    <!-- Formulaire -->
+    <div class="form-card">
+      <div class="section-label"><i class="ti ti-target"></i>Ton objectif</div>
+      <div class="field">
+        <label for="c-gap">Revenu mensuel à compléter à la retraite (€)</label>
+        <input type="number" id="c-gap" placeholder="890" min="0" max="10000" inputmode="numeric">
+        <span class="hint">= écart entre ton salaire actuel et ta pension estimée</span>
+      </div>
+      <div class="field">
+        <label for="c-annees">Années avant la retraite</label>
+        <input type="number" id="c-annees" placeholder="25" min="1" max="45" inputmode="numeric">
+      </div>
+
+      <div class="section-label"><i class="ti ti-percent"></i>Paramètres financiers</div>
+      <div class="field">
+        <label for="c-rendement">Rendement annuel estimé (%)</label>
+        <select id="c-rendement">
+          <option value="3">3% — Prudent (fonds euros, obligations)</option>
+          <option value="5" selected>5% — Équilibré (mix actions/obligations)</option>
+          <option value="7">7% — Dynamique (majoritairement actions)</option>
+          <option value="9">9% — Offensif (100% actions, long terme)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="c-tranche">Tranche marginale d'imposition</label>
+        <select id="c-tranche">
+          <option value="0">0% — Non imposable</option>
+          <option value="11" selected>11% — Tranche 2</option>
+          <option value="30">30% — Tranche 3</option>
+          <option value="41">41% — Tranche 4</option>
+          <option value="45">45% — Tranche 5</option>
+        </select>
+      </div>
+
+      <div class="section-label"><i class="ti ti-calendar"></i>Durée de consommation</div>
+      <div class="field">
+        <label for="c-duree">Pendant combien d'années à la retraite</label>
+        <select id="c-duree">
+          <option value="20">20 ans</option>
+          <option value="25" selected>25 ans</option>
+          <option value="30">30 ans</option>
+        </select>
+      </div>
+
+      <button class="btn-calc" id="btn-calc">
+        Calculer ma stratégie <i class="ti ti-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- Résultats -->
+    <div class="results-section" id="results">
+      <div class="result-header">Stratégie recommandée</div>
+      <div class="env-grid" id="env-grid"></div>
+      <div class="fiscal-card" id="fiscal-card"></div>
+      <p style="font-size:11px;color:var(--text-faint);margin-top:16px;line-height:1.6">
+        ⚠️ Ces calculs sont indicatifs. Les rendements passés ne garantissent pas les rendements futurs. Consultez un conseiller en gestion de patrimoine pour une stratégie personnalisée.
+      </p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div style="display:flex;gap:20px;">
+      <a href="/cgv.html" class="footer-link">CGV</a>
+      <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
+      <a href="/contact.html" class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2026 Prevano</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+// Pré-remplir depuis la dernière simulation
+try {
+  const saved = JSON.parse(localStorage.getItem('prv_last_sim') || 'null');
+  if (saved) {
+    const RATE = {prive:{b:.35,e:.15,f:43},fonctionnaire:{b:.55,e:.20,f:41.5},independant:{b:.25,e:.10,f:43}};
+    const r = RATE[saved.statut] ?? RATE.prive;
+    const ann = (saved.dep||64) - (saved.age||40);
+    const pension = Math.round(saved.sal * (r.b + Math.min(ann/r.f,1)*r.e));
+    const gap = saved.sal - pension;
+    if (gap > 0) document.getElementById('c-gap').value    = gap;
+    if (ann > 0) document.getElementById('c-annees').value = ann;
+  }
+} catch {}
+
+// Nav auth
+(async () => {
+  const navAuth = document.getElementById('nav-auth');
+  if (!navAuth) return;
+  try {
+    const res = await fetch('/api/auth/me', { credentials:'include' });
+    if (res.ok) {
+      const { user } = await res.json();
+      const escH = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      navAuth.innerHTML = `<a href="/profil.html" class="nav-link">Bonjour, ${escH(user.firstName)}</a>`;
+    } else {
+      navAuth.innerHTML = `<a href="/login.html" class="nav-link">Connexion</a><a href="/signup.html" class="btn-nav">Commencer</a>`;
+    }
+  } catch { navAuth.innerHTML = `<a href="/login.html" class="nav-link">Connexion</a><a href="/signup.html" class="btn-nav">Commencer</a>`; }
+})();
+
+function fmt(n) { return Math.round(n).toLocaleString('fr-FR'); }
+
+function calcEpargne(capitalCible, annees, rendementAnnuel) {
+  // Formule valeur future d'une rente : C = E * ((1+r)^n - 1) / r
+  const r = rendementAnnuel / 12;
+  const n = annees * 12;
+  if (r === 0) return capitalCible / n;
+  return capitalCible * r / (Math.pow(1 + r, n) - 1);
+}
+
+function calcCapitalCible(rente, dureeRetraite, rendRetrait) {
+  // Capital nécessaire pour servir une rente pendant X ans
+  const r = rendRetrait / 12;
+  const n = dureeRetraite * 12;
+  if (r === 0) return rente * n;
+  return rente * (1 - Math.pow(1 + r, -n)) / r;
+}
+
+document.getElementById('btn-calc').addEventListener('click', () => {
+  const gap     = parseFloat(document.getElementById('c-gap').value)     || 0;
+  const annees  = parseInt(document.getElementById('c-annees').value)    || 25;
+  const rend    = parseFloat(document.getElementById('c-rendement').value) / 100;
+  const tranche = parseFloat(document.getElementById('c-tranche').value) / 100;
+  const duree   = parseInt(document.getElementById('c-duree').value)     || 25;
+
+  if (gap <= 0) { document.getElementById('c-gap').focus(); return; }
+
+  window.plausible?.('Calculateur PEA/PER');
+
+  // Capital nécessaire (rendement 2% en phase de retrait = conservateur)
+  const capitalCible = calcCapitalCible(gap, duree, 0.02);
+
+  // Épargne mensuelle par enveloppe
+  const epPEA = calcEpargne(capitalCible, annees, rend);
+  const epPER = calcEpargne(capitalCible * (1 - tranche), annees, rend * 1.05); // déduction fiscale réinvestie
+  const epAV  = calcEpargne(capitalCible, annees, rend * 0.95); // frais gestion ~0.8%/an
+
+  // Économie fiscale PER (déduction IR chaque année)
+  const versAnnuelPER  = epPER * 12;
+  const econoFiscPER   = versAnnuelPER * tranche;
+  const econoFiscTotal = econoFiscPER * annees;
+
+  // Capital accumulé au terme
+  const capPEA = epPEA * (Math.pow(1 + rend/12, annees*12) - 1) / (rend/12);
+  const capPER = epPER * (Math.pow(1 + (rend*1.05)/12, annees*12) - 1) / ((rend*1.05)/12);
+  const capAV  = epAV  * (Math.pow(1 + (rend*0.95)/12, annees*12) - 1) / ((rend*0.95)/12);
+
+  const ENVELOPPES = [
+    {
+      id: 'PEA',
+      name: 'Plan d\'Épargne en Actions',
+      ep: epPEA, cap: capPEA, best: tranche < 0.3,
+      avantages: [
+        { pos: true,  txt: 'Exonération totale d\'IR après 5 ans (hors PS 17,2%)' },
+        { pos: true,  txt: 'Plafond 150 000 € — idéal pour les actions européennes' },
+        { pos: true,  txt: 'Sortie libre à tout moment après 5 ans' },
+        { pos: false, txt: 'Pas de déduction fiscale à l\'entrée' },
+        { pos: false, txt: 'Uniquement actions Europe / ETF éligibles' },
+      ],
+    },
+    {
+      id: 'PER',
+      name: 'Plan d\'Épargne Retraite',
+      ep: epPER, cap: capPER, best: tranche >= 0.3,
+      avantages: [
+        { pos: true,  txt: `Déduction fiscale immédiate (économie ${fmt(econoFiscPER)} €/an pour toi)` },
+        { pos: true,  txt: 'Large choix de supports (actions, fonds euros, SCPI…)' },
+        { pos: true,  txt: 'Sortie en rente ou en capital à la retraite' },
+        { pos: false, txt: 'Bloqué jusqu\'à la retraite (sauf cas exceptionnels)' },
+        { pos: false, txt: 'Fiscalité à la sortie (IR + PS sur les versements déduits)' },
+      ],
+    },
+    {
+      id: 'AV',
+      name: 'Assurance-vie',
+      ep: epAV, cap: capAV, best: false,
+      avantages: [
+        { pos: true,  txt: 'Disponibilité totale à tout moment' },
+        { pos: true,  txt: 'Fiscalité avantageuse après 8 ans (abattement 4 600 €)' },
+        { pos: true,  txt: 'Transmission hors succession (abattement 152 500 €)' },
+        { pos: false, txt: 'Frais de gestion annuels (0,5%–1% selon contrat)' },
+        { pos: false, txt: 'Pas de déduction fiscale à l\'entrée' },
+      ],
+    },
+  ];
+
+  // Ordonner : best en premier
+  ENVELOPPES.sort((a,b) => (b.best?1:0)-(a.best?1:0));
+
+  const grid = document.getElementById('env-grid');
+  grid.innerHTML = ENVELOPPES.map(e => `
+    <div class="env-card${e.best?' best':''}">
+      <div class="env-badge ${e.best?'best-badge':'other-badge'}">
+        ${e.best ? '⭐ Recommandé pour toi' : e.id}
+      </div>
+      <div class="env-name">${e.name} (${e.id})</div>
+      <div class="env-amount">${fmt(e.ep)} €<span>/mois</span></div>
+      <div class="env-capital">Capital accumulé en ${annees} ans : <strong>${fmt(e.cap)} €</strong></div>
+      <div class="env-avantages">
+        ${e.avantages.map(a => `
+          <div class="env-av${a.pos?'':' neg'}">
+            <i class="ti ti-${a.pos?'check':'minus'}"></i>${a.txt}
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const fiscal = document.getElementById('fiscal-card');
+  if (tranche > 0) {
+    fiscal.innerHTML = `
+      <div class="fiscal-title"><i class="ti ti-receipt-tax" style="font-size:14px;margin-right:6px;color:var(--color-primary)"></i>Impact fiscal du PER pour toi</div>
+      <div class="fiscal-row"><span>Versement annuel PER</span><span class="fiscal-val">${fmt(versAnnuelPER)} €</span></div>
+      <div class="fiscal-row"><span>Économie d'IR annuelle (TMI ${(tranche*100).toFixed(0)}%)</span><span class="fiscal-saving">−${fmt(econoFiscPER)} €</span></div>
+      <div class="fiscal-row"><span>Économie totale sur ${annees} ans</span><span class="fiscal-saving">−${fmt(econoFiscTotal)} €</span></div>
+      <div class="fiscal-row"><span>Capital cible (rente ${fmt(gap)} €/mois pendant ${duree} ans)</span><span class="fiscal-val">${fmt(capitalCible)} €</span></div>`;
+  } else {
+    fiscal.innerHTML = `
+      <div class="fiscal-title">Capital cible</div>
+      <div class="fiscal-row"><span>Pour une rente de ${fmt(gap)} €/mois pendant ${duree} ans</span><span class="fiscal-val">${fmt(capitalCible)} €</span></div>`;
+  }
+
+  const results = document.getElementById('results');
+  results.classList.add('visible');
+  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+</script>
+<script src="/mobile-nav.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

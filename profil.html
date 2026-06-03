@@ -135,8 +135,9 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
         <span class="logo" translate="no">Pre<em>vano</em></span>
       </a>
       <div class="nav-links">
-        <a href="/tarifs.html" class="nav-link">Tarifs</a>
-        <a href="/"            class="nav-link">Simulateur</a>
+        <a href="/tarifs.html"      class="nav-link">Tarifs</a>
+        <a href="/"                 class="nav-link">Simulateur</a>
+        <a href="/calculateur.html" class="nav-link">PEA · PER</a>
         <button id="btn-logout" class="btn-nav">Déconnexion</button>
       </div>
     </div>
@@ -266,6 +267,14 @@ function buildToolsCard(plan) {
         <div class="tool-desc">Plan d'optimisation IA en 5 actions</div>
       </div>
       <i class="ti ti-arrow-right tool-arrow" aria-hidden="true"></i>
+    </a>
+    <a href="/calculateur.html" class="tool-link">
+      <div class="tool-icon"><i class="ti ti-building-bank" aria-hidden="true"></i></div>
+      <div class="tool-body">
+        <div class="tool-name">Calculateur PEA · PER · AV</div>
+        <div class="tool-desc">Stratégie d'investissement optimale</div>
+      </div>
+      <i class="ti ti-arrow-right tool-arrow" aria-hidden="true"></i>
     </a>`);
 
   if (PRO.has(plan)) {
@@ -353,7 +362,37 @@ function buildScoreDashCard() {
             <i class="ti ti-refresh" aria-hidden="true"></i> Resimul­er
           </a>
         </div>
+        ${buildHistoryHtml()}
       </div>`;
+  } catch { return ''; }
+}
+
+function buildHistoryHtml() {
+  try {
+    const hist = JSON.parse(localStorage.getItem('prv_sim_history') || '[]');
+    if (hist.length < 2) return ''; // Pas assez d'historique à montrer
+    const TIERS = [{t:26,c:'#E24B4A',l:'Critique'},{t:51,c:'#CD7F32',l:'Bronze'},{t:71,c:'#B0B0C8',l:'Argent'},{t:91,c:'#FFB400',l:'Or'},{t:Infinity,c:'#22C55E',l:'Platine'}];
+    const RATE  = {prive:{b:.35,e:.15,f:43},fonctionnaire:{b:.55,e:.20,f:41.5},independant:{b:.25,e:.10,f:43}};
+    function calcScore(s) {
+      const r=RATE[s.statut]??RATE.prive, ann=(s.dep||64)-s.age, p=Math.round(s.sal*(r.b+Math.min(ann/r.f,1)*r.e));
+      let sc=Math.round((p/s.sal)*40)+Math.min(Math.round(((s.ep||0)/s.sal)*150),20)+Math.min(Math.round((ann/r.f)*25),25)+({prive:5,fonctionnaire:15,independant:0}[s.statut]??5);
+      return Math.min(Math.max(sc,5),100);
+    }
+    const rows = hist.slice(0,6).map(s => {
+      const sc=calcScore(s), tier=TIERS.find(t=>sc<t.t);
+      const d=s.date?new Date(s.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border-subtle);">
+        <div style="font-size:22px;font-weight:900;color:${tier.c};min-width:38px;text-align:right">${sc}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:${tier.c}">${tier.l}</div>
+          <div style="font-size:11px;color:var(--text-faint)">${d} · ${s.sal?s.sal.toLocaleString('fr-FR')+'€':''}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border-subtle)">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:12px">Historique</div>
+      ${rows}
+    </div>`;
   } catch { return ''; }
 }
 
