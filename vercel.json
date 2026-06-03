@@ -1,4 +1,7 @@
 {
+  "crons": [
+    { "path": "/api/features?t=cron-reminder", "schedule": "0 9 1 * *" }
+  ],
   "headers": [
     {
       "source": "/(.*\\.(?:png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$)",

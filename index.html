@@ -155,9 +155,11 @@ nav { border-bottom:1px solid var(--border-subtle); padding:0 48px; background:r
 .score-num { font-size:30px; font-weight:900; letter-spacing:-0.04em; }
 .score-max { font-size:12px; color:var(--text-faint); font-weight:500; margin-top:2px; }
 .score-badge { font-size:13px; font-weight:700; padding:5px 14px; border-radius:100px; letter-spacing:0.04em; }
-.score-badge.bad  { background:rgba(226,75,74,0.15); color:var(--color-primary); }
-.score-badge.mid  { background:rgba(255,180,0,0.15);  color:#FFB400; }
-.score-badge.good { background:rgba(34,197,94,0.15);  color:#22C55E; }
+.score-badge.tier-critical { background:rgba(226,75,74,0.15);   color:#E24B4A; }
+.score-badge.tier-bronze   { background:rgba(205,127,50,0.18);  color:#CD7F32; }
+.score-badge.tier-silver   { background:rgba(180,180,180,0.18); color:#B0B0C8; }
+.score-badge.tier-gold     { background:rgba(255,180,0,0.18);   color:#FFB400; }
+.score-badge.tier-platine  { background:rgba(34,197,94,0.18);   color:#22C55E; }
 .score-tip { font-size:13px; color:var(--text-muted); margin-top:10px; max-width:340px; line-height:1.55; }
 
 .bar-card { background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:14px; padding:24px; margin-bottom:28px; }
@@ -690,12 +692,16 @@ const SCORE_WEIGHTS = {
 };
 
 const SCORE_TIERS = [
-  { threshold: 35, color: '#E24B4A', cls: 'bad',  label: 'Situation critique',
-    tip: "Ton niveau d'épargne actuel ne compensera pas le manque à la retraite. Il est urgent d'agir dès maintenant." },
-  { threshold: 65, color: '#FFB400', cls: 'mid',  label: 'À améliorer',
-    tip: "Tu as une base correcte, mais quelques ajustements maintenant feront une grande différence dans 20 ans." },
-  { threshold: Infinity, color: '#22C55E', cls: 'good', label: 'Bonne trajectoire',
-    tip: "Tu es sur la bonne voie. Continue et optimise ton allocation pour sécuriser encore mieux ton avenir." },
+  { threshold: 26,       color: '#E24B4A', cls: 'tier-critical', label: '🔴 Situation critique',
+    tip: "Ton niveau d'épargne actuel ne compensera pas le manque à la retraite. Il est urgent d'agir maintenant." },
+  { threshold: 51,       color: '#CD7F32', cls: 'tier-bronze',   label: '🥉 Bronze',
+    tip: "Tu as posé les bases. Quelques ajustements ciblés maintenant peuvent radicalement changer ton futur." },
+  { threshold: 71,       color: '#B0B0C8', cls: 'tier-silver',   label: '🥈 Argent',
+    tip: "Bonne progression. Optimise ton épargne mensuelle et tes enveloppes fiscales pour passer à l'Or." },
+  { threshold: 91,       color: '#FFB400', cls: 'tier-gold',     label: '🥇 Or',
+    tip: "Excellente trajectoire ! Affine ton plan avec le Coach IA pour atteindre le niveau Platine." },
+  { threshold: Infinity, color: '#22C55E', cls: 'tier-platine',  label: '💎 Platine',
+    tip: "Score exceptionnel. Tu es parmi les mieux préparés — maintiens le cap et optimise ta transmission." },
 ];
 
 const CONFETTI_COLORS = ['#E24B4A','#FF7B6B','#FFB400','#22C55E','#60A5FA','#F5F4F0'];
@@ -1217,7 +1223,125 @@ $('btn-scroll').addEventListener('click', () => {
   window.plausible?.('CTA Hero');
   setTimeout(() => $('age')?.focus(), 600);
 });
-$('btn-simulate').addEventListener('click', simulate);
+
+/* ─── Sauvegarde simulation en localStorage ─────────────────── */
+
+const SIM_KEY  = 'prv_last_sim';
+const SIM_COUNT_KEY = 'prv_sim_count';
+const FREE_SIM_MAX  = 3;
+
+function saveSimToStorage(data) {
+  try { localStorage.setItem(SIM_KEY, JSON.stringify({ ...data, date: new Date().toISOString() })); } catch {}
+}
+
+function loadSimFromStorage() {
+  try { return JSON.parse(localStorage.getItem(SIM_KEY) || 'null'); } catch { return null; }
+}
+
+function getSimCount() {
+  return parseInt(localStorage.getItem(SIM_COUNT_KEY) || '0');
+}
+
+function incSimCount() {
+  const n = getSimCount() + 1;
+  try { localStorage.setItem(SIM_COUNT_KEY, String(n)); } catch {}
+  return n;
+}
+
+// Pré-remplir le formulaire depuis la dernière simulation
+(function prefillForm() {
+  const saved = loadSimFromStorage();
+  if (!saved) return;
+  const d = new Date(saved.date);
+  const label = d.toLocaleDateString('fr-FR', { day:'numeric', month:'long' });
+  const banner = document.createElement('div');
+  banner.id = 'prefill-banner';
+  banner.style.cssText = 'background:var(--bg-surface);border:1px solid var(--border-default);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--text-muted);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
+  banner.innerHTML = `<span><i class="ti ti-history" style="color:var(--color-primary);margin-right:6px"></i>Simulation du ${label} rechargée — modifie les champs si besoin.</span>
+    <button onclick="this.closest('#prefill-banner').remove()" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:18px;line-height:1">×</button>`;
+  const simWrap = document.querySelector('.sim-wrap');
+  if (simWrap) simWrap.prepend(banner);
+  if (saved.age)    { const el = $('age');    if (el) el.value = saved.age; }
+  if (saved.sal)    { const el = $('salaire'); if (el) el.value = saved.sal; }
+  if (saved.ep)     { const el = $('epargne'); if (el) el.value = saved.ep; }
+  if (saved.dep)    { const el = $('depart');  if (el) el.value = saved.dep; }
+  if (saved.statut) { const el = $('statut');  if (el) el.value = saved.statut; }
+})();
+
+/* ─── Gate : 3 simulations gratuites max sans compte ─────────── */
+
+function showSignupGate() {
+  const overlay = document.createElement('div');
+  overlay.id = 'sim-gate';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);';
+  overlay.innerHTML = `
+    <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:20px;max-width:440px;width:100%;padding:40px 36px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:16px">🔒</div>
+      <h2 style="font-size:22px;font-weight:900;letter-spacing:-0.04em;margin-bottom:12px">Crée ton compte gratuit</h2>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:28px;line-height:1.65">
+        Tu as utilisé tes <strong style="color:var(--text-primary)">${FREE_SIM_MAX} simulations gratuites</strong>.<br>
+        Crée un compte pour continuer — c'est <strong style="color:var(--text-primary)">100% gratuit</strong> et sans carte bancaire.
+      </p>
+      <a href="/signup.html" style="display:block;background:var(--color-primary);color:#fff;border-radius:10px;padding:14px;font-weight:700;font-size:15px;text-decoration:none;margin-bottom:12px;">
+        Créer mon compte gratuit <i class="ti ti-arrow-right"></i>
+      </a>
+      <a href="/login.html" style="display:block;color:var(--text-muted);font-size:13px;text-decoration:none;">Déjà un compte ? Connexion</a>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+/* ─── Wrap simulate() avec sauvegarde + gate ─────────────────── */
+
+const _simulateOriginal = simulate;
+window.simulate = async function simulateWrapped() {
+  // Vérifier si connecté (si oui, illimité)
+  let isLoggedIn = false;
+  try {
+    const r = await fetch('/api/auth/me', { credentials: 'include' });
+    isLoggedIn = r.ok;
+  } catch {}
+
+  if (!isLoggedIn) {
+    const count = getSimCount();
+    if (count >= FREE_SIM_MAX) { showSignupGate(); return; }
+    incSimCount();
+  }
+
+  _simulateOriginal();
+
+  // Sauvegarder après un court délai (pour que les champs soient lus)
+  setTimeout(async () => {
+    const age    = parseInt($('age')?.value)    || null;
+    const sal    = parseInt($('salaire')?.value) || null;
+    const ep     = parseInt($('epargne')?.value) || null;
+    const dep    = parseInt($('depart')?.value)  || null;
+    const statut = $('statut')?.value || null;
+    if (!age || !sal) return;
+
+    // localStorage (toujours)
+    saveSimToStorage({ age, sal, ep, dep, statut });
+
+    // DB (si connecté) — calcul score + save
+    if (isLoggedIn) {
+      try {
+        const RATE = { prive:{base:.35,extra:.15,fy:43}, fonctionnaire:{base:.55,extra:.20,fy:41.5}, independant:{base:.25,extra:.10,fy:43} };
+        const r    = RATE[statut] ?? RATE.prive;
+        const ann  = (dep||64) - age;
+        const pension2 = Math.round(sal * (r.base + Math.min(ann/r.fy,1)*r.extra));
+        const gap2     = sal - pension2;
+        let sc = Math.round((pension2/sal)*40) + Math.min(Math.round(((ep||0)/sal)*150),20)
+               + Math.min(Math.round((ann/r.fy)*25),25) + ({prive:5,fonctionnaire:15,independant:0}[statut]??5);
+        sc = Math.min(Math.max(sc,5),100);
+        fetch('/api/features', {
+          method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify({ type:'simulation', age, sal, pension:pension2, gap:gap2, ep:ep||0, annees:ann, statut, score:sc }),
+        }).catch(() => {});
+      } catch {}
+    }
+  }, 300);
+};
+
+$('btn-simulate').addEventListener('click', window.simulate);
 updateCta();
 </script>
 </body>

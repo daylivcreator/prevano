@@ -47,6 +47,17 @@ main{flex:1;padding:48px 48px 80px;max-width:1100px;margin:0 auto;width:100%;}
 .tool-desc{font-size:12px;color:var(--text-muted);}
 .tool-arrow{font-size:16px;color:var(--text-faint);transition:transform .2s;}
 .tool-link:hover .tool-arrow{transform:translateX(3px);color:var(--color-primary);}
+.tool-locked{opacity:0.55;cursor:default;pointer-events:none;}
+.lock-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;background:var(--color-primary-subtle);color:var(--color-primary);letter-spacing:0.04em;margin-left:6px;vertical-align:middle;}
+/* Dashboard score card */
+.score-dash{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.score-dash-ring{position:relative;width:64px;height:64px;flex-shrink:0;}
+.score-dash-ring svg{width:64px;height:64px;}
+.score-dash-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;}
+.score-dash-info{flex:1;min-width:0;}
+.score-dash-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-faint);margin-bottom:4px;}
+.score-dash-tier{font-size:14px;font-weight:700;}
+.score-dash-date{font-size:12px;color:var(--text-muted);margin-top:2px;}
 .upgrade-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:16px 20px;gap:12px;}
 .upgrade-text{font-size:13px;color:var(--text-muted);}
 .upgrade-text strong{color:var(--text-primary);}
@@ -197,8 +208,34 @@ function buildToolsCard(plan) {
     return `
       <div class="card tools-card">
         <div class="card-title">Mes outils</div>
-        <div class="upgrade-row">
-          <span class="upgrade-text"><strong>Débloquez les outils Prevano</strong> — Calculateur budget, Coach IA, leçons quotidiennes.</span>
+        <div class="tools-grid">
+          <div class="tool-link tool-locked">
+            <div class="tool-icon"><i class="ti ti-chart-pie-2" aria-hidden="true"></i></div>
+            <div class="tool-body">
+              <div class="tool-name">Calculateur Budget <span class="lock-badge">Starter</span></div>
+              <div class="tool-desc">Plan d'optimisation IA en 5 actions</div>
+            </div>
+            <i class="ti ti-lock tool-arrow" aria-hidden="true"></i>
+          </div>
+          <div class="tool-link tool-locked">
+            <div class="tool-icon"><i class="ti ti-message-chatbot" aria-hidden="true"></i></div>
+            <div class="tool-body">
+              <div class="tool-name">Coach IA <span class="lock-badge">Coach Pro</span></div>
+              <div class="tool-desc">Conseils PEA, AV, PER personnalisés</div>
+            </div>
+            <i class="ti ti-lock tool-arrow" aria-hidden="true"></i>
+          </div>
+          <div class="tool-link tool-locked">
+            <div class="tool-icon"><i class="ti ti-flame" aria-hidden="true"></i></div>
+            <div class="tool-body">
+              <div class="tool-name">Leçon du jour <span class="lock-badge">Daily Finance</span></div>
+              <div class="tool-desc">5 min/jour, streak et badges</div>
+            </div>
+            <i class="ti ti-lock tool-arrow" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="upgrade-row" style="margin-top:16px">
+          <span class="upgrade-text"><strong>Débloquez vos outils</strong> — à partir de 9,99€/mois, sans engagement.</span>
           <a href="/tarifs.html" class="btn-primary" style="white-space:nowrap;text-decoration:none;width:auto;">
             <i class="ti ti-bolt" aria-hidden="true"></i> Voir les offres
           </a>
@@ -256,6 +293,57 @@ function buildToolsCard(plan) {
     </div>`;
 }
 
+function buildScoreDashCard() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('prv_last_sim') || 'null');
+    if (!saved || !saved.age) return '';
+    const TIERS = [
+      { t:26, color:'#E24B4A', label:'🔴 Situation critique' },
+      { t:51, color:'#CD7F32', label:'🥉 Bronze' },
+      { t:71, color:'#B0B0C8', label:'🥈 Argent' },
+      { t:91, color:'#FFB400', label:'🥇 Or' },
+      { t:Infinity, color:'#22C55E', label:'💎 Platine' },
+    ];
+    const RATE = { prive:{ base:.35,extra:.15,fy:43 }, fonctionnaire:{ base:.55,extra:.20,fy:41.5 }, independant:{ base:.25,extra:.10,fy:43 } };
+    const r    = RATE[saved.statut] ?? RATE.prive;
+    const ann  = (saved.dep||64) - (saved.age||40);
+    const pension = Math.round((saved.sal||0) * (r.base + Math.min(ann/r.fy,1)*r.extra));
+    let score = 0;
+    score += Math.round((pension/(saved.sal||1))*40);
+    score += Math.min(Math.round(((saved.ep||0)/(saved.sal||1))*150),20);
+    score += Math.min(Math.round((ann/r.fy)*25),25);
+    score += { prive:5, fonctionnaire:15, independant:0 }[saved.statut] ?? 5;
+    score  = Math.min(Math.max(score,5),100);
+    const tier = TIERS.find(t => score < t.t);
+    const circ = 2*Math.PI*26;
+    const offset = (circ - (score/100)*circ).toFixed(1);
+    const date = saved.date ? new Date(saved.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) : '';
+    return `
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-title">Ma dernière simulation</div>
+        <div class="score-dash">
+          <div class="score-dash-ring">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--bg-overlay)" stroke-width="6"/>
+              <circle cx="32" cy="32" r="26" fill="none" stroke="${tier.color}" stroke-width="6"
+                stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset}"
+                stroke-linecap="round" transform="rotate(-90 32 32)"/>
+            </svg>
+            <div class="score-dash-num" style="color:${tier.color}">${score}</div>
+          </div>
+          <div class="score-dash-info">
+            <div class="score-dash-label">Score retraite</div>
+            <div class="score-dash-tier">${tier.label}</div>
+            <div class="score-dash-date">${date ? `Simulé le ${date}` : ''} · ${saved.statut ?? ''} · ${saved.sal ? saved.sal.toLocaleString('fr-FR')+'€/mois' : ''}</div>
+          </div>
+          <a href="/" class="btn-secondary" style="text-decoration:none;font-size:13px;">
+            <i class="ti ti-refresh" aria-hidden="true"></i> Resimul­er
+          </a>
+        </div>
+      </div>`;
+  } catch { return ''; }
+}
+
 function renderProfile(user) {
   const grid = document.getElementById('profile-grid');
   const hasPaid = user.plan !== 'free';
@@ -288,6 +376,10 @@ function renderProfile(user) {
   `;
 
   document.getElementById('page-title').textContent = `Bonjour, ${escHtml(user.firstName)} !`;
+
+  // Score dashboard card (depuis localStorage)
+  const scoreCard = buildScoreDashCard();
+  if (scoreCard) grid.insertAdjacentHTML('afterbegin', scoreCard);
 
   // Tools card
   const toolsCard = buildToolsCard(user.plan);

@@ -150,6 +150,48 @@ module.exports = async function handler(req, res) {
       } catch (err) { console.error('[features/daily-progress]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
+    // GET ?t=cron-reminder → rappel mensuel email (appelé par Vercel Cron, protégé)
+    if (t === 'cron-reminder') {
+      const auth = req.headers['authorization'] ?? '';
+      if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
+        return res.status(401).json({ error: 'Non autorisé.' });
+      }
+      const resendKey = process.env.RESEND_API_KEY;
+      const emailFrom = process.env.EMAIL_FROM ?? 'noreply@prevano.fr';
+      if (!resendKey) return res.status(503).json({ error: 'Resend non configuré.' });
+
+      try {
+        // Récupérer tous les abonnés actifs
+        const users = await sql`
+          SELECT email, first_name, plan FROM users
+          WHERE plan IN ('starter','pro','premium')
+          AND subscription_status = 'active'
+          LIMIT 500
+        `;
+        const month = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+        let sent = 0;
+        for (const u of users.rows) {
+          try {
+            await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                from: emailFrom,
+                to: u.email,
+                subject: `Prevano — Bilan de ${month} : mets à jour ton plan`,
+                html: `<p>Bonjour ${u.first_name ?? 'là'} 👋</p>
+                  <p>C'est le début du mois — le bon moment pour <strong>mettre à jour ton budget et relancer une simulation</strong> avec les données de ${month}.</p>
+                  <p><a href="https://prevano.vercel.app/profil.html" style="display:inline-block;background:#E24B4A;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Accéder à mon espace →</a></p>
+                  <p style="font-size:12px;color:#888">Désabonnement : <a href="https://prevano.vercel.app/contact.html">contacter le support</a></p>`,
+              }),
+            });
+            sent++;
+          } catch (e) { console.error('[cron-reminder] email:', u.email, e.message); }
+        }
+        return res.status(200).json({ ok: true, sent });
+      } catch (err) { console.error('[cron-reminder]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
     return res.status(400).json({ error: 'Paramètre ?t manquant. Valeurs : budget, simulation, daily.' });
   }
 
@@ -281,7 +323,24 @@ module.exports = async function handler(req, res) {
       } catch (err) { console.error('[features/daily-complete]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
-    return res.status(400).json({ error: 'Paramètre type manquant. Valeurs : budget, coach, daily.' });
+    // POST type=simulation → sauvegarder la simulation retraite
+    if (type === 'simulation') {
+      const session = requireSession(req, res);
+      if (!session) return;
+      const { age, sal, pension, gap, ep, annees, statut, score } = req.body ?? {};
+      if (!age || !sal || !statut) return res.status(400).json({ error: 'Données manquantes.' });
+      const data = JSON.stringify({ age, sal, pension, gap, ep, annees, statut, score });
+      try {
+        await sql`
+          INSERT INTO user_simulations (user_id, data, updated_at)
+          VALUES (${session.userId}, ${data}, NOW())
+          ON CONFLICT (user_id) DO UPDATE SET data = ${data}, updated_at = NOW()
+        `;
+        return res.status(200).json({ ok: true });
+      } catch (err) { console.error('[features/simulation-save]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
+    return res.status(400).json({ error: 'Paramètre type manquant. Valeurs : budget, coach, daily, simulation.' });
   }
 
   return res.status(405).json({ error: 'Méthode non autorisée.' });
