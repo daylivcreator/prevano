@@ -256,7 +256,12 @@ module.exports = async function handler(req, res) {
         const userResult = await sql`SELECT u.first_name, u.plan, s.data AS sim_data FROM users u LEFT JOIN user_simulations s ON s.user_id = u.id WHERE u.id = ${session.userId}`;
         const user = userResult.rows[0];
         if (!user) return res.status(401).json({ error: 'Compte introuvable.' });
-        if (!PRO_PLANS.has(user.plan)) return res.status(403).json({ error: 'Accès réservé aux abonnés Coach Pro et Daily Finance.' });
+        if (!PRO_PLANS.has(user.plan)) {
+          // 1 message gratuit pour les comptes free
+          const msgCount = await sql`SELECT COUNT(*)::int AS n FROM coach_messages WHERE user_id = ${session.userId} AND role = 'user'`;
+          const used = msgCount.rows[0]?.n ?? 0;
+          if (used >= 1) return res.status(403).json({ error: 'free_limit', message: 'Tu as utilisé ton message gratuit. Passe à Coach Pro pour des conseils illimités.' });
+        }
         if (!rateLimitUser(session.userId, 20, 3_600_000)) return res.status(429).json({ error: 'Limite de 20 messages par heure atteinte. Reviens plus tard !' });
 
         const { message, history } = req.body ?? {};

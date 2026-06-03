@@ -313,6 +313,23 @@ async function sendMessage(text) {
     }
 
     if (!res.ok) {
+      if (data.error === 'free_limit') {
+        // Upsell après le message gratuit épuisé
+        const upsell = document.createElement('div');
+        upsell.style.cssText = 'margin:16px 0;background:var(--bg-surface);border:1px solid var(--color-primary-border);border-radius:14px;padding:20px 24px;text-align:center;';
+        upsell.innerHTML = `
+          <div style="font-size:22px;margin-bottom:10px">🔓</div>
+          <div style="font-weight:700;margin-bottom:8px">Tu as utilisé ton message gratuit</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6">Passe à <strong style="color:var(--text-primary)">Coach Pro à 19,99€/mois</strong> pour poser toutes tes questions — PEA, PER, assurance-vie, fiscalité — sans limite.</p>
+          <a href="/tarifs.html" style="display:inline-block;background:var(--color-primary);color:#fff;padding:11px 24px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none;">Passer à Coach Pro →</a>`;
+        messagesWrap.appendChild(upsell);
+        scrollBottom();
+        input.disabled  = true;
+        btnSend.disabled = true;
+        document.getElementById('free-coach-banner')?.remove();
+        history.pop();
+        return;
+      }
       appendMessage('assistant', data.error ?? 'Une erreur est survenue. Réessaie.');
       history.pop();
       return;
@@ -467,14 +484,20 @@ async function init() {
 
     document.getElementById('page-loading').style.display = 'none';
 
-    const PRO = new Set(['pro', 'premium']);
-    if (!PRO.has(user.plan)) {
-      document.getElementById('plan-guard').style.display = 'flex';
-      return;
-    }
-
     document.getElementById('user-firstname').textContent = user.firstName ?? '';
     document.getElementById('chat-shell').style.display = 'flex';
+
+    // Bandeau "1 message gratuit" pour les free
+    const PRO = new Set(['pro', 'premium']);
+    if (!PRO.has(user.plan)) {
+      const banner = document.createElement('div');
+      banner.id = 'free-coach-banner';
+      banner.style.cssText = 'background:var(--color-primary-subtle);border-bottom:1px solid var(--color-primary-border);padding:10px 20px;font-size:13px;color:var(--text-primary);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;';
+      banner.innerHTML = `<span><i class="ti ti-gift" style="color:var(--color-primary);margin-right:6px"></i><strong>1 message gratuit</strong> — pose ta question, puis découvre Coach Pro pour des conseils illimités.</span>
+        <a href="/tarifs.html" style="color:var(--color-primary);font-weight:700;font-size:12px;white-space:nowrap;text-decoration:none;">Voir Coach Pro →</a>`;
+      document.getElementById('chat-shell').prepend(banner);
+    }
+
     input.focus();
   } catch {
     location.replace('/login.html?next=/coach.html');
