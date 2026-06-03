@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -9,19 +9,19 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
-<link rel="canonical" href="https://prevano.vercel.app/">
+<link rel="canonical" href="https://prevano.fr/">
 <meta name="description" content="Calcule en 60 secondes le montant exact de ta pension retraite — et reçois un plan d'action IA personnalisé pour l'améliorer.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://prevano.vercel.app/">
+<meta property="og:url" content="https://prevano.fr/">
 <meta property="og:title" content="Prevano — Découvre ce qui t'attend à la retraite">
 <meta property="og:description" content="Calcule en 60 secondes le montant exact de ta pension retraite — et reçois un plan d'action IA personnalisé pour l'améliorer.">
-<meta property="og:image" content="https://prevano.vercel.app/og.png">
+<meta property="og:image" content="https://prevano.fr/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://prevano.vercel.app/og.png">
+<meta name="twitter:image" content="https://prevano.fr/og.png">
 <meta name="twitter:title" content="Prevano — Découvre ce qui t'attend à la retraite">
 <meta name="twitter:description" content="Calcule en 60 secondes le montant exact de ta pension retraite — et reçois un plan d'action IA personnalisé pour l'améliorer.">
-<script defer data-domain="prevano.vercel.app" src="https://plausible.io/js/script.js"></script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Prevano","description":"Simulateur de retraite IA personnalisé","url":"https://prevano.vercel.app","applicationCategory":"FinanceApplication","inLanguage":"fr","offers":{"@type":"Offer","price":"9.99","priceCurrency":"EUR"}}</script>
+<script defer data-domain="prevano.fr" src="https://plausible.io/js/script.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Prevano","description":"Simulateur de retraite IA personnalisé","url":"https://prevano.fr","applicationCategory":"FinanceApplication","inLanguage":"fr","offers":{"@type":"Offer","price":"9.99","priceCurrency":"EUR"}}</script>
 <style>
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -85,7 +85,7 @@ main { flex:1; }
   }
   /* Pied de page PDF */
   #shock-section::after {
-    content: 'Généré sur prevano.vercel.app — ' attr(data-date);
+    content: 'Généré sur prevano.fr — ' attr(data-date);
     display: block;
     font-size: 9pt;
     color: #888;
@@ -1320,7 +1320,7 @@ $('btn-share')?.addEventListener('click', async () => {
   const score   = $('score-num')?.textContent ?? '?';
   const pension = $('stat-pension')?.textContent ?? '?';
   const text    = `Mon score retraite Prevano : ${score}/100 — pension estimée ${pension}. Et toi ?`;
-  const url     = 'https://prevano.vercel.app';
+  const url     = 'https://prevano.fr';
   try {
     if (navigator.share) {
       await navigator.share({ title: 'Mon score Prevano', text, url });

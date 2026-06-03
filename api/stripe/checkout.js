@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 const Stripe      = require('stripe');
 const { sql }     = require('../_lib/db');
 const { requireSession } = require('../_lib/auth');
@@ -27,7 +27,7 @@ module.exports = async function handler(req, res) {
   }
 
   const stripe   = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
-  const siteUrl  = process.env.SITE_URL ?? 'https://prevano.vercel.app';
+  const siteUrl  = process.env.SITE_URL ?? 'https://prevano.fr';
 
   try {
     const userResult = await sql`

@@ -1,4 +1,4 @@
-User-agent: *
+﻿User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /profil.html
@@ -7,4 +7,4 @@ Disallow: /signup.html
 Disallow: /forgot-password.html
 Disallow: /reset-password.html
 
-Sitemap: https://prevano.vercel.app/sitemap.xml
+Sitemap: https://prevano.fr/sitemap.xml

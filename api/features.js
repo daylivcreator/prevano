@@ -28,7 +28,7 @@ sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits_reset_at TIMESTAMPTZ`
   .catch(e => console.error('[migrate] credits_reset_at:', e.message));
 
 // ── Constantes crédits ──────────────────────────────────────────────────────
-const CREDIT_ALLOWANCES = { starter: 100, pro: 300, premium: 600 };
+const CREDIT_ALLOWANCES = { starter: 200, pro: 500, premium: 1500 };
 const CREDIT_COSTS      = { plan_retraite: 10, coach_message: 3, budget_plan: 8 };
 
 async function deductCredits(userId, cost) {
@@ -219,9 +219,9 @@ module.exports = async function handler(req, res) {
         await sql`
           UPDATE users SET
             credits_balance  = CASE plan
-              WHEN 'starter' THEN 100
-              WHEN 'pro'     THEN 300
-              WHEN 'premium' THEN 600
+              WHEN 'starter' THEN 200
+              WHEN 'pro'     THEN 500
+              WHEN 'premium' THEN 1500
               ELSE 0
             END,
             credits_reset_at = (NOW() + INTERVAL '1 month')
@@ -249,8 +249,8 @@ module.exports = async function handler(req, res) {
                 subject: `Prevano — Bilan de ${month} : mets à jour ton plan`,
                 html: `<p>Bonjour ${u.first_name ?? 'là'} 👋</p>
                   <p>C'est le début du mois — le bon moment pour <strong>mettre à jour ton budget et relancer une simulation</strong> avec les données de ${month}.</p>
-                  <p><a href="https://prevano.vercel.app/profil.html" style="display:inline-block;background:#E24B4A;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Accéder à mon espace →</a></p>
-                  <p style="font-size:12px;color:#888">Désabonnement : <a href="https://prevano.vercel.app/contact.html">contacter le support</a></p>`,
+                  <p><a href="https://prevano.fr/profil.html" style="display:inline-block;background:#E24B4A;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Accéder à mon espace →</a></p>
+                  <p style="font-size:12px;color:#888">Désabonnement : <a href="https://prevano.fr/contact.html">contacter le support</a></p>`,
               }),
             });
             sent++;

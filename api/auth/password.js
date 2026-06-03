@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 const crypto  = require('crypto');
 const bcrypt  = require('bcryptjs');
 const { sql } = require('../_lib/db');
@@ -37,7 +37,7 @@ module.exports = async function handler(req, res) {
 
       await sql`UPDATE users SET reset_token_hash = ${tokenHash}, reset_token_expires = ${expiresAt} WHERE id = ${result.rows[0].id}`;
 
-      const siteUrl  = process.env.SITE_URL ?? 'https://prevano.vercel.app';
+      const siteUrl  = process.env.SITE_URL ?? 'https://prevano.fr';
       const resetUrl = `${siteUrl}/reset-password.html?token=${rawToken}`;
 
       await fetch('https://api.brevo.com/v3/smtp/email', {
