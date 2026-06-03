@@ -424,21 +424,7 @@ async function startCheckout(plan) {
     if (activeCheckout) { activeCheckout.destroy(); activeCheckout = null; }
     document.getElementById('stripe-checkout-container').innerHTML = '';
 
-    activeCheckout = await stripe.initEmbeddedCheckout({
-      clientSecret: data.clientSecret,
-      appearance: {
-        theme: 'night',
-        variables: {
-          colorPrimary:    '#E24B4A',
-          colorBackground: '#1C1C1A',
-          colorText:       '#F5F4F0',
-          colorDanger:     '#ff6b6b',
-          fontFamily:      'Inter, system-ui, sans-serif',
-          borderRadius:    '8px',
-          spacingUnit:     '4px',
-        },
-      },
-    });
+    activeCheckout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
     activeCheckout.mount('#stripe-checkout-container');
 
     const overlay = document.getElementById('checkout-overlay');
