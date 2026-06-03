@@ -618,7 +618,12 @@ async function initNav() {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (res.ok) {
       const { user } = await res.json();
+      const PAID = new Set(['starter','pro','premium']);
+      const PRO  = new Set(['pro','premium']);
       navAuth.innerHTML = `
+        ${PAID.has(user.plan) ? '<a href="/budget.html" class="nav-link">Budget</a>' : ''}
+        ${PRO.has(user.plan)  ? '<a href="/coach.html"  class="nav-link">Coach IA</a>' : ''}
+        ${user.plan === 'premium' ? '<a href="/daily.html" class="nav-link">Daily</a>' : ''}
         <a href="/profil.html" class="nav-link">Bonjour, ${escHtml(user.firstName)}</a>
         <button id="btn-logout" class="btn-nav">Déconnexion</button>`;
       $('btn-logout')?.addEventListener('click', async () => {

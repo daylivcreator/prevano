@@ -158,7 +158,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
       <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
       <a href="/contact.html"          class="footer-link">Contact</a>
     </div>
-    <span class="footer-copy">© 2025 Prevano</span>
+    <span class="footer-copy">© 2026 Prevano</span>
   </div>
 </footer>
 
@@ -169,7 +169,7 @@ function escHtml(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-const PLAN_LABELS = { free:'Gratuit', starter:'Starter', pro:'Pro', premium:'Premium' };
+const PLAN_LABELS = { free:'Gratuit', starter:'Starter', pro:'Coach Pro', premium:'Daily Finance' };
 const SUB_LABELS  = { active:'Actif', past_due:'Paiement en attente', canceled:'Annulé', trialing:'Période d\'essai' };
 
 function planBadge(plan) {
