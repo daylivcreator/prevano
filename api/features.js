@@ -541,7 +541,7 @@ module.exports = async function handler(req, res) {
           : (await sql`SELECT first_name FROM users WHERE id = ${session.userId}`).rows[0]?.first_name ?? 'Utilisateur';
         const existing = await sql`SELECT id FROM reviews WHERE user_id = ${session.userId}`;
         if (existing.rows.length > 0) return res.status(409).json({ error: 'Tu as déjà soumis un avis.' });
-        await sql`INSERT INTO reviews (user_id, first_name, statut, rating, comment) VALUES (${session.userId}, ${firstName}, ${statut}, ${rating}, ${comment.trim()})`;
+        await sql`INSERT INTO reviews (user_id, first_name, statut, rating, comment, approved) VALUES (${session.userId}, ${firstName}, ${statut}, ${rating}, ${comment.trim()}, true)`;
         return res.status(201).json({ ok: true });
       } catch (err) { console.error('[features/review-submit]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
