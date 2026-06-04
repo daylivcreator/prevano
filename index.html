@@ -715,23 +715,24 @@ initNav();
 
   const now    = new Date();
   const day    = Math.floor(Date.now() / 86400000);
-  const dayMax = 143 + (day * 31 + 7) % 184; // 143-326, unique par jour
+  const dayMax = 3247 + (day * 31 + 7) % 520; // 3 247-3 766, unique par jour
   const hours  = now.getHours() + now.getMinutes() / 60;
   // Courbe d'activité : monte de 7h à 19h, reste stable après
   const prog   = Math.max(0, Math.min(1, (hours - 7) / 12));
-  let count    = Math.floor(dayMax * 0.08 + dayMax * 0.92 * prog);
+  let count    = Math.floor(dayMax * 0.12 + dayMax * 0.88 * prog);
 
   const el = document.getElementById('hero-count');
   if (!el) return;
   el.textContent = fmtFR(count);
 
-  // Auto-incrément toutes les 2-4 min (hors nuit)
+  // Auto-incrément toutes les 4-9 s (hors nuit) — effet live visible
   setInterval(function() {
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
-    count += Math.random() < 0.55 ? 1 : 2;
+    const jump = Math.random() < 0.60 ? 1 : Math.random() < 0.80 ? 2 : 3;
+    count += jump;
     el.textContent = fmtFR(count);
-  }, 45000 + Math.random() * 45000);
+  }, 4000 + Math.random() * 5000);
 })();
 
 /* ─── Constants ─────────────────────────────────────────────────── */
