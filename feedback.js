@@ -42,26 +42,22 @@
   overlay.className = 'fb-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', 'Feedback et support');
+  overlay.setAttribute('aria-label', 'Signaler un problème');
   overlay.innerHTML = `
     <div class="fb-modal">
       <button class="fb-close" aria-label="Fermer">×</button>
-      <div class="fb-title">Votre retour nous aide 🙏</div>
-      <div class="fb-tabs">
-        <button class="fb-tab active" data-kind="avis">⭐ Partager un avis</button>
-        <button class="fb-tab" data-kind="probleme">🐛 Signaler un problème</button>
-      </div>
+      <div class="fb-title">🐛 Signaler un problème</div>
       <div id="fb-form-wrap">
-        <div class="fb-label" id="fb-msg-label">Votre avis</div>
-        <textarea class="fb-textarea" id="fb-msg" placeholder="Qu'est-ce que vous pensez de Prevano ?" maxlength="1000"></textarea>
+        <div class="fb-label">Décrivez le problème</div>
+        <textarea class="fb-textarea" id="fb-msg" placeholder="Sur quelle page ? Que s'est-il passé ?" maxlength="1000"></textarea>
         <div class="fb-label">Votre email (optionnel)</div>
         <input type="email" class="fb-input" id="fb-email" placeholder="pour qu'on vous réponde" autocomplete="email">
         <button class="fb-send" id="fb-send">Envoyer <i class="ti ti-send"></i></button>
       </div>
       <div id="fb-success" class="fb-success" style="display:none">
-        <div class="fb-success-icon" id="fb-success-icon">✅</div>
-        <div class="fb-success-title" id="fb-success-title">Merci pour votre avis !</div>
-        <p class="fb-success-sub" id="fb-success-sub">Votre retour nous aide à améliorer Prevano.</p>
+        <div class="fb-success-icon">✅</div>
+        <div class="fb-success-title">Problème signalé !</div>
+        <p class="fb-success-sub">Notre équipe va analyser votre signalement et le corriger au plus vite.</p>
       </div>
     </div>`;
 
@@ -69,36 +65,18 @@
   document.body.appendChild(overlay);
 
   // ── Logique ────────────────────────────────────────────────────────────────
-  let currentKind = 'avis';
-
   function openWidget() {
     overlay.classList.add('active');
     document.getElementById('fb-msg').focus();
   }
   function closeWidget() {
     overlay.classList.remove('active');
-    // Reset
     setTimeout(() => {
       document.getElementById('fb-form-wrap').style.display = '';
       document.getElementById('fb-success').style.display = 'none';
       document.getElementById('fb-msg').value = '';
       document.getElementById('fb-email').value = '';
-      setKind('avis');
     }, 300);
-  }
-
-  function setKind(kind) {
-    currentKind = kind;
-    overlay.querySelectorAll('.fb-tab').forEach(t => t.classList.toggle('active', t.dataset.kind === kind));
-    const label = document.getElementById('fb-msg-label');
-    const ta    = document.getElementById('fb-msg');
-    if (kind === 'avis') {
-      label.textContent = 'Votre avis';
-      ta.placeholder    = 'Qu\'est-ce que vous pensez de Prevano ?';
-    } else {
-      label.textContent = 'Décrivez le problème';
-      ta.placeholder    = 'Sur quelle page ? Que s\'est-il passé ?';
-    }
   }
 
   btn.addEventListener('click', openWidget);
@@ -106,19 +84,12 @@
   overlay.addEventListener('click', e => { if (e.target === overlay) closeWidget(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('active')) closeWidget(); });
 
-  overlay.querySelectorAll('.fb-tab').forEach(tab => {
-    tab.addEventListener('click', () => setKind(tab.dataset.kind));
-  });
-
   document.getElementById('fb-send').addEventListener('click', async () => {
-    const message  = document.getElementById('fb-msg').value.trim();
-    const email    = document.getElementById('fb-email').value.trim();
-    const sendBtn  = document.getElementById('fb-send');
+    const message = document.getElementById('fb-msg').value.trim();
+    const email   = document.getElementById('fb-email').value.trim();
+    const sendBtn = document.getElementById('fb-send');
 
-    if (!message || message.length < 5) {
-      document.getElementById('fb-msg').focus();
-      return;
-    }
+    if (!message || message.length < 5) { document.getElementById('fb-msg').focus(); return; }
 
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> Envoi…';
@@ -127,25 +98,12 @@
       await fetch('/api/features', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
-          type:    'feedback',
-          kind:    currentKind,
-          message,
-          email:   email || undefined,
-          page:    location.pathname,
-        }),
+        body:    JSON.stringify({ type: 'feedback', kind: 'probleme', message, email: email || undefined, page: location.pathname }),
       });
-    } catch { /* On affiche le succès même en cas d'erreur réseau */ }
+    } catch { /* succès affiché même en cas d'erreur réseau */ }
 
     document.getElementById('fb-form-wrap').style.display = 'none';
-    const success = document.getElementById('fb-success');
-    success.style.display = 'block';
-    document.getElementById('fb-success-icon').textContent  = currentKind === 'avis' ? '🙏' : '✅';
-    document.getElementById('fb-success-title').textContent = currentKind === 'avis' ? 'Merci pour votre avis !' : 'Problème signalé !';
-    document.getElementById('fb-success-sub').textContent   = currentKind === 'avis'
-      ? 'Votre retour nous aide à améliorer Prevano chaque jour.'
-      : 'Notre équipe va analyser votre signalement et le corriger au plus vite.';
-
+    document.getElementById('fb-success').style.display = 'block';
     setTimeout(closeWidget, 3000);
   });
 
