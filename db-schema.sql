@@ -73,3 +73,18 @@ CREATE TABLE IF NOT EXISTS user_simulations (
   data       JSONB       NOT NULL,  -- {age, sal, pension, gap, ep, annees, statut}
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Avis utilisateurs (validés manuellement)
+-- ──────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS reviews (
+  id         SERIAL      PRIMARY KEY,
+  user_id    UUID        REFERENCES users(id) ON DELETE SET NULL,
+  first_name TEXT        NOT NULL,
+  statut     TEXT        NOT NULL,
+  rating     INTEGER     NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment    TEXT        NOT NULL,
+  approved   BOOLEAN     NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS reviews_approved_idx ON reviews (approved, created_at DESC);

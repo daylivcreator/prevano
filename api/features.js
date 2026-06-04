@@ -36,6 +36,19 @@ sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits_balance  INTEGER     NOT 
 sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits_reset_at TIMESTAMPTZ`
   .catch(e => console.error('[migrate] credits_reset_at:', e.message));
 
+sql`
+  CREATE TABLE IF NOT EXISTS reviews (
+    id         SERIAL      PRIMARY KEY,
+    user_id    UUID        REFERENCES users(id) ON DELETE SET NULL,
+    first_name TEXT        NOT NULL,
+    statut     TEXT        NOT NULL,
+    rating     INTEGER     NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment    TEXT        NOT NULL,
+    approved   BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )
+`.catch(e => console.error('[migrate] reviews:', e.message));
+
 // ── Constantes crédits ──────────────────────────────────────────────────────
 const CREDIT_ALLOWANCES = { starter: 200, pro: 500, premium: 1500 };
 const CREDIT_COSTS      = { plan_retraite: 10, coach_message: 3, budget_plan: 8 };
@@ -283,6 +296,33 @@ module.exports = async function handler(req, res) {
       } catch (err) { console.error('[cron-reminder]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
+    // GET ?t=reviews → avis validés (public)
+    if (t === 'reviews') {
+      try {
+        const result = await sql`
+          SELECT first_name, statut, rating, comment, created_at
+          FROM reviews WHERE approved = true
+          ORDER BY created_at DESC LIMIT 20
+        `;
+        return res.status(200).json({ reviews: result.rows });
+      } catch (err) { console.error('[features/reviews]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
+    // GET ?t=reviews-pending → avis en attente de validation (admin, Bearer CRON_SECRET)
+    if (t === 'reviews-pending') {
+      const auth = req.headers['authorization'] ?? '';
+      if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
+        return res.status(401).json({ error: 'Non autorisé.' });
+      }
+      try {
+        const result = await sql`
+          SELECT id, first_name, statut, rating, comment, created_at
+          FROM reviews WHERE approved = false ORDER BY created_at DESC
+        `;
+        return res.status(200).json({ reviews: result.rows });
+      } catch (err) { console.error('[features/reviews-pending]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
     return res.status(400).json({ error: 'Paramètre ?t manquant. Valeurs : budget, simulation, daily.' });
   }
 
@@ -479,6 +519,43 @@ module.exports = async function handler(req, res) {
         console.error('[feedback]', err.message);
         return res.status(500).json({ error: 'Erreur envoi.' });
       }
+    }
+
+    // POST type=review → soumettre un avis (connecté, 1 par utilisateur)
+    if (type === 'review') {
+      const rl = rateLimit(req, { limit: 3, windowMs: 3_600_000, prefix: 'review:' });
+      if (!rl.ok) return tooManyRequests(res, rl.retryAfter);
+      const session = requireSession(req, res);
+      if (!session) return;
+      try {
+        const { statut, rating, comment } = req.body ?? {};
+        const STATUTS = new Set(['prive', 'fonctionnaire', 'independant', 'autre']);
+        if (!STATUTS.has(statut)) return res.status(400).json({ error: 'Statut invalide.' });
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: 'Note invalide (1 à 5).' });
+        if (typeof comment !== 'string' || comment.trim().length < 10 || comment.trim().length > 500) {
+          return res.status(400).json({ error: 'Commentaire : 10 à 500 caractères.' });
+        }
+        const existing = await sql`SELECT id FROM reviews WHERE user_id = ${session.userId}`;
+        if (existing.rows.length > 0) return res.status(409).json({ error: 'Tu as déjà soumis un avis.' });
+        const userRow  = await sql`SELECT first_name FROM users WHERE id = ${session.userId}`;
+        const firstName = (userRow.rows[0]?.first_name ?? 'Utilisateur').slice(0, 50);
+        await sql`INSERT INTO reviews (user_id, first_name, statut, rating, comment) VALUES (${session.userId}, ${firstName}, ${statut}, ${rating}, ${comment.trim()})`;
+        return res.status(201).json({ ok: true });
+      } catch (err) { console.error('[features/review-submit]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
+    // POST type=review-approve → valider un avis (admin, { id, secret: CRON_SECRET })
+    if (type === 'review-approve') {
+      const { id, secret } = req.body ?? {};
+      if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+        return res.status(401).json({ error: 'Non autorisé.' });
+      }
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: 'ID invalide.' });
+      try {
+        const r = await sql`UPDATE reviews SET approved = true WHERE id = ${id} RETURNING id`;
+        if (!r.rows.length) return res.status(404).json({ error: 'Avis introuvable.' });
+        return res.status(200).json({ ok: true, id: r.rows[0].id });
+      } catch (err) { console.error('[features/review-approve]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
     return res.status(400).json({ error: 'Paramètre type manquant. Valeurs : budget, coach, daily, simulation.' });
