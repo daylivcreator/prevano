@@ -188,16 +188,23 @@ form.addEventListener('submit', async e => {
   btnSub.disabled = true;
   btnSub.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Envoi…';
 
-  // Pour le MVP : simuler un envoi réussi et renvoyer vers l'email directement
-  // En prod : ajouter un endpoint /api/contact qui envoie via Resend
-  await new Promise(r => setTimeout(r, 800));
-
-  form.style.display = 'none';
-  msgEl.className    = 'form-msg success';
-  msgEl.textContent  = `Message envoyé ! On te répond sous 48h à ${email}.`;
-
-  // Fallback : ouvrir le client email local
-  window.location.href = `mailto:prevano.app@outlook.fr?subject=${encodeURIComponent('[Prevano] ' + subject)}&body=${encodeURIComponent('Prénom: ' + name + '\n\n' + message)}`;
+  try {
+    const res = await fetch('/api/features', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ type: 'feedback', kind: 'avis', email, message: `Prénom : ${name}\nSujet : ${subject}\n\n${message}`, page: '/contact.html' }),
+    });
+    if (!res.ok) throw new Error();
+    form.style.display = 'none';
+    msgEl.className    = 'form-msg success';
+    msgEl.textContent  = `Message envoyé ! On te répond sous 48h à ${email}.`;
+  } catch {
+    btnSub.disabled  = false;
+    btnSub.innerHTML = '<i class="ti ti-send" aria-hidden="true"></i> Envoyer le message';
+    msgEl.className  = 'form-msg error';
+    msgEl.textContent = 'Erreur d\'envoi. Écris-nous directement à prevano.app@outlook.fr.';
+  }
 });
 </script>
 </body>
