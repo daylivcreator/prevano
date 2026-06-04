@@ -498,9 +498,13 @@ async function init() {
     document.getElementById('user-firstname').textContent = user.firstName ?? '';
     document.getElementById('chat-shell').style.display = 'flex';
 
-    // Bandeau "1 message gratuit" pour les free
     const PRO = new Set(['pro', 'premium']);
-    if (!PRO.has(user.plan)) {
+    if (user.plan === 'starter') {
+      // Starter n'inclut pas le Coach IA — afficher l'écran d'upgrade
+      document.getElementById('chat-shell').style.display = 'none';
+      document.getElementById('plan-guard').style.display = 'flex';
+    } else if (!PRO.has(user.plan)) {
+      // Bandeau "1 message gratuit" uniquement pour les comptes free
       const banner = document.createElement('div');
       banner.id = 'free-coach-banner';
       banner.style.cssText = 'background:var(--color-primary-subtle);border-bottom:1px solid var(--color-primary-border);padding:10px 20px;font-size:13px;color:var(--text-primary);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;';

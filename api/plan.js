@@ -100,17 +100,21 @@ module.exports = async function handler(req, res) {
   const session = getSession(req);
   if (session) {
     try {
-      const r = await sql`SELECT plan, credits_balance FROM users WHERE id = ${session.userId}`;
-      userPlan = r.rows[0]?.plan ?? 'free';
+      const planRow = await sql`SELECT plan FROM users WHERE id = ${session.userId}`;
+      userPlan = planRow.rows[0]?.plan ?? 'free';
 
-      // Déduire crédits pour les abonnés
+      // Déduire crédits de façon atomique pour les abonnés
       if (userPlan !== 'free') {
         const COST = 10;
-        const credits = r.rows[0]?.credits_balance ?? 0;
-        if (credits < COST) {
-          return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent le 1er du mois.', balance: credits });
+        const deduct = await sql`
+          UPDATE users SET credits_balance = credits_balance - ${COST}
+          WHERE id = ${session.userId} AND credits_balance >= ${COST}
+          RETURNING credits_balance
+        `;
+        if (!deduct.rows.length) {
+          const bal = await sql`SELECT credits_balance FROM users WHERE id = ${session.userId}`;
+          return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent le 1er du mois.', balance: bal.rows[0]?.credits_balance ?? 0 });
         }
-        sql`UPDATE users SET credits_balance = credits_balance - ${COST} WHERE id = ${session.userId}`.catch(() => {});
       }
 
       // Persiste les paramètres de simulation (non-bloquant)
