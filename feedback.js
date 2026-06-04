@@ -46,7 +46,7 @@
   overlay.innerHTML = `
     <div class="fb-modal">
       <button class="fb-close" aria-label="Fermer">×</button>
-      <div class="fb-title">🐛 Signaler un problème</div>
+      <div class="fb-title">Signaler un problème</div>
       <div id="fb-form-wrap">
         <div class="fb-label">Décrivez le problème</div>
         <textarea class="fb-textarea" id="fb-msg" placeholder="Sur quelle page ? Que s'est-il passé ?" maxlength="1000"></textarea>
