@@ -242,9 +242,9 @@ module.exports = async function handler(req, res) {
         await sql`
           UPDATE users SET
             credits_balance  = CASE plan
-              WHEN 'starter' THEN 200
-              WHEN 'pro'     THEN 500
-              WHEN 'premium' THEN 1500
+              WHEN 'starter' THEN 100
+              WHEN 'pro'     THEN 300
+              WHEN 'premium' THEN 600
               ELSE 0
             END,
             credits_reset_at = (NOW() + INTERVAL '1 month')

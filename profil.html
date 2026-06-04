@@ -503,9 +503,35 @@ async function init() {
   }
 
   try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (!res.ok) { location.replace('/login.html?next=/profil.html'); return; }
-    const { user } = await res.json();
+    const expectingPlan = params.get('success') === '1';
+    let user;
+
+    // Polling : après un paiement réussi, le webhook Stripe met ~1-3s à mettre à jour la BDD.
+    // On attend jusqu'à 12s que le plan passe de 'free' à payant avant de rendre le profil.
+    if (expectingPlan) {
+      const deadline = Date.now() + 12_000;
+      while (Date.now() < deadline) {
+        const r = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!r.ok) { location.replace('/login.html?next=/profil.html'); return; }
+        const data = await r.json();
+        if (data.user?.plan && data.user.plan !== 'free') { user = data.user; break; }
+        await new Promise(ok => setTimeout(ok, 1500));
+      }
+      if (!user) {
+        // Webhook toujours pas arrivé : on affiche quand même mais avec un message d'attente
+        const r = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!r.ok) { location.replace('/login.html?next=/profil.html'); return; }
+        user = (await r.json()).user;
+        const banner = document.getElementById('success-banner');
+        if (banner) banner.querySelector('span').textContent =
+          'Paiement confirmé — activation de ton abonnement en cours… Actualise la page dans quelques secondes.';
+      }
+    } else {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!res.ok) { location.replace('/login.html?next=/profil.html'); return; }
+      user = (await res.json()).user;
+    }
+
     renderProfile(user);
     // Historique DB (remplace localStorage si dispo)
     fetch('/api/features?t=sim-history', { credentials: 'include' })
