@@ -106,6 +106,15 @@ module.exports = async function handler(req, res) {
       // Déduire crédits de façon atomique pour les abonnés
       if (userPlan !== 'free') {
         const COST = 10;
+        // Reset journalier automatique si expiré
+        await sql`
+          UPDATE users SET
+            credits_balance  = CASE plan WHEN 'starter' THEN 50 WHEN 'pro' THEN 100 WHEN 'premium' THEN 200 ELSE 0 END,
+            credits_reset_at = NOW() + INTERVAL '1 day'
+          WHERE id = ${session.userId}
+            AND credits_reset_at < NOW()
+            AND plan IN ('starter', 'pro', 'premium')
+        `;
         const deduct = await sql`
           UPDATE users SET credits_balance = credits_balance - ${COST}
           WHERE id = ${session.userId} AND credits_balance >= ${COST}
@@ -113,7 +122,7 @@ module.exports = async function handler(req, res) {
         `;
         if (!deduct.rows.length) {
           const bal = await sql`SELECT credits_balance FROM users WHERE id = ${session.userId}`;
-          return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent le 1er du mois.', balance: bal.rows[0]?.credits_balance ?? 0 });
+          return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent chaque jour.', balance: bal.rows[0]?.credits_balance ?? 0 });
         }
       }
 

@@ -50,10 +50,19 @@ sql`
 `.catch(e => console.error('[migrate] reviews:', e.message));
 
 // ── Constantes crédits ──────────────────────────────────────────────────────
-const CREDIT_ALLOWANCES = { starter: 200, pro: 500, premium: 1500 };
+const CREDIT_ALLOWANCES = { starter: 50, pro: 100, premium: 200 }; // quotas journaliers
 const CREDIT_COSTS      = { plan_retraite: 10, coach_message: 3, budget_plan: 8 };
 
 async function deductCredits(userId, cost) {
+  // Reset journalier automatique si le quota est expiré
+  await sql`
+    UPDATE users SET
+      credits_balance  = CASE plan WHEN 'starter' THEN 50 WHEN 'pro' THEN 100 WHEN 'premium' THEN 200 ELSE 0 END,
+      credits_reset_at = NOW() + INTERVAL '1 day'
+    WHERE id = ${userId}
+      AND credits_reset_at < NOW()
+      AND plan IN ('starter', 'pro', 'premium')
+  `;
   const r = await sql`
     UPDATE users SET credits_balance = credits_balance - ${cost}
     WHERE id = ${userId} AND credits_balance >= ${cost}
@@ -251,19 +260,8 @@ module.exports = async function handler(req, res) {
       if (!resendKey) return res.status(503).json({ error: 'Resend non configuré.' });
 
       try {
-        // Reset des crédits mensuels
-        await sql`
-          UPDATE users SET
-            credits_balance  = CASE plan
-              WHEN 'starter' THEN 100
-              WHEN 'pro'     THEN 300
-              WHEN 'premium' THEN 600
-              ELSE 0
-            END,
-            credits_reset_at = (NOW() + INTERVAL '1 month')
-          WHERE plan IN ('starter','pro','premium')
-          AND subscription_status = 'active'
-        `;
+        // Le reset journalier est désormais géré de façon lazy dans deductCredits.
+        // Le cron mensuel envoie uniquement les emails de rappel.
 
         // Récupérer tous les abonnés actifs
         const users = await sql`
@@ -342,7 +340,7 @@ module.exports = async function handler(req, res) {
         if (!user) return res.status(401).json({ error: 'Compte introuvable.' });
         if (!PAID_PLANS.has(user.plan)) return res.status(403).json({ error: 'Accès réservé aux abonnés Starter, Coach Pro et Daily Finance.' });
         const budgetCredits = await deductCredits(session.userId, CREDIT_COSTS.budget_plan);
-        if (budgetCredits === null) return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent le 1er du mois.' });
+        if (budgetCredits === null) return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent chaque jour.' });
 
         const body     = req.body ?? {};
         const revenus  = sanitizeAmounts(body.revenus);
@@ -397,7 +395,7 @@ module.exports = async function handler(req, res) {
         } else {
           // Déduire crédits pour les abonnés
           const remaining = await deductCredits(session.userId, CREDIT_COSTS.coach_message);
-          if (remaining === null) return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent le 1er du mois.' });
+          if (remaining === null) return res.status(402).json({ error: 'credits_empty', message: 'Crédits insuffisants. Ils se renouvellent chaque jour.' });
         }
         if (!rateLimitUser(session.userId, 20, 3_600_000)) return res.status(429).json({ error: 'Limite de 20 messages par heure atteinte. Reviens plus tard !' });
 
