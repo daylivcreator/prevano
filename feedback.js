@@ -2,8 +2,9 @@
 (function initFeedbackWidget() {
   // ── Styles ─────────────────────────────────────────────────────────────────
   const css = `
-.fb-btn{position:fixed;bottom:24px;right:24px;z-index:8900;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#E24B4A,#FF7B35);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(226,75,74,0.45);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;color:#fff;font-size:22px;}
-.fb-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(226,75,74,0.6);}
+.fb-btn{position:fixed;bottom:24px;right:24px;z-index:8900;height:44px;padding:0 18px 0 14px;border-radius:100px;background:linear-gradient(135deg,#E24B4A,#FF7B35);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(226,75,74,0.45);display:flex;align-items:center;gap:8px;transition:transform .2s,box-shadow .2s;color:#fff;font-size:13px;font-weight:700;white-space:nowrap;}
+.fb-btn i{font-size:18px;flex-shrink:0;}
+.fb-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(226,75,74,0.6);}
 .fb-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9900;display:none;align-items:flex-end;justify-content:center;padding:0 0 88px;backdrop-filter:blur(4px);}
 @media(min-width:480px){.fb-overlay{align-items:center;padding:20px;}}
 .fb-overlay.active{display:flex;}
@@ -36,7 +37,7 @@
   const btn = document.createElement('button');
   btn.className = 'fb-btn';
   btn.setAttribute('aria-label', 'Feedback & support');
-  btn.innerHTML = '<i class="ti ti-message-heart"></i>';
+  btn.innerHTML = '<i class="ti ti-alert-circle"></i> Signaler un problème';
 
   const overlay = document.createElement('div');
   overlay.className = 'fb-overlay';
