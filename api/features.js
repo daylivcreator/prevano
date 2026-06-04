@@ -535,10 +535,12 @@ module.exports = async function handler(req, res) {
         if (typeof comment !== 'string' || comment.trim().length < 10 || comment.trim().length > 500) {
           return res.status(400).json({ error: 'Commentaire : 10 à 500 caractères.' });
         }
+        const { first_name: rawName } = req.body ?? {};
+        const firstName = typeof rawName === 'string' && rawName.trim().length >= 2
+          ? rawName.trim().slice(0, 50)
+          : (await sql`SELECT first_name FROM users WHERE id = ${session.userId}`).rows[0]?.first_name ?? 'Utilisateur';
         const existing = await sql`SELECT id FROM reviews WHERE user_id = ${session.userId}`;
         if (existing.rows.length > 0) return res.status(409).json({ error: 'Tu as déjà soumis un avis.' });
-        const userRow  = await sql`SELECT first_name FROM users WHERE id = ${session.userId}`;
-        const firstName = (userRow.rows[0]?.first_name ?? 'Utilisateur').slice(0, 50);
         await sql`INSERT INTO reviews (user_id, first_name, statut, rating, comment) VALUES (${session.userId}, ${firstName}, ${statut}, ${rating}, ${comment.trim()})`;
         return res.status(201).json({ ok: true });
       } catch (err) { console.error('[features/review-submit]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
