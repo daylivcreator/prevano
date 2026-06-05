@@ -1411,16 +1411,41 @@ const ACTIVITY_POPUP_ENABLED = true;
   const PAGE_LOAD = Date.now();
   const MAX_SHOWS = 4;
 
-  const MESSAGES = [
-    { text: '<strong>Marie L.</strong> vient de calculer sa retraite',          delay: 0  },
-    { text: '<strong>Thomas R.</strong> a ouvert un PER ce matin',              delay: 4  },
-    { text: '<strong>Sophie M.</strong> est passée de 28 à 61 de score',        delay: 7  },
-    { text: '<strong>Antoine D.</strong> a rejoint Prevano Starter',            delay: 12 },
-    { text: '<strong>Céline F.</strong> a simulé sa retraite',                  delay: 15 },
-    { text: '<strong>Julien B.</strong> économise 340€/mois supplémentaires',   delay: 18 },
-    { text: '<strong>Nadia K.</strong> a comparé 3 scénarios de retraite',      delay: 22 },
-    { text: '<strong>Paul M.</strong> découvre qu\'il lui manque 890€/mois',    delay: 25 },
+  const _PN=['Léa','Camille','Julie','Marine','Emma','Lucie','Claire','Sarah','Manon',
+    'Charlotte','Mathilde','Alice','Inès','Chloé','Laura','Anaïs','Pauline','Justine',
+    'Hugo','Maxime','Louis','Théo','Romain','Alexandre','Nicolas','Pierre','Baptiste',
+    'Vincent','Florian','Arthur','Mathieu','Clément','Adrien','Rémi','Simon','Kevin',
+    'Mélanie','Aurélie'];
+  const _IN=['A.','B.','C.','D.','F.','G.','H.','K.','L.','M.','N.','P.','R.','S.','T.','V.'];
+  let _uN=[];
+  function _rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+  function _pN(){
+    const pool=_PN.filter(n=>!_uN.slice(-7).includes(n));
+    const n=pool[Math.floor(Math.random()*pool.length)];
+    _uN.push(n);if(_uN.length>20)_uN=_uN.slice(-15);
+    return `<strong>${n} ${_IN[Math.floor(Math.random()*_IN.length)]}</strong>`;
+  }
+  const TEMPLATES=[
+    ()=>`${_pN()} vient de calculer sa retraite`,
+    ()=>`${_pN()} a simulé sa pension : ${_rnd(740,1750)}€/mois`,
+    ()=>`${_pN()} a ouvert un PER grâce au plan IA`,
+    ()=>`${_pN()} est passé·e de ${_rnd(18,44)} à ${_rnd(55,84)} de score`,
+    ()=>`${_pN()} économise ${_rnd(150,520)}€/mois de plus`,
+    ()=>`${_pN()} a comparé 3 scénarios de retraite`,
+    ()=>`${_pN()} découvre un écart de ${_rnd(610,1490)}€/mois`,
+    ()=>`${_pN()} vient de rejoindre Prevano`,
+    ()=>`${_pN()} a reçu son plan IA en 5 secondes`,
+    ()=>`${_pN()} a simulé sa retraite en 60 secondes`,
+    ()=>`${_pN()} score retraite : ${_rnd(28,81)}/100`,
+    ()=>`${_pN()} a calculé son gap : ${_rnd(590,1420)}€/mois manquants`,
+    ()=>`${_pN()} vient d'ouvrir son résultat`,
+    ()=>`${_pN()} a rejoint ${_rnd(4300,7100)} utilisateurs Prevano`,
   ];
+  let _lT=-1;
+  function genMsg(){
+    let t;do{t=Math.floor(Math.random()*TEMPLATES.length);}while(t===_lT);
+    _lT=t;return{text:TEMPLATES[t](),delay:_rnd(0,14)};
+  }
 
   function fmtTime(delay) {
     const mins = delay + Math.floor((Date.now() - PAGE_LOAD) / 60000);
@@ -1430,8 +1455,6 @@ const ACTIVITY_POPUP_ENABLED = true;
   }
 
   let showCount = 0;
-  let lastIdx   = -1;
-  let cursor    = 0;
 
   const popup     = $('activity-popup');
   const popupText = $('activity-popup-text');
@@ -1443,11 +1466,7 @@ const ACTIVITY_POPUP_ENABLED = true;
     if (override) {
       msg = override;
     } else {
-      let idx = cursor % MESSAGES.length;
-      if (idx === lastIdx) idx = (idx + 1) % MESSAGES.length;
-      lastIdx = idx;
-      cursor  = idx + 1;
-      msg     = MESSAGES[idx];
+      msg = genMsg();
     }
     popupText.innerHTML   = msg.text;
     popupTime.textContent = fmtTime(msg.delay);
