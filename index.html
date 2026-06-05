@@ -667,7 +667,7 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
         <span class="score-badge" id="score-badge"></span>
       </div>
       <p class="score-tip" id="score-tip"></p>
-      <div style="margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div id="action-btns-member" style="margin-top:16px;display:none;align-items:center;gap:10px;flex-wrap:wrap;">
         <button id="btn-share" class="btn-share" type="button">
           <i class="ti ti-share" aria-hidden="true"></i> Partager mon score
         </button>
@@ -675,6 +675,11 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
           <i class="ti ti-file-download" aria-hidden="true"></i> Télécharger en PDF
         </button>
         <span class="share-confirm" id="share-confirm">✓ Copié !</span>
+      </div>
+      <div id="action-btns-guest" style="margin-top:16px;display:none;">
+        <a href="/signup.html" class="btn-primary" style="max-width:360px;text-decoration:none;display:inline-flex;">
+          <i class="ti ti-user-plus" aria-hidden="true"></i> Créer un compte pour télécharger mon plan
+        </a>
       </div>
     </div>
 
@@ -859,6 +864,7 @@ function escHtml(str) {
 }
 
 /* ─── Nav auth ──────────────────────────────────────────────────── */
+let currentUser = null;
 
 async function initNav() {
   const navAuth = $('nav-auth');
@@ -867,6 +873,8 @@ async function initNav() {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (res.ok) {
       const { user } = await res.json();
+      currentUser = user;
+      showStreakIfEligible();
       const PAID = new Set(['starter','pro','premium']);
       const PRO  = new Set(['pro','premium']);
       navAuth.innerHTML = `
@@ -1154,6 +1162,11 @@ function simulate() {
   $('bar-fill').style.transform   = `scaleX(${barW / 100})`;
   $('bar-pension-label').textContent = fmt(pension);
   $('bar-gap-label').textContent     = `Il manque ${fmt(gap)}`;
+
+  // Afficher les bons boutons selon la connexion
+  const _mb = $('action-btns-member'), _gb = $('action-btns-guest');
+  if (_mb) _mb.style.display = currentUser ? 'flex' : 'none';
+  if (_gb) _gb.style.display = currentUser ? 'none' : '';
 
   const shock = $('shock-section');
   shock.style.display = 'block';
@@ -1447,12 +1460,7 @@ const ACTIVITY_POPUP_ENABLED = true;
     _lT=t;return{text:TEMPLATES[t](),delay:_rnd(0,14)};
   }
 
-  function fmtTime(delay) {
-    const mins = delay + Math.floor((Date.now() - PAGE_LOAD) / 60000);
-    if (mins === 0) return 'À l\'instant';
-    if (mins === 1) return 'Il y a 1 min';
-    return 'Il y a ' + mins + ' min';
-  }
+  function fmtTime() { return 'À l\'instant'; }
 
   let showCount = 0;
 
@@ -1580,14 +1588,16 @@ function incSimCount() {
   return n;
 }
 
-// Streak gratuit — nb de jours distincts où l'utilisateur a simulé
-(function initStreak() {
+// Streak — réservé aux membres payants uniquement
+function showStreakIfEligible() {
+  const PAID = new Set(['starter','pro','premium']);
+  if (!currentUser || !PAID.has(currentUser.plan)) return;
   const STREAK_KEY = 'prv_sim_days';
   const today = new Date().toISOString().slice(0, 10);
   let days = [];
   try { days = JSON.parse(localStorage.getItem(STREAK_KEY) || '[]'); } catch {}
-  if (!days.includes(today)) return; // Pas encore simulé aujourd'hui — on affiche après la simu
-  const streak = calcStreak(days, today);
+  if (!days.includes(today)) return;
+  const streak = calcStreakDays(days, today);
   if (streak < 2) return;
   const heroCounter = document.querySelector('.hero-counter');
   if (!heroCounter) return;
@@ -1595,19 +1605,18 @@ function incSimCount() {
   badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;background:rgba(255,180,0,0.12);border:1px solid rgba(255,180,0,0.25);border-radius:100px;padding:5px 14px;font-size:12px;color:#FFB400;font-weight:600;margin-top:8px;';
   badge.innerHTML = `🔥 ${streak} jours consécutifs`;
   heroCounter.insertAdjacentElement('afterend', badge);
-
-  function calcStreak(days, today) {
-    const sorted = [...new Set(days)].sort().reverse();
-    let streak = 0, cur = new Date(today);
-    for (const d of sorted) {
-      const diff = (cur - new Date(d)) / 86400000;
-      if (diff > 1) break;
-      streak++;
-      cur = new Date(d);
-    }
-    return streak;
+}
+function calcStreakDays(days, today) {
+  const sorted = [...new Set(days)].sort().reverse();
+  let streak = 0, cur = new Date(today);
+  for (const d of sorted) {
+    const diff = (cur - new Date(d)) / 86400000;
+    if (diff > 1) break;
+    streak++;
+    cur = new Date(d);
   }
-})();
+  return streak;
+}
 
 // Pré-remplir le formulaire depuis la dernière simulation
 (function prefillForm() {

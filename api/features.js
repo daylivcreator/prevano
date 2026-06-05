@@ -558,6 +558,46 @@ module.exports = async function handler(req, res) {
       } catch (err) { console.error('[features/review-approve]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
+    // POST type=cancel-sub → annulation immédiate de l'abonnement
+    if (type === 'cancel-sub') {
+      const session = requireSession(req, res);
+      if (!session) return;
+      try {
+        const Stripe = require('stripe');
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
+        const r = await sql`SELECT stripe_subscription_id FROM users WHERE id = ${session.userId}`;
+        const subId = r.rows[0]?.stripe_subscription_id;
+        if (!subId) return res.status(400).json({ error: 'Aucun abonnement actif trouvé.' });
+        await stripe.subscriptions.cancel(subId);
+        await sql`UPDATE users SET plan = 'free', subscription_status = 'canceled', stripe_subscription_id = NULL WHERE id = ${session.userId}`;
+        return res.status(200).json({ ok: true });
+      } catch (err) { console.error('[features/cancel-sub]', err.message); return res.status(500).json({ error: 'Erreur lors de l\'annulation.' }); }
+    }
+
+    // POST type=refund-sub → remboursement immédiat du dernier paiement
+    if (type === 'refund-sub') {
+      const session = requireSession(req, res);
+      if (!session) return;
+      try {
+        const Stripe = require('stripe');
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
+        const r = await sql`SELECT stripe_customer_id, stripe_subscription_id FROM users WHERE id = ${session.userId}`;
+        const { stripe_customer_id: custId, stripe_subscription_id: subId } = r.rows[0] ?? {};
+        if (!custId) return res.status(400).json({ error: 'Aucun abonnement trouvé.' });
+        // Récupérer la dernière facture payée
+        const invoices = await stripe.invoices.list({ customer: custId, limit: 1, status: 'paid' });
+        const inv = invoices.data[0];
+        if (!inv?.payment_intent) return res.status(400).json({ error: 'Aucun paiement remboursable.' });
+        // Vérifier délai 48h
+        const age = (Date.now() / 1000) - inv.created;
+        if (age > 172800) return res.status(400).json({ error: 'Délai de remboursement de 48h dépassé.' });
+        await stripe.refunds.create({ payment_intent: inv.payment_intent });
+        if (subId) await stripe.subscriptions.cancel(subId);
+        await sql`UPDATE users SET plan = 'free', subscription_status = 'canceled', stripe_subscription_id = NULL WHERE id = ${session.userId}`;
+        return res.status(200).json({ ok: true });
+      } catch (err) { console.error('[features/refund-sub]', err.message); return res.status(500).json({ error: 'Erreur lors du remboursement.' }); }
+    }
+
     return res.status(400).json({ error: 'Paramètre type manquant. Valeurs : budget, coach, daily, simulation.' });
   }
 

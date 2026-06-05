@@ -149,6 +149,28 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
 .checkout-modal-close{position:absolute;top:10px;right:10px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-faint);z-index:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;}
 .checkout-modal-close:hover{background:rgba(255,255,255,0.08);color:var(--text-primary);}
 #stripe-checkout-container{min-height:300px;}
+/* ── Motion design ── */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;will-change:opacity,transform;}
+.reveal.visible{opacity:1;transform:none;}
+.plans-grid .plan-card.reveal:nth-child(1){transition-delay:.0s;}
+.plans-grid .plan-card.reveal:nth-child(2){transition-delay:.13s;}
+.plans-grid .plan-card.reveal:nth-child(3){transition-delay:.26s;}
+.plan-card{transition:border-color .2s,transform .25s cubic-bezier(.25,.8,.25,1),box-shadow .25s;}
+.plan-card.featured:hover{box-shadow:0 0 60px rgba(226,75,74,.22);}
+@keyframes fadeSU{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.faq-item[open] .faq-a{animation:fadeSU .22s ease;}
+.compare-section.visible .compare-table tbody tr{animation:fadeSU .28s ease both;}
+.compare-section.visible .compare-table tbody tr:nth-child(2){animation-delay:.04s;}
+.compare-section.visible .compare-table tbody tr:nth-child(3){animation-delay:.08s;}
+.compare-section.visible .compare-table tbody tr:nth-child(4){animation-delay:.12s;}
+.compare-section.visible .compare-table tbody tr:nth-child(5){animation-delay:.16s;}
+.compare-section.visible .compare-table tbody tr:nth-child(6){animation-delay:.20s;}
+.compare-section.visible .compare-table tbody tr:nth-child(7){animation-delay:.24s;}
+.compare-section.visible .compare-table tbody tr:nth-child(8){animation-delay:.28s;}
+.compare-section.visible .compare-table tbody tr:nth-child(9){animation-delay:.32s;}
+.compare-section.visible .compare-table tbody tr:nth-child(10){animation-delay:.36s;}
+.compare-section.visible .compare-table tbody tr:nth-child(11){animation-delay:.40s;}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}.faq-item[open] .faq-a,.compare-table tbody tr{animation:none;}.plan-card{transition:none;}}
 </style>
 <link rel="stylesheet" href="/mobile.css">
 </head>
@@ -176,7 +198,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
 </header>
 
 <main>
-  <section class="pricing-hero">
+  <section class="pricing-hero reveal">
     <h1>Construis ta retraite<br><em>sans mauvaises surprises.</em></h1>
     <p>Choisis l'offre adaptée à ta situation et commence à sécuriser ton avenir dès aujourd'hui.</p>
     <div class="sim-badge"><i class="ti ti-users" aria-hidden="true"></i> <strong id="month-count">—</strong> simulations réalisées ce mois-ci</div>
@@ -190,7 +212,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
     <div class="plans-grid">
 
       <!-- Starter -->
-      <div class="plan-card">
+      <div class="plan-card reveal">
         <div class="plan-name">Starter</div>
         <div class="plan-price">9,99 €<span>/mois</span></div>
         <p class="plan-desc">Analyse ton budget mensuel et reçois 5 actions concrètes pour économiser plus chaque mois.</p>
@@ -207,7 +229,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
       </div>
 
       <!-- Coach Pro (featured) -->
-      <div class="plan-card featured">
+      <div class="plan-card featured reveal">
         <div class="featured-badge">⚡ LE PLUS POPULAIRE</div>
         <div class="plan-name">Coach Pro</div>
         <div class="plan-price">19,99 €<span>/mois</span></div>
@@ -226,7 +248,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
       </div>
 
       <!-- Daily Finance -->
-      <div class="plan-card">
+      <div class="plan-card reveal">
         <div class="plan-name">Daily Finance</div>
         <div class="plan-price">34,99 €<span>/mois</span></div>
         <p class="plan-desc">28 leçons financières en 5 min/jour — investissement, fiscalité, patrimoine — avec streak et badges.</p>
@@ -246,7 +268,7 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
     </div>
   </section>
 
-  <section class="compare-section" aria-label="Comparaison des offres">
+  <section class="compare-section reveal" aria-label="Comparaison des offres">
     <p class="compare-title">Comparaison des offres</p>
     <div class="compare-wrap">
       <table class="compare-table">
@@ -275,13 +297,13 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;margin-top:au
     </div>
   </section>
 
-  <p class="annual-teaser"><i class="ti ti-calendar-event" aria-hidden="true"></i> <strong>Facturation annuelle bientôt disponible</strong> — 2 mois offerts par an</p>
+  <p class="annual-teaser reveal"><i class="ti ti-calendar-event" aria-hidden="true"></i> <strong>Facturation annuelle bientôt disponible</strong> — 2 mois offerts par an</p>
 
-  <div class="guarantee">
+  <div class="guarantee reveal">
     <p><i class="ti ti-shield-check" aria-hidden="true"></i> Paiement sécurisé par Stripe · Annulation à tout moment · Sans engagement</p>
   </div>
 
-  <section class="faq-section" aria-labelledby="faq-title">
+  <section class="faq-section reveal" aria-labelledby="faq-title">
     <h2 class="faq-title" id="faq-title">Questions fréquentes</h2>
     <div class="faq-list">
       <details class="faq-item">
@@ -538,12 +560,7 @@ const ACTIVITY_POPUP_ENABLED = true;
     _lT=t;return{text:TEMPLATES[t](),delay:_rnd(0,13)};
   }
 
-  function fmtTime(delay) {
-    const mins = delay + Math.floor((Date.now() - PAGE_LOAD) / 60000);
-    if (mins === 0) return 'À l\'instant';
-    if (mins === 1) return 'Il y a 1 min';
-    return 'Il y a ' + mins + ' min';
-  }
+  function fmtTime() { return 'À l\'instant'; }
 
   let showCount = 0;
 
@@ -600,9 +617,19 @@ const ACTIVITY_POPUP_ENABLED = true;
   document.addEventListener('mouseleave', e => {
     if (e.clientY <= 0 && !exitDone) {
       exitDone = true;
-      show({ text: '<strong>Lucas M.</strong> vient de souscrire à Coach Pro', delay: 0 });
+      show(genMsg());
     }
   });
+})();
+
+/* ── Reveal IntersectionObserver ── */
+(function(){
+  const els = document.querySelectorAll('.reveal');
+  if (!els.length) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  els.forEach(el => obs.observe(el));
 })();
 </script>
 <script src="/mobile-nav.js" defer></script>

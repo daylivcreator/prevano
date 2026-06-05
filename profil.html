@@ -110,6 +110,19 @@ footer{border-top:1px solid var(--border-subtle);padding:20px 48px;}
 .footer-link:hover{color:var(--text-muted);}
 .footer-copy{font-size:12px;color:var(--text-faint);}
 @keyframes spin{to{transform:rotate(360deg);}}
+/* Motion design */
+@keyframes cardIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.profile-grid.rendered .card{animation:cardIn .5s cubic-bezier(.25,.8,.25,1) both;}
+.profile-grid.rendered .card:nth-child(1){animation-delay:.0s;}
+.profile-grid.rendered .card:nth-child(2){animation-delay:.1s;}
+.profile-grid.rendered .card:nth-child(3){animation-delay:.2s;}
+.profile-grid.rendered .card:nth-child(4){animation-delay:.3s;}
+.profile-grid.rendered .card:nth-child(5){animation-delay:.4s;}
+.card{transition:border-color .2s,transform .2s,box-shadow .2s;}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3);}
+@keyframes pageIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.page-header{animation:pageIn .5s cubic-bezier(.25,.8,.25,1) both;}
+@media(prefers-reduced-motion:reduce){.card,.profile-grid.rendered .card,.page-header{animation:none;opacity:1;transform:none;transition:none;}}
 @media(max-width:700px){
   nav,.main-wrap{padding-left:20px;padding-right:20px;}
   main{padding:32px 20px 60px;}
@@ -421,7 +434,8 @@ function renderProfile(user) {
       ${hasPaid ? `<div class="info-row"><span class="info-label">Renouvellement</span><span class="info-value">${formatDate(user.periodEnd)}</span></div>` : ''}
       <div class="btn-row">
         ${hasPaid
-          ? `<button id="btn-portal" class="btn-primary"><i class="ti ti-credit-card" aria-hidden="true"></i> Gérer ma facturation</button>`
+          ? `<button id="btn-portal" class="btn-primary"><i class="ti ti-credit-card" aria-hidden="true"></i> Gérer ma facturation</button>
+             <button id="btn-cancel-sub" class="btn-secondary" style="background:transparent;border:1px solid var(--border-default);color:var(--text-muted);padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;transition:all .2s;"><i class="ti ti-x" aria-hidden="true"></i> Annuler mon abonnement</button>`
           : `<a href="/tarifs.html" class="btn-primary"><i class="ti ti-bolt" aria-hidden="true"></i> Passer à l'offre payante</a>`
         }
       </div>
@@ -437,6 +451,8 @@ function renderProfile(user) {
   // Tools card
   const toolsCard = buildToolsCard(user.plan);
   grid.insertAdjacentHTML('beforeend', toolsCard);
+  // Déclenche les animations stagger après rendu
+  requestAnimationFrame(() => grid.classList.add('rendered'));
 
   document.getElementById('btn-portal')?.addEventListener('click', async () => {
     const btn = document.getElementById('btn-portal');
@@ -447,6 +463,19 @@ function renderProfile(user) {
       const data = await res.json();
       if (data.url) location.href = data.url;
     } catch { btn.disabled = false; btn.innerHTML = '<i class="ti ti-credit-card" aria-hidden="true"></i> Gérer ma facturation'; }
+  });
+
+  document.getElementById('btn-cancel-sub')?.addEventListener('click', async () => {
+    if (!confirm('Annuler votre abonnement maintenant ? Votre accès sera supprimé immédiatement.')) return;
+    const btn = document.getElementById('btn-cancel-sub');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> Annulation…';
+    try {
+      const res  = await fetch('/api/features', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'cancel-sub' }) });
+      const data = await res.json();
+      if (data.ok) { location.reload(); }
+      else { alert(data.error ?? 'Erreur'); btn.disabled = false; btn.innerHTML = '<i class="ti ti-x"></i> Annuler mon abonnement'; }
+    } catch { btn.disabled = false; btn.innerHTML = '<i class="ti ti-x"></i> Annuler mon abonnement'; }
   });
 }
 
