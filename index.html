@@ -373,10 +373,8 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
 .share-confirm{font-size:12px;color:#22C55E;margin-left:8px;opacity:0;transition:opacity 0.3s;}
 .share-confirm.show{opacity:1;}
 
-/* Back to top */
-.btn-top{position:fixed;bottom:80px;right:24px;z-index:8000;width:42px;height:42px;background:var(--bg-raised);border:1px solid var(--border-default);border-radius:10px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.2s;opacity:0;pointer-events:none;}
-.btn-top.visible{opacity:1;pointer-events:auto;}
-.btn-top:hover{background:var(--bg-overlay);color:var(--color-primary);border-color:var(--color-primary-border);}
+/* Back to top — masqué (remplacé par feedback pill) */
+.btn-top{display:none !important;}
 
 /* ── Mockup showcase ── */
 .mockup-showcase{padding:0 48px 80px;max-width:1100px;margin:-8px auto 0;}
@@ -501,6 +499,7 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
       </a>
       <div class="nav-links">
         <a href="/tarifs.html" class="nav-link">Tarifs</a>
+        <a href="/tarifs.html#faq-title" class="nav-link">FAQ</a>
         <div id="nav-auth" style="display:flex;align-items:center;gap:10px"></div>
       </div>
     </div>
