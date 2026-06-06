@@ -321,6 +321,50 @@ module.exports = async function handler(req, res) {
       } catch (err) { console.error('[features/reviews-pending]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
+    // GET ?t=admin-stats → stats globales (admin, Bearer CRON_SECRET)
+    if (t === 'admin-stats') {
+      const auth = req.headers['authorization'] ?? '';
+      if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
+        return res.status(401).json({ error: 'Non autorisé.' });
+      }
+      try {
+        const [byPlan, recent7, recent30, revs] = await Promise.all([
+          sql`SELECT plan, COUNT(*) AS count FROM users GROUP BY plan ORDER BY plan`,
+          sql`SELECT COUNT(*) AS count FROM users WHERE created_at > NOW() - INTERVAL '7 days'`,
+          sql`SELECT COUNT(*) AS count FROM users WHERE created_at > NOW() - INTERVAL '30 days'`,
+          sql`SELECT approved, COUNT(*) AS count FROM reviews GROUP BY approved`,
+        ]);
+        const plans = {};
+        for (const r of byPlan.rows) plans[r.plan] = parseInt(r.count, 10);
+        const revCounts = { approved: 0, pending: 0 };
+        for (const r of revs.rows) {
+          if (r.approved) revCounts.approved = parseInt(r.count, 10);
+          else revCounts.pending = parseInt(r.count, 10);
+        }
+        return res.status(200).json({
+          plans,
+          recent7:  parseInt(recent7.rows[0]?.count  ?? 0, 10),
+          recent30: parseInt(recent30.rows[0]?.count ?? 0, 10),
+          reviews: revCounts,
+        });
+      } catch (err) { console.error('[features/admin-stats]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
+    // GET ?t=admin-reviews → tous les avis (admin, Bearer CRON_SECRET)
+    if (t === 'admin-reviews') {
+      const auth = req.headers['authorization'] ?? '';
+      if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
+        return res.status(401).json({ error: 'Non autorisé.' });
+      }
+      try {
+        const result = await sql`
+          SELECT id, first_name, statut, rating, comment, approved, created_at
+          FROM reviews ORDER BY created_at DESC LIMIT 100
+        `;
+        return res.status(200).json({ reviews: result.rows });
+      } catch (err) { console.error('[features/admin-reviews]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
     return res.status(400).json({ error: 'Paramètre ?t manquant. Valeurs : budget, simulation, daily.' });
   }
 
@@ -596,6 +640,33 @@ module.exports = async function handler(req, res) {
         await sql`UPDATE users SET plan = 'free', subscription_status = 'canceled', stripe_subscription_id = NULL WHERE id = ${session.userId}`;
         return res.status(200).json({ ok: true });
       } catch (err) { console.error('[features/refund-sub]', err.message); return res.status(500).json({ error: 'Erreur lors du remboursement.' }); }
+    }
+
+    // POST type=review-delete → supprimer un avis (admin)
+    if (type === 'review-delete') {
+      const { id, secret } = req.body ?? {};
+      if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+        return res.status(401).json({ error: 'Non autorisé.' });
+      }
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: 'ID invalide.' });
+      try {
+        await sql`DELETE FROM reviews WHERE id = ${id}`;
+        return res.status(200).json({ ok: true });
+      } catch (err) { console.error('[features/review-delete]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
+    }
+
+    // POST type=review-toggle → approuver/masquer un avis (admin)
+    if (type === 'review-toggle') {
+      const { id, secret } = req.body ?? {};
+      if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+        return res.status(401).json({ error: 'Non autorisé.' });
+      }
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: 'ID invalide.' });
+      try {
+        const r = await sql`UPDATE reviews SET approved = NOT approved WHERE id = ${id} RETURNING id, approved`;
+        if (!r.rows.length) return res.status(404).json({ error: 'Avis introuvable.' });
+        return res.status(200).json({ ok: true, approved: r.rows[0].approved });
+      } catch (err) { console.error('[features/review-toggle]', err.message); return res.status(500).json({ error: 'Erreur serveur.' }); }
     }
 
     return res.status(400).json({ error: 'Paramètre type manquant. Valeurs : budget, coach, daily, simulation.' });

@@ -11,12 +11,14 @@
 
   // ── Contenu du drawer selon la page ────────────────────────────────────────
   const NAV_ITEMS = [
-    { href:'/',            icon:'ti-home-2',           label:'Simulateur',    key:'index'  },
-    { href:'/tarifs.html', icon:'ti-bolt',              label:'Tarifs',        key:'tarifs' },
-    { href:'/profil.html', icon:'ti-user-circle',       label:'Mon profil',    key:'profil', authOnly: true },
-    { href:'/budget.html', icon:'ti-chart-pie-2',       label:'Budget',        key:'budget', authOnly: true },
-    { href:'/coach.html',  icon:'ti-message-chatbot',   label:'Coach IA',      key:'coach',  authOnly: true },
-    { href:'/daily.html',  icon:'ti-flame',             label:'Daily Finance', key:'daily',  authOnly: true },
+    { href:'/',                  icon:'ti-home-2',           label:'Simulateur',    key:'index'       },
+    { href:'/tarifs.html',       icon:'ti-bolt',              label:'Tarifs',        key:'tarifs'      },
+    { href:'/calculateur.html',  icon:'ti-math-function',     label:'Calculateur',   key:'calculateur' },
+    { href:'/blog.html',         icon:'ti-book-2',            label:'Blog',          key:'blog'        },
+    { href:'/profil.html',       icon:'ti-user-circle',       label:'Mon profil',    key:'profil',     authOnly: true },
+    { href:'/budget.html',       icon:'ti-chart-pie-2',       label:'Budget',        key:'budget',     authOnly: true },
+    { href:'/coach.html',        icon:'ti-message-chatbot',   label:'Coach IA',      key:'coach',      authOnly: true },
+    { href:'/daily.html',        icon:'ti-flame',             label:'Daily Finance', key:'daily',      authOnly: true },
   ];
 
   // ── Hamburger button ────────────────────────────────────────────────────────

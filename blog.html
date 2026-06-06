@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Retraite — Conseils & Guides — Prevano</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://prevano.fr/blog.html">
+<meta name="description" content="Guides pratiques, conseils et simulateurs pour préparer votre retraite — calcul de pension, PEA, PER, assurance-vie, âge de départ.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://prevano.fr/blog.html">
+<meta property="og:title" content="Blog Retraite — Conseils & Guides — Prevano">
+<meta property="og:description" content="Guides pratiques pour préparer votre retraite — calcul de pension, PEA, PER, assurance-vie.">
+<meta property="og:image" content="https://prevano.fr/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://prevano.fr/og.png">
+<script defer data-domain="prevano.fr" src="https://plausible.io/js/script.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+main{flex:1;}
+/* Nav */
+nav{border-bottom:1px solid var(--border-subtle);padding:0 48px;background:rgba(12,12,11,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-inner{max-width:1100px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--grad-brand);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo{font-size:18px;font-weight:900;letter-spacing:-0.05em;background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo em{font-style:normal;}
+.nav-links{display:flex;align-items:center;gap:14px;}
+.nav-link{font-size:14px;color:var(--text-muted);text-decoration:none;transition:color .2s;white-space:nowrap;}
+.nav-link:hover,.nav-link.active{color:var(--text-primary);}
+.btn-nav{padding:7px 16px;background:var(--color-primary);color:#fff;font-size:13px;font-weight:700;border-radius:8px;text-decoration:none;white-space:nowrap;transition:background .2s;}
+.btn-nav:hover{background:var(--color-primary-dark);}
+/* Hero */
+.blog-hero{padding:72px 48px 56px;max-width:1100px;margin:0 auto;text-align:center;}
+.blog-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--color-primary-subtle);border:1px solid var(--color-primary-border);color:var(--color-primary);font-size:12px;font-weight:700;padding:5px 14px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px;}
+.blog-hero h1{font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-0.04em;line-height:1.15;margin-bottom:16px;}
+.blog-hero p{font-size:17px;color:var(--text-muted);max-width:560px;margin:0 auto;}
+/* Articles grid */
+.articles-section{padding:0 48px 80px;max-width:1100px;margin:0 auto;}
+.articles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;}
+.article-card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:border-color .2s,transform .2s;}
+.article-card:hover{border-color:var(--color-primary-border);transform:translateY(-2px);}
+.card-top{padding:28px 28px 0;}
+.card-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-primary);margin-bottom:14px;}
+.card-title{font-size:18px;font-weight:800;line-height:1.3;letter-spacing:-0.02em;margin-bottom:10px;}
+.card-excerpt{font-size:14px;color:var(--text-muted);line-height:1.7;flex:1;}
+.card-bottom{padding:20px 28px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border-subtle);margin-top:20px;}
+.card-meta{font-size:12px;color:var(--text-faint);}
+.card-arrow{color:var(--color-primary);font-size:18px;}
+/* Footer */
+footer{border-top:1px solid var(--border-subtle);padding:32px 48px;text-align:center;}
+.footer-links{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+.footer-link{font-size:13px;color:var(--text-faint);text-decoration:none;transition:color .2s;}
+.footer-link:hover{color:var(--text-muted);}
+.footer-copy{font-size:12px;color:var(--text-faint);}
+@media(max-width:640px){
+  nav{padding:0 20px;}
+  .blog-hero{padding:48px 20px 36px;}
+  .articles-section{padding:0 16px 60px;}
+}
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo-wrap">
+        <div class="logo-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4 L21 21 L2 21Z" fill="rgba(255,255,255,0.18)"/>
+            <path d="M2 20 C7 20 9 7 14 9 C17 11 17 4 21 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="4" r="2.4" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="logo" translate="no">Pre<em>vano</em></span>
+      </a>
+      <div class="nav-links">
+        <a href="/tarifs.html" class="nav-link">Tarifs</a>
+        <a href="/calculateur.html" class="nav-link">Calculateur</a>
+        <a href="/blog.html" class="nav-link active">Blog</a>
+        <div id="nav-auth" style="display:flex;align-items:center;gap:10px"></div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="blog-hero">
+    <div class="blog-eyebrow"><i class="ti ti-book-2" aria-hidden="true"></i> Guides retraite</div>
+    <h1>Tout comprendre pour<br>préparer <em style="background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ta retraite</em></h1>
+    <p>Des articles clairs et pratiques pour calculer ta pension, choisir tes placements et partir sereinement.</p>
+  </section>
+
+  <section class="articles-section">
+    <div class="articles-grid">
+
+      <a href="/blog/calculer-sa-retraite.html" class="article-card">
+        <div class="card-top">
+          <div class="card-tag"><i class="ti ti-calculator" aria-hidden="true"></i> Calcul</div>
+          <div class="card-title">Comment calculer sa retraite en France : guide complet 2025</div>
+          <div class="card-excerpt">Trimestres validés, taux plein, salaire de référence… Tout ce qu'il faut savoir pour estimer précisément votre future pension de retraite.</div>
+        </div>
+        <div class="card-bottom">
+          <span class="card-meta">8 min de lecture</span>
+          <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
+        </div>
+      </a>
+
+      <a href="/blog/pea-per-assurance-vie.html" class="article-card">
+        <div class="card-top">
+          <div class="card-tag"><i class="ti ti-trending-up" aria-hidden="true"></i> Placements</div>
+          <div class="card-title">PEA, PER ou Assurance-vie : quel placement choisir pour la retraite ?</div>
+          <div class="card-excerpt">Comparatif complet des trois enveloppes fiscales incontournables pour épargner en vue de la retraite — avantages, inconvénients et stratégies.</div>
+        </div>
+        <div class="card-bottom">
+          <span class="card-meta">10 min de lecture</span>
+          <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
+        </div>
+      </a>
+
+      <a href="/blog/retraite-a-quel-age.html" class="article-card">
+        <div class="card-top">
+          <div class="card-tag"><i class="ti ti-clock" aria-hidden="true"></i> Âge de départ</div>
+          <div class="card-title">À quel âge partir à la retraite ? Tout savoir sur les règles 2025</div>
+          <div class="card-excerpt">62 ans, 64 ans, taux plein, décote, surcote… Les règles de départ à la retraite évoluent. Ce guide fait le point sur votre situation.</div>
+        </div>
+        <div class="card-bottom">
+          <span class="card-meta">7 min de lecture</span>
+          <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
+        </div>
+      </a>
+
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-links">
+    <a href="/" class="footer-link">Simulateur</a>
+    <a href="/tarifs.html" class="footer-link">Tarifs</a>
+    <a href="/blog.html" class="footer-link">Blog</a>
+    <a href="/cgv.html" class="footer-link">CGV</a>
+    <a href="/mentions-legales.html" class="footer-link">Mentions légales</a>
+    <a href="/contact.html" class="footer-link">Contact</a>
+  </div>
+  <p class="footer-copy">© 2025 Prevano — Simulateur de retraite</p>
+</footer>
+
+<script>
+(async () => {
+  const el = document.getElementById('nav-auth');
+  try {
+    const r = await fetch('/api/auth/me', { credentials: 'include' });
+    if (r.ok) {
+      const { user } = await r.json();
+      el.innerHTML = `<a href="/profil.html" class="nav-link">Bonjour, ${user.firstName.replace(/</g,'&lt;')}</a>`;
+    } else {
+      el.innerHTML = `<a href="/login.html" class="nav-link">Connexion</a><a href="/signup.html" class="btn-nav">Commencer</a>`;
+    }
+  } catch { el.innerHTML = `<a href="/login.html" class="nav-link">Connexion</a><a href="/signup.html" class="btn-nav">Commencer</a>`; }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Prevano</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input,button,select{font-family:inherit;font-size:inherit;}
+:root{
+  --color-primary:#E24B4A;--color-primary-dark:#A32D2D;
+  --color-primary-subtle:rgba(226,75,74,0.12);--color-primary-border:rgba(226,75,74,0.25);
+  --grad-brand:linear-gradient(135deg,#E24B4A 0%,#FF7B35 100%);
+  --bg-base:#0C0C0B;--bg-surface:#141413;--bg-raised:#1C1C1A;--bg-overlay:#242422;
+  --text-primary:#F5F4F0;--text-muted:#A8A79F;--text-faint:#5F5E5A;
+  --border-subtle:rgba(255,255,255,0.07);--border-default:rgba(255,255,255,0.12);
+  --green:#22C55E;--yellow:#F59E0B;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:15px;line-height:1.6;min-height:100vh;}
+/* ── Auth screen ── */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.auth-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:16px;padding:40px;width:100%;max-width:400px;}
+.auth-card h1{font-size:20px;font-weight:800;margin-bottom:6px;}
+.auth-card p{color:var(--text-muted);font-size:14px;margin-bottom:24px;}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-size:13px;font-weight:600;color:var(--text-muted);}
+.field input{background:var(--bg-raised);border:1px solid var(--border-default);border-radius:8px;padding:10px 14px;color:var(--text-primary);outline:none;transition:border-color .2s;}
+.field input:focus{border-color:var(--color-primary);}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:var(--color-primary);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:10px;cursor:pointer;transition:background .2s;}
+.btn-primary:hover{background:var(--color-primary-dark);}
+.auth-err{color:#F87171;font-size:13px;margin-top:10px;display:none;}
+/* ── Dashboard ── */
+.dashboard{display:none;max-width:1100px;margin:0 auto;padding:32px 24px;}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px;}
+.dash-header h1{font-size:22px;font-weight:900;letter-spacing:-0.03em;}
+.btn-sm{padding:7px 16px;font-size:13px;font-weight:600;border:1px solid var(--border-default);border-radius:8px;background:var(--bg-raised);color:var(--text-muted);cursor:pointer;transition:color .2s,border-color .2s;}
+.btn-sm:hover{color:var(--text-primary);border-color:var(--border-default);}
+/* ── Stats ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:32px;}
+.stat-card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:12px;padding:20px;}
+.stat-label{font-size:12px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.stat-val{font-size:28px;font-weight:900;letter-spacing:-0.03em;line-height:1;}
+.stat-sub{font-size:12px;color:var(--text-muted);margin-top:4px;}
+.stat-card.accent{border-color:var(--color-primary-border);background:var(--color-primary-subtle);}
+.stat-card.accent .stat-val{color:var(--color-primary);}
+/* ── Plans breakdown ── */
+.plan-bars{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:12px;padding:20px;margin-bottom:32px;}
+.plan-bars h2{font-size:14px;font-weight:700;margin-bottom:16px;}
+.plan-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px;}
+.plan-row:last-child{margin-bottom:0;}
+.plan-name{width:90px;color:var(--text-muted);flex-shrink:0;}
+.plan-bar-wrap{flex:1;background:var(--bg-raised);border-radius:6px;height:8px;overflow:hidden;}
+.plan-bar{height:100%;border-radius:6px;transition:width .5s ease;}
+.plan-count{width:40px;text-align:right;font-weight:600;color:var(--text-primary);}
+.plan-revenue{width:70px;text-align:right;font-size:12px;color:var(--text-muted);}
+/* ── Reviews ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-header h2{font-size:16px;font-weight:700;}
+.filter-tabs{display:flex;gap:4px;}
+.tab{padding:6px 14px;font-size:13px;font-weight:500;border:1px solid var(--border-subtle);border-radius:8px;background:none;color:var(--text-muted);cursor:pointer;transition:all .15s;}
+.tab.active{background:var(--bg-raised);color:var(--text-primary);border-color:var(--border-default);}
+.reviews-list{display:flex;flex-direction:column;gap:8px;}
+.review-card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:12px;padding:16px 20px;display:flex;gap:16px;align-items:flex-start;}
+.review-card.pending{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04);}
+.review-stars{color:var(--color-primary);font-size:13px;letter-spacing:1px;flex-shrink:0;}
+.review-meta{flex:1;min-width:0;}
+.review-name{font-weight:600;font-size:14px;}
+.review-statut{font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+.review-comment{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.review-date{font-size:11px;color:var(--text-faint);margin-top:4px;}
+.review-actions{display:flex;gap:6px;flex-shrink:0;flex-direction:column;}
+.btn-action{padding:6px 12px;font-size:12px;font-weight:600;border-radius:7px;border:1px solid;cursor:pointer;transition:opacity .15s;white-space:nowrap;}
+.btn-action:hover{opacity:.8;}
+.btn-approve{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#22C55E;}
+.btn-hide{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#F59E0B;}
+.btn-delete{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#EF4444;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;}
+.badge.approved{background:rgba(34,197,94,.1);color:#22C55E;}
+.badge.pending{background:rgba(245,158,11,.1);color:#F59E0B;}
+.empty{text-align:center;padding:40px;color:var(--text-faint);font-size:14px;}
+.loading{color:var(--text-faint);font-size:13px;padding:20px 0;}
+</style>
+</head>
+<body>
+
+<!-- ── Auth screen ── -->
+<div class="auth-wrap" id="auth-screen">
+  <div class="auth-card">
+    <h1>Panel Admin</h1>
+    <p>Accès réservé. Entre la clé secrète pour continuer.</p>
+    <div class="field">
+      <label for="secret-input">Clé secrète (CRON_SECRET)</label>
+      <input type="password" id="secret-input" placeholder="••••••••••••••••" autocomplete="off">
+    </div>
+    <button class="btn-primary" id="btn-login">
+      <i class="ti ti-lock-open" aria-hidden="true"></i> Accéder
+    </button>
+    <p class="auth-err" id="auth-err">Clé incorrecte.</p>
+  </div>
+</div>
+
+<!-- ── Dashboard ── -->
+<div class="dashboard" id="dashboard">
+  <div class="dash-header">
+    <h1>Panel Admin</h1>
+    <button class="btn-sm" id="btn-refresh"><i class="ti ti-refresh"></i> Actualiser</button>
+  </div>
+
+  <!-- Stats globales -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="loading">Chargement…</div>
+  </div>
+
+  <!-- Répartition par plan -->
+  <div class="plan-bars" id="plan-bars" style="display:none">
+    <h2>Répartition par plan</h2>
+    <div id="plan-bars-inner"></div>
+  </div>
+
+  <!-- Avis -->
+  <div>
+    <div class="section-header">
+      <h2>Avis utilisateurs</h2>
+      <div class="filter-tabs">
+        <button class="tab active" data-filter="all">Tous</button>
+        <button class="tab" data-filter="approved">Visibles</button>
+        <button class="tab" data-filter="pending">Masqués</button>
+      </div>
+    </div>
+    <div class="reviews-list" id="reviews-list">
+      <div class="loading">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const PRICES = { free: 0, starter: 9.99, pro: 19.99, premium: 34.99 };
+const PLAN_COLORS = { free: '#5F5E5A', starter: '#60A5FA', pro: '#A78BFA', premium: '#E24B4A' };
+
+let SECRET = '';
+let ALL_REVIEWS = [];
+let FILTER = 'all';
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+document.getElementById('secret-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') login();
+});
+document.getElementById('btn-login').addEventListener('click', login);
+
+async function login() {
+  const key = document.getElementById('secret-input').value.trim();
+  if (!key) return;
+  const res = await fetch('/api/features?t=admin-stats', {
+    headers: { Authorization: `Bearer ${key}` }
+  });
+  if (!res.ok) {
+    document.getElementById('auth-err').style.display = 'block';
+    return;
+  }
+  SECRET = key;
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  const data = await res.json();
+  renderStats(data);
+  loadReviews();
+}
+
+document.getElementById('btn-refresh').addEventListener('click', () => {
+  fetch(`/api/features?t=admin-stats`, { headers: { Authorization: `Bearer ${SECRET}` } })
+    .then(r => r.json()).then(renderStats);
+  loadReviews();
+});
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+function renderStats(data) {
+  const { plans = {}, recent7 = 0, recent30 = 0, reviews = {} } = data;
+  const total   = Object.values(plans).reduce((a, v) => a + v, 0);
+  const revenue = Object.entries(plans).reduce((a, [plan, cnt]) => a + cnt * (PRICES[plan] ?? 0), 0);
+  const mrr     = (plans.starter ?? 0) * 9.99 + (plans.pro ?? 0) * 19.99 + (plans.premium ?? 0) * 34.99;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card accent">
+      <div class="stat-label">MRR estimé</div>
+      <div class="stat-val">${mrr.toFixed(0)}€</div>
+      <div class="stat-sub">abonnements actifs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Utilisateurs total</div>
+      <div class="stat-val">${total}</div>
+      <div class="stat-sub">${recent30} ce mois · ${recent7} cette semaine</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Abonnés payants</div>
+      <div class="stat-val">${(plans.starter??0)+(plans.pro??0)+(plans.premium??0)}</div>
+      <div class="stat-sub">${total > 0 ? (((plans.starter??0)+(plans.pro??0)+(plans.premium??0))/total*100).toFixed(1) : 0}% de conversion</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avis</div>
+      <div class="stat-val">${(reviews.approved??0)+(reviews.pending??0)}</div>
+      <div class="stat-sub">${reviews.approved??0} visibles · ${reviews.pending??0} masqués</div>
+    </div>`;
+
+  // Plan bars
+  if (total > 0) {
+    const bars = document.getElementById('plan-bars');
+    const inner = document.getElementById('plan-bars-inner');
+    bars.style.display = 'block';
+    inner.innerHTML = ['premium','pro','starter','free'].map(plan => {
+      const cnt = plans[plan] ?? 0;
+      const pct = total > 0 ? (cnt / total * 100).toFixed(1) : 0;
+      const rev = (cnt * (PRICES[plan] ?? 0)).toFixed(0);
+      return `<div class="plan-row">
+        <div class="plan-name">${planLabel(plan)}</div>
+        <div class="plan-bar-wrap"><div class="plan-bar" style="width:${pct}%;background:${PLAN_COLORS[plan]??'#5F5E5A'}"></div></div>
+        <div class="plan-count">${cnt}</div>
+        <div class="plan-revenue">${rev}€/mois</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function planLabel(p) {
+  return { free:'Gratuit', starter:'Starter', pro:'Coach Pro', premium:'Daily Finance' }[p] ?? p;
+}
+
+// ── Reviews ───────────────────────────────────────────────────────────────────
+async function loadReviews() {
+  const res = await fetch('/api/features?t=admin-reviews', {
+    headers: { Authorization: `Bearer ${SECRET}` }
+  });
+  if (!res.ok) return;
+  const { reviews } = await res.json();
+  ALL_REVIEWS = reviews;
+  renderReviews();
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    FILTER = tab.dataset.filter;
+    renderReviews();
+  });
+});
+
+function renderReviews() {
+  const list = document.getElementById('reviews-list');
+  let reviews = ALL_REVIEWS;
+  if (FILTER === 'approved') reviews = reviews.filter(r => r.approved);
+  if (FILTER === 'pending')  reviews = reviews.filter(r => !r.approved);
+  if (!reviews.length) {
+    list.innerHTML = '<div class="empty">Aucun avis.</div>';
+    return;
+  }
+  list.innerHTML = reviews.map(r => `
+    <div class="review-card ${r.approved ? '' : 'pending'}" id="review-${r.id}">
+      <div>
+        <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+        <div style="margin-top:6px">${r.approved
+          ? '<span class="badge approved"><i class="ti ti-eye"></i> Visible</span>'
+          : '<span class="badge pending"><i class="ti ti-eye-off"></i> Masqué</span>'}</div>
+      </div>
+      <div class="review-meta">
+        <div class="review-name">${esc(r.first_name)}</div>
+        <div class="review-statut">${esc(r.statut)}</div>
+        <div class="review-comment">${esc(r.comment)}</div>
+        <div class="review-date">${new Date(r.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+      <div class="review-actions">
+        <button class="btn-action ${r.approved ? 'btn-hide' : 'btn-approve'}" onclick="toggleReview(${r.id},${r.approved})">
+          ${r.approved ? '<i class="ti ti-eye-off"></i> Masquer' : '<i class="ti ti-eye"></i> Publier'}
+        </button>
+        <button class="btn-action btn-delete" onclick="deleteReview(${r.id})">
+          <i class="ti ti-trash"></i> Suppr.
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+async function toggleReview(id, wasApproved) {
+  const res = await fetch('/api/features', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'review-toggle', id, secret: SECRET })
+  });
+  if (!res.ok) return alert('Erreur.');
+  const { approved } = await res.json();
+  const rev = ALL_REVIEWS.find(r => r.id === id);
+  if (rev) rev.approved = approved;
+  renderReviews();
+}
+
+async function deleteReview(id) {
+  if (!confirm('Supprimer définitivement cet avis ?')) return;
+  const res = await fetch('/api/features', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'review-delete', id, secret: SECRET })
+  });
+  if (!res.ok) return alert('Erreur.');
+  ALL_REVIEWS = ALL_REVIEWS.filter(r => r.id !== id);
+  renderReviews();
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
