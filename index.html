@@ -54,46 +54,6 @@ main { flex:1; }
 /* ── Scroll reveal ── */
 .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.6s ease,transform 0.6s ease; will-change:opacity,transform; }
 .reveal.visible { opacity:1; transform:none; }
-/* ── Impression PDF ── */
-@media print {
-  nav, footer, .hero, .sim-section, .avis-section,
-  .btn-top, .activity-popup, .fb-btn, .prv-bottom-nav,
-  .prv-hamburger, .email-cta, #btn-share, #btn-pdf,
-  .plan-upgrade-cta, .upsell-block, .plan-teaser-overlay { display: none !important; }
-
-  body { background: #fff !important; color: #111 !important; font-size: 12pt; }
-  .shock { padding: 0 !important; }
-  .shock-banner h2, .shock-banner p { color: #111 !important; }
-  .shock-stat { background: #f5f5f5 !important; border: 1px solid #ddd !important; }
-  .shock-stat .val { color: #E24B4A !important; }
-  .score-card, .bar-card, .plan-card { background: #fff !important; border: 1px solid #ddd !important; border-radius: 8px !important; break-inside: avoid; }
-  .score-badge { border: 1px solid #ddd !important; }
-  .plan-step { break-inside: avoid; }
-  .reveal { opacity: 1 !important; transform: none !important; }
-  .shock-grid { grid-template-columns: repeat(3,1fr) !important; }
-
-  /* En-tête PDF */
-  #shock-section::before {
-    content: 'Mon plan retraite Prevano';
-    display: block;
-    font-size: 20pt;
-    font-weight: 900;
-    color: #E24B4A;
-    margin-bottom: 24px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #E24B4A;
-  }
-  /* Pied de page PDF */
-  #shock-section::after {
-    content: 'Généré sur prevano.fr — ' attr(data-date);
-    display: block;
-    font-size: 9pt;
-    color: #888;
-    margin-top: 40px;
-    padding-top: 12px;
-    border-top: 1px solid #ddd;
-  }
-}
 
 @media(prefers-reduced-motion:reduce) {
   .reveal { opacity:1; transform:none; transition:none; }
@@ -672,9 +632,6 @@ footer { border-top:1px solid var(--border-subtle); padding:28px 48px; margin-to
       <div id="action-btns-member" style="margin-top:16px;display:none;align-items:center;gap:10px;flex-wrap:wrap;">
         <button id="btn-share" class="btn-share" type="button">
           <i class="ti ti-share" aria-hidden="true"></i> Partager mon score
-        </button>
-        <button id="btn-pdf" class="btn-share" type="button">
-          <i class="ti ti-file-download" aria-hidden="true"></i> Télécharger en PDF
         </button>
         <span class="share-confirm" id="share-confirm">✓ Copié !</span>
       </div>
@@ -1261,6 +1218,16 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
   const loading = $('plan-loading');
   const body    = $('plan-body');
   const title   = $('plan-card-title');
+
+  // Nettoyage entre deux simulations
+  document.querySelectorAll('#plan-card > .upsell-block').forEach(el => el.remove());
+  const teaserWrap = document.querySelector('.plan-steps-teaser');
+  if (teaserWrap) {
+    const stepsEl = teaserWrap.querySelector('#plan-steps');
+    if (stepsEl) teaserWrap.parentNode.replaceChild(stepsEl, teaserWrap);
+  }
+  loading.innerHTML = '<div class="skel-line w90"></div><div class="skel-line w70"></div><div class="skel-line w50"></div><div class="skel-line w90" style="margin-top:8px"></div><div class="skel-line w70"></div><div class="skel-line w60"></div>';
+
   loading.style.display = 'block';
   body.style.display    = 'none';
   // Reset sections
@@ -1352,7 +1319,7 @@ async function generatePlan(age, sal, pension, gap, ep, annees, statut) {
     body.style.display    = 'block';
   } catch (err) {
     console.error('[generatePlan]', err);
-    loading.innerHTML = '<span style="color:var(--text-muted);font-size:13px">Erreur lors de la génération. Réessaie dans un moment.</span>';
+    loading.innerHTML = '<div style="text-align:center;padding:16px 0"><a href="/tarifs.html" class="btn-primary" style="display:inline-flex;text-decoration:none;max-width:300px"><i class="ti ti-bolt" aria-hidden="true"></i> Récupérer mon plan</a></div>';
   }
 }
 
@@ -1543,13 +1510,6 @@ $('btn-share')?.addEventListener('click', async () => {
   } catch { /* annulé par l'utilisateur */ }
 });
 
-/* ─── Export PDF ──────────────────────────────────────────── */
-$('btn-pdf')?.addEventListener('click', () => {
-  const section = $('shock-section');
-  if (section) section.setAttribute('data-date', new Date().toLocaleDateString('fr-FR'));
-  window.plausible?.('Export PDF');
-  window.print();
-});
 
 $('btn-scroll').addEventListener('click', () => {
   $('simulator').scrollIntoView({ behavior: 'smooth' });
