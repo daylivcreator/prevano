@@ -38,6 +38,19 @@ module.exports = async function handler(req, res) {
 
     // Réutiliser ou créer le customer Stripe
     let customerId = user.stripe_customer_id;
+    if (customerId) {
+      // Vérifier que le customer existe encore (peut être périmé si switch test↔live)
+      try {
+        await stripe.customers.retrieve(customerId);
+      } catch (e) {
+        if (e.code === 'resource_missing') {
+          customerId = null; // sera recréé ci-dessous
+          await sql`UPDATE users SET stripe_customer_id = NULL WHERE id = ${session.userId}`;
+        } else {
+          throw e;
+        }
+      }
+    }
     if (!customerId) {
       const customer = await stripe.customers.create({
         email:    user.email,
