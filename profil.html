@@ -51,8 +51,12 @@ main{flex:1;padding:48px 48px 80px;max-width:1100px;margin:0 auto;width:100%;}
 .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px;}
 .tool-link{background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:14px;text-decoration:none;transition:border-color .2s,background .2s;color:var(--text-primary);}
 .tool-link:hover{border-color:var(--color-primary-border);background:var(--color-primary-subtle);}
-.tool-icon{width:40px;height:40px;background:var(--color-primary-subtle);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.tool-icon i{font-size:18px;color:var(--color-primary);}
+.tool-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tool-icon i{font-size:20px;color:#fff;}
+.tool-icon-budget{background:linear-gradient(135deg,#2563EB,#60A5FA);}
+.tool-icon-invest{background:linear-gradient(135deg,#059669,#34D399);}
+.tool-icon-coach{background:linear-gradient(135deg,#7C3AED,#A78BFA);}
+.tool-icon-daily{background:linear-gradient(135deg,#EA580C,#FB923C);}
 .tool-body{flex:1;min-width:0;}
 .tool-name{font-size:13px;font-weight:700;margin-bottom:2px;}
 .tool-desc{font-size:12px;color:var(--text-muted);}
@@ -249,7 +253,7 @@ function buildToolsCard(plan) {
         <div class="card-title">Mes outils</div>
         <div class="tools-grid">
           <div class="tool-link tool-locked">
-            <div class="tool-icon"><i class="ti ti-chart-pie-2" aria-hidden="true"></i></div>
+            <div class="tool-icon tool-icon-budget"><i class="ti ti-calculator" aria-hidden="true"></i></div>
             <div class="tool-body">
               <div class="tool-name">Calculateur Budget <span class="lock-badge">Starter</span></div>
               <div class="tool-desc">Plan d'optimisation IA en 5 actions</div>
@@ -257,7 +261,7 @@ function buildToolsCard(plan) {
             <i class="ti ti-lock tool-arrow" aria-hidden="true"></i>
           </div>
           <div class="tool-link tool-locked">
-            <div class="tool-icon"><i class="ti ti-message-chatbot" aria-hidden="true"></i></div>
+            <div class="tool-icon tool-icon-coach"><i class="ti ti-robot" aria-hidden="true"></i></div>
             <div class="tool-body">
               <div class="tool-name">Coach IA <span class="lock-badge">Coach Pro</span></div>
               <div class="tool-desc">Conseils PEA, AV, PER personnalisés</div>
@@ -265,7 +269,7 @@ function buildToolsCard(plan) {
             <i class="ti ti-lock tool-arrow" aria-hidden="true"></i>
           </div>
           <div class="tool-link tool-locked">
-            <div class="tool-icon"><i class="ti ti-flame" aria-hidden="true"></i></div>
+            <div class="tool-icon tool-icon-daily"><i class="ti ti-book-open" aria-hidden="true"></i></div>
             <div class="tool-body">
               <div class="tool-name">Leçon du jour <span class="lock-badge">Daily Finance</span></div>
               <div class="tool-desc">5 min/jour, streak et badges</div>
@@ -286,7 +290,7 @@ function buildToolsCard(plan) {
 
   tools.push(`
     <a href="/budget.html" class="tool-link">
-      <div class="tool-icon"><i class="ti ti-chart-pie-2" aria-hidden="true"></i></div>
+      <div class="tool-icon tool-icon-budget"><i class="ti ti-calculator" aria-hidden="true"></i></div>
       <div class="tool-body">
         <div class="tool-name">Calculateur Budget</div>
         <div class="tool-desc">Plan d'optimisation IA en 5 actions</div>
@@ -294,7 +298,7 @@ function buildToolsCard(plan) {
       <i class="ti ti-arrow-right tool-arrow" aria-hidden="true"></i>
     </a>
     <a href="/calculateur.html" class="tool-link">
-      <div class="tool-icon"><i class="ti ti-building-bank" aria-hidden="true"></i></div>
+      <div class="tool-icon tool-icon-invest"><i class="ti ti-trending-up" aria-hidden="true"></i></div>
       <div class="tool-body">
         <div class="tool-name">Calculateur PEA · PER · AV</div>
         <div class="tool-desc">Stratégie d'investissement optimale</div>
@@ -305,7 +309,7 @@ function buildToolsCard(plan) {
   if (PRO.has(plan)) {
     tools.push(`
       <a href="/coach.html" class="tool-link">
-        <div class="tool-icon"><i class="ti ti-message-chatbot" aria-hidden="true"></i></div>
+        <div class="tool-icon tool-icon-coach"><i class="ti ti-robot" aria-hidden="true"></i></div>
         <div class="tool-body">
           <div class="tool-name">Coach IA</div>
           <div class="tool-desc">Conseils investissement & retraite</div>
@@ -317,7 +321,7 @@ function buildToolsCard(plan) {
   if (PREM) {
     tools.push(`
       <a href="/daily.html" class="tool-link">
-        <div class="tool-icon"><i class="ti ti-flame" aria-hidden="true"></i></div>
+        <div class="tool-icon tool-icon-daily"><i class="ti ti-book-open" aria-hidden="true"></i></div>
         <div class="tool-body">
           <div class="tool-name">Leçon du jour</div>
           <div class="tool-desc">5 min/jour pour maîtriser tes finances</div>
