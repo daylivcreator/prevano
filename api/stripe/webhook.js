@@ -3,13 +3,13 @@ const Stripe  = require('stripe');
 const { sql } = require('../_lib/db');
 
 const CREDIT_ALLOWANCES = { starter: 50, pro: 100, premium: 200 };
-async function grantDailyCredits(userId, plan) {
+async function grantCredits(userId, plan) {
   const allowance = CREDIT_ALLOWANCES[plan] ?? 0;
   if (!allowance) return;
   await sql`
     UPDATE users SET
       credits_balance  = ${allowance},
-      credits_reset_at = (NOW() + INTERVAL '1 day')
+      credits_reset_at = (NOW() + INTERVAL '1 month')
     WHERE id = ${userId}
   `;
 }
@@ -66,7 +66,7 @@ async function handler(req, res) {
           WHERE stripe_customer_id = ${session.customer}
           RETURNING id
         `;
-        if (updatedUser.rows[0]) await grantDailyCredits(updatedUser.rows[0].id, plan);
+        if (updatedUser.rows[0]) await grantCredits(updatedUser.rows[0].id, plan);
         break;
       }
 
@@ -77,7 +77,7 @@ async function handler(req, res) {
         // Si annulation planifiée, on garde le plan jusqu'à la fin de période
         const planToSet = sub.cancel_at_period_end ? undefined : newPlan;
 
-        if (planToSet) {
+        if (planToSet !== undefined) {
           await sql`
             UPDATE users SET
               plan                            = ${planToSet},
@@ -116,7 +116,7 @@ async function handler(req, res) {
         const planRenew = planFromPriceId(subRenew.items.data[0]?.price?.id);
         const renewUser = await sql`SELECT id FROM users WHERE stripe_customer_id = ${invoice.customer}`;
         if (renewUser.rows[0] && planRenew !== 'free') {
-          await grantDailyCredits(renewUser.rows[0].id, planRenew);
+          await grantCredits(renewUser.rows[0].id, planRenew);
         }
         break;
       }
