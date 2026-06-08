@@ -879,8 +879,7 @@ initNav();
   setInterval(function() {
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
-    const jump = Math.random() < 0.60 ? 1 : Math.random() < 0.80 ? 2 : 3;
-    count += jump;
+    count += 1;
     el.textContent = fmtFR(count);
   }, 4000 + Math.random() * 5000);
 })();
