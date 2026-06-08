@@ -55,7 +55,9 @@ async function handler(req, res) {
 
         const sub    = await stripe.subscriptions.retrieve(session.subscription);
         const plan   = planFromPriceId(sub.items.data[0]?.price?.id);
-        const periodEnd = new Date(sub.current_period_end * 1000);
+        const periodEnd = sub.current_period_end
+          ? new Date(sub.current_period_end * 1000)
+          : null;
 
         const updatedUser = await sql`
           UPDATE users SET
@@ -73,7 +75,9 @@ async function handler(req, res) {
       case 'customer.subscription.updated': {
         const sub       = event.data.object;
         const newPlan   = planFromPriceId(sub.items.data[0]?.price?.id);
-        const periodEnd = new Date(sub.current_period_end * 1000);
+        const periodEnd = sub.current_period_end
+          ? new Date(sub.current_period_end * 1000)
+          : null;
         // Si annulation planifiée, on garde le plan jusqu'à la fin de période
         const planToSet = sub.cancel_at_period_end ? undefined : newPlan;
 
@@ -137,8 +141,8 @@ async function handler(req, res) {
 
     return res.status(200).json({ received: true });
   } catch (err) {
-    console.error('[webhook] Erreur handler:', err.message);
-    return res.status(500).json({ error: 'Erreur interne.' });
+    console.error('[webhook] Erreur handler:', err.stack ?? err.message);
+    return res.status(500).json({ error: err.message });
   }
 }
 
